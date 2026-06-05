@@ -1,0 +1,76 @@
+---
+title: "Order lifecycle"
+description: "How async orders move from processing to completed — and how bulk orders are handled."
+icon: "arrows-spin"
+---
+
+Every v2 order is **asynchronous**. You place an order, receive an `orderId` immediately,
+then poll until the codes are ready.
+
+## Statuses
+
+<ResponseField name="processing" type="status">
+  The order was accepted and is being fulfilled. Poll again after `estimatedReadyAt`.
+</ResponseField>
+<ResponseField name="completed" type="status">
+  All codes were delivered. The response includes `products[].pin`.
+</ResponseField>
+<ResponseField name="partially_completed" type="status">
+  Some — but not all — codes were delivered. The response includes `delivered` and `total`.
+</ResponseField>
+<ResponseField name="failed" type="status">
+  No codes were delivered. The response includes a `reason`.
+</ResponseField>
+
+<Note>
+  **Codes are returned only when `status` is `completed`.** While `processing`, you receive
+  `{"status": "processing", "message": "Order is still processing"}`.
+</Note>
+
+## The flow
+
+<Steps>
+  <Step title="Place the order">
+    `POST /orders` returns `202 Accepted` with `orderId`, `status: "processing"`, and
+    `estimatedReadyAt`.
+  </Step>
+  <Step title="Wait for the estimate">
+    `estimatedReadyAt` tells you roughly when codes will be ready. It scales with the order
+    size — small orders are near-instant; large/bulk orders take longer.
+  </Step>
+  <Step title="Poll the order">
+    `GET /orders/{reference}` by `orderId` or `externalOrderCode`. Repeat until you get a
+    terminal status (`completed`, `partially_completed`, or `failed`).
+  </Step>
+</Steps>
+
+## Bulk / B2B orders
+
+There is **no separate bulk endpoint**. When you submit a large order, Kalixo automatically
+segments it across providers and returns an `estimatedReadyAt` sized to the quantity. Just
+poll `GET /orders/{reference}` — while it works you’ll get “Order is still processing”, and
+once finished you’ll get the codes.
+
+<CardGroup cols={2}>
+  <Card title="Polling cadence" icon="clock">
+    Poll at or after `estimatedReadyAt`, then every minute or so. Avoid tight polling loops.
+  </Card>
+  <Card title="Idempotency" icon="fingerprint" href="/concepts/idempotency">
+    Re-submitting the same `externalOrderCode` returns the existing order — never a duplicate.
+  </Card>
+</CardGroup>
+
+## Polling example
+
+```javascript Node
+async function waitForOrder(ref) {
+  for (;;) {
+    const res = await fetch(`https://api.kalixo.io/v2/orders/${ref}`, {
+      headers: { "x-api-key": process.env.KALIXO_API_KEY },
+    });
+    const order = await res.json();
+    if (order.status !== "processing") return order;
+    await new Promise((r) => setTimeout(r, 60_000)); // wait 60s
+  }
+}
+```

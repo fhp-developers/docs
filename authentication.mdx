@@ -1,0 +1,69 @@
+---
+title: "Authentication"
+description: "Authenticate every request with your Kalixo API key."
+icon: "key"
+---
+
+The Kalixo API authenticates requests with an **API key** sent in the `x-api-key` header.
+Each key is scoped to a single partner account.
+
+```bash
+curl -X GET "https://api.kalixo.io/v2/wallet" \
+  -H "x-api-key: $KALIXO_API_KEY"
+```
+
+<ParamField header="x-api-key" type="string" required>
+  Your secret API key. Sent on every request.
+</ParamField>
+
+## Sandbox vs production
+
+You receive two keys. Sandbox runs against test data and never charges your wallet; production
+is live.
+
+| Environment | Base URL | Key prefix |
+| --- | --- | --- |
+| Sandbox | `https://sandbox.kalixo.io/v2` | `kal_test_…` |
+| Production | `https://api.kalixo.io/v2` | `kal_live_…` |
+
+## Keeping your key safe
+
+<Warning>
+  Treat your API key like a password. Never commit it to source control, embed it in
+  client-side code, or share it in screenshots. Store it in an environment variable or secret manager.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Rotate regularly" icon="rotate">
+    Ask your account manager to rotate a key if it may have leaked. The old key is revoked.
+  </Card>
+  <Card title="Server-side only" icon="server">
+    Call the API from your backend, never from a browser or mobile app.
+  </Card>
+</CardGroup>
+
+## Errors
+
+A missing or invalid key returns `401 Unauthorized`:
+
+**Header omitted**
+
+```json
+{
+  "statusCode": 401,
+  "error": "Unauthorized",
+  "message": "Missing API key"
+}
+```
+
+**Wrong or revoked key**
+
+```json
+{
+  "statusCode": 401,
+  "error": "Unauthorized",
+  "message": "Invalid API key"
+}
+```
+
+See [Errors](/concepts/errors) for the full error catalogue.

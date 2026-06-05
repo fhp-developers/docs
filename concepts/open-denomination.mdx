@@ -1,0 +1,64 @@
+---
+title: "Open-denomination products"
+description: "Order products where you choose the amount within a range."
+icon: "sliders"
+---
+
+Most products are **fixed** — they have a single price. **Open-denomination** products let
+you choose any amount within an allowed range (for example, a top-up between £5 and £100).
+
+## Identifying open products
+
+Each catalog product includes denomination metadata:
+
+```json
+{
+  "id": 814,
+  "name": "Flexible Top-Up",
+  "currencyCode": "GBP",
+  "denominationType": "open",
+  "denominationMinValue": 500,
+  "denominationMaxValue": 10000,
+  "denominationStep": 100,
+  "denominationDefaultValue": 2500
+}
+```
+
+<ResponseField name="denominationType" type="string">
+  `fixed` or `open`.
+</ResponseField>
+<ResponseField name="denominationMinValue" type="number">
+  Minimum amount (minor units) for open products.
+</ResponseField>
+<ResponseField name="denominationMaxValue" type="number">
+  Maximum amount (minor units) for open products.
+</ResponseField>
+<ResponseField name="denominationStep" type="number">
+  Increment the chosen amount must align to.
+</ResponseField>
+<ResponseField name="denominationDefaultValue" type="number">
+  Suggested default amount.
+</ResponseField>
+
+## Ordering an open product
+
+Send your chosen amount as the line `price`. It must fall within `[min, max]` and align to `step`.
+
+```bash
+curl -X POST "https://api.kalixo.io/v2/orders" \
+  -H "x-api-key: $KALIXO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "externalOrderCode": "O-OPEN-1",
+    "currency": "GBP",
+    "price": 5000,
+    "orderProducts": [
+      { "productId": 814, "price": 5000, "quantity": 1 }
+    ]
+  }'
+```
+
+<Warning>
+  Amounts outside the allowed range are rejected with `400 Bad Request`. For **fixed**
+  products, the line `price` must exactly match the catalog price.
+</Warning>

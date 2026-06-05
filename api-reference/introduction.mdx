@@ -1,0 +1,52 @@
+---
+title: "API reference"
+description: "Endpoints, schemas, and a built-in playground to test live calls."
+icon: "code"
+---
+
+Every endpoint below includes an interactive **“Try it”** panel. Add your API key once and
+send real requests straight from the docs.
+
+<Note>
+  Set the `x-api-key` field in the playground’s **Authorization** section. Use your
+  **sandbox** key while testing — sandbox never charges your wallet.
+</Note>
+
+## Conventions
+
+<CardGroup cols={2}>
+  <Card title="Base URL" icon="link">
+    `https://api.kalixo.io/v2` (production) · `https://sandbox.kalixo.io/v2` (sandbox)
+  </Card>
+  <Card title="Auth" icon="key" href="/authentication">
+    `x-api-key` header on every request.
+  </Card>
+  <Card title="Money" icon="coins">
+    Prices and balances are in **minor units** (e.g. pennies/cents) unless stated otherwise.
+  </Card>
+  <Card title="Errors" icon="triangle-exclamation" href="/concepts/errors">
+    Sanitized `{ statusCode, error, message }` body — full message catalogue in the guide.
+  </Card>
+</CardGroup>
+
+## Resources
+
+<CardGroup cols={3}>
+  <Card title="Catalog" icon="shapes">
+    `GET /catalog/products` · `GET /catalog/products/{productId}`
+  </Card>
+  <Card title="Orders" icon="cart-shopping">
+    `POST /orders` · `GET /orders/{reference}`
+  </Card>
+  <Card title="Wallet" icon="wallet">
+    `GET /wallet`
+  </Card>
+</CardGroup>
+
+<Tip>
+  Prefer your own tooling? Use the **Download API spec** option in the page menu to grab the
+  OpenAPI file, or import the ready-made
+  [Postman collection](/kalixo-api-v2.postman_collection.json) with
+  [Sandbox](/kalixo-api-v2.postman_environment.sandbox.json) /
+  [Production](/kalixo-api-v2.postman_environment.production.json) environments.
+</Tip>

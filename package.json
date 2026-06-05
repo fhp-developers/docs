@@ -1,0 +1,11 @@
+{
+  "name": "fhp-codehypev2-docs",
+  "private": true,
+  "description": "Kalixo API v2 developer documentation (Mintlify)",
+  "scripts": {
+    "postman:generate": "openapi-to-postmanv2 -s openapi.json -o kalixo-api-v2.postman_collection.json -p && node scripts/postprocess-postman.mjs"
+  },
+  "devDependencies": {
+    "openapi-to-postmanv2": "^4.25.0"
+  }
+}

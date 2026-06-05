@@ -1,47 +1,150 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "From zero to your first delivered order in four steps."
+icon: "bolt"
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+This guide walks you through authenticating, finding a product, placing an order, and
+retrieving your codes.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Get your API key">
+    Your Kalixo account manager issues a sandbox and a production key. Keep them secret and
+    send them in the `x-api-key` header on every request. See [Authentication](/authentication).
 
-    ```bash
-    npm install your-package
+    <Tip>
+      Using **Postman**? Import the
+      [Kalixo API v2 collection](/kalixo-api-v2.postman_collection.json) and an environment
+      ([Sandbox](/kalixo-api-v2.postman_environment.sandbox.json) or
+      [Production](/kalixo-api-v2.postman_environment.production.json)), then set your `apiKey`
+      variable. For local dev against split services, use the
+      [Local environment](/kalixo-api-v2.postman_environment.local.json).
+    </Tip>
+  </Step>
+
+  <Step title="Find a product in your catalog">
+    List your catalog and pick a `productId`. You can filter by country, brand, category and more.
+
+    <CodeGroup>
+
+    ```bash cURL
+    curl -X GET "https://api.kalixo.io/v2/catalog/products?country=GB&take=5" \
+      -H "x-api-key: $KALIXO_API_KEY"
+    ```
+
+    ```javascript Node
+    const res = await fetch(
+      "https://api.kalixo.io/v2/catalog/products?country=GB&take=5",
+      { headers: { "x-api-key": process.env.KALIXO_API_KEY } }
+    );
+    const { products } = await res.json();
+    console.log(products[0]);
+    ```
+
+    ```python Python
+    import os, requests
+
+    res = requests.get(
+        "https://api.kalixo.io/v2/catalog/products",
+        params={"country": "GB", "take": 5},
+        headers={"x-api-key": os.environ["KALIXO_API_KEY"]},
+    )
+    print(res.json()["products"][0])
+    ```
+
+    </CodeGroup>
+  </Step>
+
+  <Step title="Place an order">
+    Send the `productId`, the `price` you expect to pay (for validation), the `quantity`,
+    and a unique `externalOrderCode`. The order is accepted immediately with a `processing`
+    status and an `estimatedReadyAt` timestamp.
+
+    <CodeGroup>
+
+    ```bash cURL
+    curl -X POST "https://api.kalixo.io/v2/orders" \
+      -H "x-api-key: $KALIXO_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "externalOrderCode": "O-12345",
+        "currency": "GBP",
+        "price": 3299,
+        "orderProducts": [
+          { "productId": 2, "price": 3299, "quantity": 1 }
+        ]
+      }'
+    ```
+
+    ```javascript Node
+    const res = await fetch("https://api.kalixo.io/v2/orders", {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.KALIXO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        externalOrderCode: "O-12345",
+        currency: "GBP",
+        price: 3299,
+        orderProducts: [{ productId: 2, price: 3299, quantity: 1 }],
+      }),
+    });
+    console.log(await res.json());
+    ```
+
+    </CodeGroup>
+
+    ```json Response
+    {
+      "orderId": 59400,
+      "externalOrderCode": "O-12345",
+      "status": "processing",
+      "estimatedReadyAt": "2026-06-02T11:05:00Z"
+    }
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Poll until completed">
+    After `estimatedReadyAt`, fetch the order. Codes are returned once the status is `completed`.
 
-    ```bash
-    your-cli start
+    ```bash cURL
+    curl -X GET "https://api.kalixo.io/v2/orders/O-12345" \
+      -H "x-api-key: $KALIXO_API_KEY"
     ```
+
+    ```json Response (completed)
+    {
+      "orderId": 59400,
+      "status": "completed",
+      "externalOrderCode": "O-12345",
+      "products": [
+        { "productId": 2, "price": 3299, "quantity": 1, "pin": [{ "PIN": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }] }
+      ]
+    }
+    ```
+
+    <Tip>
+      While the order is still working you’ll get `{"status": "processing", "message": "Order is still processing"}`.
+      Read more in [Order lifecycle](/concepts/order-lifecycle).
+    </Tip>
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Next steps
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+<CardGroup cols={3}>
+  <Card title="Order lifecycle" icon="arrows-spin" href="/concepts/order-lifecycle">
+    Understand `processing`, `completed`, `partially_completed`, and `failed`.
+  </Card>
+  <Card title="Filtering" icon="filter" href="/concepts/filtering">
+    Narrow your catalog by country, language, brand, category, and tag.
+  </Card>
+  <Card
+    title="Postman collection"
+    icon="download"
+    href="/kalixo-api-v2.postman_collection.json"
+  >
+    Download the v2 collection and import the Sandbox or Production environment.
+  </Card>
+</CardGroup>

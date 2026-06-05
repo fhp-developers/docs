@@ -1,72 +1,116 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Kalixo API",
+  "description": "Developer documentation for the Kalixo Distribution API v2 — catalog, ordering, bulk fulfilment and wallet.",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#c9f73a",
+    "light": "#c9f73a",
+    "dark": "#4d6a00"
   },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+  "appearance": {
+    "default": "dark",
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#0a0a0a"
+    },
+    "decoration": "gradient"
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/kalixo-black.svg",
+    "dark": "/logo/kalixo-white.svg",
+    "href": "https://kalixo.io"
+  },
+  "favicon": "/favicon.svg",
+  "styling": {
+    "eyebrows": "section",
+    "codeblocks": "dark"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:integrations@kalixo.io"
+      },
+      {
+        "label": "Status",
+        "href": "https://status.kalixo.io"
+      },
+      {
+        "label": "Postman",
+        "href": "/kalixo-api-v2.postman_collection.json"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Get an API key",
+      "href": "mailto:integrations@kalixo.io"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": ["index", "quickstart", "authentication"]
+          },
+          {
+            "group": "Core concepts",
+            "pages": [
+              "concepts/pagination",
+              "concepts/filtering",
+              "concepts/open-denomination",
+              "concepts/order-lifecycle",
+              "concepts/idempotency",
+              "concepts/rate-limits",
+              "concepts/errors",
+              "concepts/notifications"
+            ]
+          },
+          {
+            "group": "Migrate",
+            "pages": ["migrating-from-v1"]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["api-reference/introduction"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "openapi.json"
+          }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": ["bash", "javascript", "python", "php"]
     }
   },
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude", "download-spec"]
+  },
+  "search": {
+    "prompt": "Search the Kalixo API docs"
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "website": "https://kalixo.io",
+      "linkedin": "https://www.linkedin.com/company/kalixo"
     }
   }
 }

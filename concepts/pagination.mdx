@@ -1,0 +1,70 @@
+---
+title: "Pagination"
+description: "Page through large result sets with skip and take."
+icon: "layer-group"
+---
+
+List endpoints use **offset pagination** with two query parameters.
+
+<ParamField query="skip" type="integer" default="0">
+  Number of records to skip before collecting results.
+</ParamField>
+
+<ParamField query="take" type="integer" default="20">
+  Number of records to return. **Maximum 100.** Requests above 100 are clamped to 100.
+</ParamField>
+
+Every list response echoes your paging window and the total `count`:
+
+```json
+{
+  "count": 1320,
+  "skip": 0,
+  "take": 20,
+  "products": [ /* … */ ]
+}
+```
+
+## Iterating all pages
+
+Increase `skip` by `take` until `skip + take >= count`.
+
+<CodeGroup>
+
+```javascript Node
+async function* allProducts() {
+  const take = 100;
+  let skip = 0, count = Infinity;
+  while (skip < count) {
+    const res = await fetch(
+      `https://api.kalixo.io/v2/catalog/products?skip=${skip}&take=${take}`,
+      { headers: { "x-api-key": process.env.KALIXO_API_KEY } }
+    );
+    const page = await res.json();
+    count = page.count;
+    yield* page.products;
+    skip += take;
+  }
+}
+```
+
+```python Python
+def all_products():
+    take, skip, count = 100, 0, None
+    while count is None or skip < count:
+        res = requests.get(
+            "https://api.kalixo.io/v2/catalog/products",
+            params={"skip": skip, "take": take},
+            headers={"x-api-key": KEY},
+        ).json()
+        count = res["count"]
+        yield from res["products"]
+        skip += take
+```
+
+</CodeGroup>
+
+<Tip>
+  Use `take=100` for bulk syncs to minimise round trips, and combine with
+  [filters](/concepts/filtering) to fetch only what you need.
+</Tip>

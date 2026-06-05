@@ -1,0 +1,41 @@
+---
+title: "Idempotency"
+description: "Safely retry order requests without creating duplicates."
+icon: "fingerprint"
+---
+
+Network calls fail, time out, and get retried. To make ordering safe, Kalixo uses your
+**`externalOrderCode`** as an idempotency key.
+
+## How it works
+
+- `externalOrderCode` must be **unique per order** within your account.
+- If you `POST /orders` again with an `externalOrderCode` that already exists, Kalixo does
+  **not** create a second order — it returns the **existing** order instead.
+- This means you can safely retry a request whose response you never received.
+
+<Note>
+  Generate a stable `externalOrderCode` **before** you send the request (for example, your
+  own internal order id), so a retry uses the exact same code.
+</Note>
+
+## Example
+
+The first call creates the order; an identical retry returns the same `orderId`.
+
+```bash
+curl -X POST "https://api.kalixo.io/v2/orders" \
+  -H "x-api-key: $KALIXO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "externalOrderCode": "O-12345",
+    "currency": "GBP",
+    "price": 3299,
+    "orderProducts": [{ "productId": 2, "price": 3299, "quantity": 1 }]
+  }'
+```
+
+<Warning>
+  Reusing an `externalOrderCode` with a **different** payload does not modify the original
+  order. Always use a new code for a genuinely new order.
+</Warning>

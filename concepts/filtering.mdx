@@ -1,0 +1,53 @@
+---
+title: "Filtering"
+description: "Narrow the catalog by country, language, brand, category, and tag."
+icon: "filter"
+---
+
+The catalog list endpoint accepts several filters. They are **AND-combined across fields**:
+a product must match every filter you supply. Within a single field you can pass
+**multiple comma-separated values** (treated as OR for that field).
+
+<ParamField query="country" type="string">
+  ISO country code(s), e.g. `GB` or `GB,IE`.
+</ParamField>
+<ParamField query="language" type="string">
+  Language code(s), e.g. `en` or `en,fr`.
+</ParamField>
+<ParamField query="brand" type="string">
+  Brand name(s), e.g. `PlayStation`.
+</ParamField>
+<ParamField query="category" type="string">
+  Category / main category, e.g. `Gaming`.
+</ParamField>
+<ParamField query="tag" type="string">
+  Tag(s), e.g. `bestseller,gaming`.
+</ParamField>
+<ParamField query="search" type="string">
+  Free-text search across product name and EAN.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+
+```bash UK gaming bestsellers
+curl -G "https://api.kalixo.io/v2/catalog/products" \
+  -H "x-api-key: $KALIXO_API_KEY" \
+  --data-urlencode "country=GB" \
+  --data-urlencode "category=Gaming" \
+  --data-urlencode "tag=bestseller"
+```
+
+```bash Multiple countries
+curl -G "https://api.kalixo.io/v2/catalog/products" \
+  -H "x-api-key: $KALIXO_API_KEY" \
+  --data-urlencode "country=GB,IE,DE"
+```
+
+</CodeGroup>
+
+<Note>
+  Filters are case-insensitive. Combine them with [pagination](/concepts/pagination)
+  (`skip` / `take`) to page through filtered results.
+</Note>

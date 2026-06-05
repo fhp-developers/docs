@@ -1,0 +1,164 @@
+---
+title: "Errors"
+description: "A consistent error model across every endpoint."
+icon: "triangle-exclamation"
+---
+
+The API uses conventional HTTP status codes and returns a consistent JSON error body.
+
+```json
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": "Product 2 price mismatch: expected 3299"
+}
+```
+
+<ResponseField name="statusCode" type="integer">
+  The HTTP status code.
+</ResponseField>
+<ResponseField name="error" type="string">
+  A short, machine-friendly label for the status (for example `Bad Request`, `Not Found`).
+</ResponseField>
+<ResponseField name="message" type="string">
+  A human-readable explanation. Messages are **sanitized for integrators**: we never return
+  internal backend text (reseller ids, FX rates, `buyingPrice`, linked-product diagnostics, etc.).
+  When a message refers to a product, it uses the **`productId` you sent** in the request.
+</ResponseField>
+
+<Note>
+  Placeholders below use `{productId}`, `{reference}`, `{min}`, `{max}`, `{expected}`,
+  `{productCurrency}`, `{requested}`, and `{seconds}` for values that depend on your request.
+  All other text is returned **exactly** as shown.
+</Note>
+
+## Status codes
+
+| Code | `error` label | When it applies |
+| --- | --- | --- |
+| `400` | `Bad Request` | Validation before or during order placement (price, currency, catalog membership, product configuration) |
+| `401` | `Unauthorized` | Missing or invalid `x-api-key` |
+| `403` | `Forbidden` | API ordering disabled for your account |
+| `404` | `Not Found` | Unknown catalog product or order |
+| `409` | `Conflict` | Duplicate `externalOrderCode` |
+| `422` | `Unprocessable Entity` | Account order limit exceeded, or product not available for purchase |
+| `429` | `Too Many Requests` | [Rate limit](/concepts/rate-limits) exceeded |
+| `502` | `Bad Gateway` | Upstream order service unavailable or order could not be created |
+
+## Authentication (`401`)
+
+| Message |
+| --- |
+| `Missing API key` |
+| `Invalid API key` |
+
+See [Authentication](/authentication) for examples.
+
+## Rate limiting (`429`)
+
+| Message |
+| --- |
+| `Rate limit exceeded. Retry after {seconds}s.` |
+
+The `Retry-After` response header matches `{seconds}`. See [Rate limits](/concepts/rate-limits).
+
+## Catalog (`404`)
+
+Returned by `GET /catalog/products/{productId}` when the id is not in your active catalog.
+
+| Message |
+| --- |
+| `Product {productId} was not found in your catalog` |
+
+## Orders — request validation (`400`)
+
+Returned by `POST /orders` when the request body fails checks **before** the order is accepted.
+
+| Message |
+| --- |
+| `orderProducts must not be empty` |
+| `Each line requires a productId and a quantity of at least 1` |
+| `Product {productId} is priced in {productCurrency}, not {requested}` |
+| `Product {productId} is open-denomination and requires a price` |
+| `Price for product {productId} is below the minimum allowed ({min})` |
+| `Price for product {productId} exceeds the maximum allowed ({max})` |
+| `Product {productId} price mismatch: expected {expected}` |
+
+<Info>
+  Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `3299` = 32.99.
+</Info>
+
+## Orders — backend rejection (`400`)
+
+Returned by `POST /orders` when the upstream order service rejects the order. The `message` is mapped from an internal result code; you will **not** see raw backend diagnostics.
+
+| Typical situation | Message |
+| --- | --- |
+| Product not orderable for country/currency | `Product {productId} is not available for ordering with the supplied country or currency.` |
+| Product inactive | `Product {productId} is not currently available.` |
+| Wrong order currency | `Product {productId} cannot be ordered in the requested currency.` |
+| Open denomination, price missing upstream | `Product {productId} is open-denomination and requires a price.` |
+| Order data invalid | `The order could not be validated. Check product ids, prices, and currency.` |
+| Order already placed | `This order has already been placed.` |
+| Unmapped rejection | `The order could not be placed. Check your request and try again.` |
+
+<Warning>
+  Always send each line’s `CountryCode` when ordering for a specific market. Missing or wrong country
+  data often surfaces as “not available for ordering with the supplied country or currency”.
+</Warning>
+
+## Orders — forbidden (`403`)
+
+| Message |
+| --- |
+| `API ordering is disabled for your account. Contact support for assistance.` |
+
+## Orders — conflict (`409`)
+
+| Message |
+| --- |
+| `An order with this external order code already exists.` |
+
+## Orders — unprocessable (`422`)
+
+| Message |
+| --- |
+| `Your account order limit has been exceeded. Contact support for assistance.` |
+| `Product {productId} is not available for purchase.` |
+
+## Orders — not found (`404`)
+
+Returned by `GET /orders/{reference}`.
+
+| Message |
+| --- |
+| `Order {reference} not found` |
+
+`{reference}` is the path value you sent (numeric `orderId` or your `externalOrderCode`).
+
+## Orders — bad gateway (`502`)
+
+Returned when the upstream order service cannot be reached or does not return an order id.
+
+| Message |
+| --- |
+| `Order processing is temporarily unavailable. Please try again later.` |
+| `Order could not be created. Please try again later.` |
+
+## Handling errors in your integration
+
+<Steps>
+  <Step title="Log statusCode and message">
+    Persist both fields for support and retries. Do not parse internal backend codes from `message`.
+  </Step>
+  <Step title="Map by productId">
+    When `message` starts with `Product {id}`, attach the error to that line in your cart or order payload.
+  </Step>
+  <Step title="Retry only when appropriate">
+    Retry `502` and `429` with backoff. Do not retry `400`, `403`, `404`, `409`, or `422` without fixing the request.
+  </Step>
+  <Step title="Refresh catalog on configuration errors">
+    If you see “not available for ordering with the supplied country or currency”, re-fetch the product from
+    `GET /catalog/products` and verify `countryCode`, `price`, and open-denomination bounds.
+  </Step>
+</Steps>

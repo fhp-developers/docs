@@ -1,0 +1,45 @@
+---
+title: "Notifications"
+description: "Stay ahead of a low wallet balance with automatic email alerts."
+icon: "bell"
+---
+
+Kalixo proactively emails your account when your **wallet balance falls below a threshold**,
+so orders never fail for lack of funds.
+
+## Low-balance email
+
+<Steps>
+  <Step title="We watch your balance">
+    Balances are checked regularly against a configured low-balance threshold.
+  </Step>
+  <Step title="We email you on the way down">
+    When a balance crosses **below** the threshold, we email your account address once.
+    We won’t spam you on every check.
+  </Step>
+  <Step title="We re-arm after a top-up">
+    Once you top up above the threshold, the alert resets and can fire again next time.
+  </Step>
+</Steps>
+
+## Check your balance anytime
+
+You can always read your balances on demand:
+
+```bash
+curl -X GET "https://api.kalixo.io/v2/wallet" \
+  -H "x-api-key: $KALIXO_API_KEY"
+```
+
+```json Response
+{
+  "balances": { "EUR": 1234.56, "GBP": 196.01 },
+  "lowBalance": false,
+  "threshold": 100
+}
+```
+
+<Info>
+  Email alerts are the first notification type. HTTP webhooks for events such as
+  `order.completed` and `balance.low` are planned — this page will be updated when they ship.
+</Info>
