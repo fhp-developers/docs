@@ -9,7 +9,7 @@ Requests are rate limited per API key to keep the platform fast and fair.
 <Note>
   The default limit is **60 requests per minute per API key**. When you exceed it, responses
   include a `Retry-After` header (in seconds). Higher limits can be arranged with your account
-  manager — always design your integration to respect `429` responses.
+  manager - always design your integration to respect `429` responses.
 </Note>
 
 ## When you exceed a limit
@@ -31,12 +31,12 @@ You receive `429 Too Many Requests`:
     On `429`, wait and retry with exponential backoff and jitter.
   </Card>
   <Card title="Poll sensibly" icon="clock">
-    Poll orders at or after `estimatedReadyAt`, then about once a minute — not in a tight loop.
+    Poll orders at or after `estimatedReadyAt`, then about once a minute - not in a tight loop.
   </Card>
   <Card title="Batch reads" icon="layer-group">
     Use `take=100` and [filters](/concepts/filtering) to reduce the number of calls.
   </Card>
   <Card title="Cache the catalog" icon="database">
-    The catalog changes infrequently — cache it and refresh periodically.
+    The catalog changes infrequently - cache it and refresh periodically.
   </Card>
 </CardGroup>

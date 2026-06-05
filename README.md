@@ -1,4 +1,4 @@
-# Kalixo API v2 — Developer Docs
+# Kalixo API v2 - Developer Docs
 
 Mintlify-powered developer documentation for the Kalixo Distribution API v2.
 Modern theme, Kalixo branding, and an interactive **“Try it”** API playground driven by
@@ -6,10 +6,10 @@ the bundled OpenAPI spec.
 
 ## Stack
 
-- **[Mintlify](https://mintlify.com)** — docs framework + hosting + API playground.
-- `docs.json` — site config (theme, colors, navigation, API playground).
-- `openapi.json` — OpenAPI 3.1 spec that generates the API reference and the live playground.
-- MDX pages — guides and core-concept pages.
+- **[Mintlify](https://mintlify.com)** - docs framework + hosting + API playground.
+- `docs.json` - site config (theme, colors, navigation, API playground).
+- `openapi.json` - OpenAPI 3.1 spec that generates the API reference and the live playground.
+- MDX pages - guides and core-concept pages.
 
 ## Local development
 
@@ -43,7 +43,7 @@ Import into Postman:
 
 1. **Collection:** [`kalixo-api-v2.postman_collection.json`](./kalixo-api-v2.postman_collection.json)
 2. **Environment:** [Sandbox](./kalixo-api-v2.postman_environment.sandbox.json) or
-   [Production](./kalixo-api-v2.postman_environment.production.json) — set the `apiKey` variable.
+   [Production](./kalixo-api-v2.postman_environment.production.json) - set the `apiKey` variable.
 3. For local dev (catalog on `:3002`, orders on `:3003`): use
    [`kalixo-api-v2.postman_environment.local.json`](./kalixo-api-v2.postman_environment.local.json).
 
@@ -75,7 +75,7 @@ api-reference/introduction.mdx
 ## Editing the API reference
 
 The API reference is generated from `openapi.json`. To add or change an endpoint, edit the
-spec — the reference pages and the interactive playground update automatically. Use
+spec - the reference pages and the interactive playground update automatically. Use
 `x-default` on the `apiKey` security scheme to pre-fill a placeholder key in the playground.
 
 ## Deployment
@@ -85,4 +85,4 @@ self-host the built output. The “Download API spec” menu option lets integra
 spec into Postman/Insomnia, or use the bundled Postman collection (see above).
 
 > Base URLs in `openapi.json` (`api.kalixo.io`, `sandbox.kalixo.io`) are pre-release
-> placeholders — update them once the final domains are confirmed.
+> placeholders - update them once the final domains are confirmed.

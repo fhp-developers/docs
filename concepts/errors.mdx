@@ -70,7 +70,7 @@ Returned by `GET /catalog/products/{productId}` when the id is not in your activ
 | --- |
 | `Product {productId} was not found in your catalog` |
 
-## Orders — request validation (`400`)
+## Orders - request validation (`400`)
 
 Returned by `POST /orders` when the request body fails checks **before** the order is accepted.
 
@@ -88,7 +88,7 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
   Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `3299` = 32.99.
 </Info>
 
-## Orders — backend rejection (`400`)
+## Orders - backend rejection (`400`)
 
 Returned by `POST /orders` when the upstream order service rejects the order. The `message` is mapped from an internal result code; you will **not** see raw backend diagnostics.
 
@@ -107,26 +107,26 @@ Returned by `POST /orders` when the upstream order service rejects the order. Th
   data often surfaces as “not available for ordering with the supplied country or currency”.
 </Warning>
 
-## Orders — forbidden (`403`)
+## Orders - forbidden (`403`)
 
 | Message |
 | --- |
 | `API ordering is disabled for your account. Contact support for assistance.` |
 
-## Orders — conflict (`409`)
+## Orders - conflict (`409`)
 
 | Message |
 | --- |
 | `An order with this external order code already exists.` |
 
-## Orders — unprocessable (`422`)
+## Orders - unprocessable (`422`)
 
 | Message |
 | --- |
 | `Your account order limit has been exceeded. Contact support for assistance.` |
 | `Product {productId} is not available for purchase.` |
 
-## Orders — not found (`404`)
+## Orders - not found (`404`)
 
 Returned by `GET /orders/{reference}`.
 
@@ -136,7 +136,7 @@ Returned by `GET /orders/{reference}`.
 
 `{reference}` is the path value you sent (numeric `orderId` or your `externalOrderCode`).
 
-## Orders — bad gateway (`502`)
+## Orders - bad gateway (`502`)
 
 Returned when the upstream order service cannot be reached or does not return an order id.
 

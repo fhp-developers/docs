@@ -11,7 +11,7 @@ Network calls fail, time out, and get retried. To make ordering safe, Kalixo use
 
 - `externalOrderCode` must be **unique per order** within your account.
 - If you `POST /orders` again with an `externalOrderCode` that already exists, Kalixo does
-  **not** create a second order — it returns the **existing** order instead.
+  **not** create a second order - it returns the **existing** order instead.
 - This means you can safely retry a request whose response you never received.
 
 <Note>
