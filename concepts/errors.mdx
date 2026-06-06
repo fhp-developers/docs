@@ -21,9 +21,8 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
   A short, machine-friendly label for the status (for example `Bad Request`, `Not Found`).
 </ResponseField>
 <ResponseField name="message" type="string">
-  A human-readable explanation. Messages are **sanitized for integrators**: we never return
-  internal backend text (reseller ids, FX rates, `buyingPrice`, linked-product diagnostics, etc.).
-  When a message refers to a product, it uses the **`productId` you sent** in the request.
+  A human-readable explanation you can show to operators or log for support. When a message
+  refers to a product, it uses the **`productId` you sent** in the request.
 </ResponseField>
 
 <Note>
@@ -43,7 +42,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 | `409` | `Conflict` | Duplicate `externalOrderCode` |
 | `422` | `Unprocessable Entity` | Account order limit exceeded, or product not available for purchase |
 | `429` | `Too Many Requests` | [Rate limit](/concepts/rate-limits) exceeded |
-| `502` | `Bad Gateway` | Upstream order service unavailable or order could not be created |
+| `502` | `Bad Gateway` | Order could not be created or is temporarily unavailable |
 
 ## Authentication (`401`)
 
@@ -88,23 +87,23 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
   Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `10000` = 100.00.
 </Info>
 
-## Orders - backend rejection (`400`)
+## Orders - rejected at placement (`400`)
 
-Returned by `POST /orders` when the upstream order service rejects the order. The `message` is mapped from an internal result code; you will **not** see raw backend diagnostics.
+Returned by `POST /orders` when the order cannot be accepted after validation.
 
 | Typical situation | Message |
 | --- | --- |
 | Product not orderable for country/currency | `Product {productId} is not available for ordering with the supplied country or currency.` |
 | Product inactive | `Product {productId} is not currently available.` |
 | Wrong order currency | `Product {productId} cannot be ordered in the requested currency.` |
-| Open denomination, price missing upstream | `Product {productId} is open-denomination and requires a price.` |
+| Open denomination, price missing | `Product {productId} is open-denomination and requires a price.` |
 | Order data invalid | `The order could not be validated. Check product ids, prices, and currency.` |
 | Order already placed | `This order has already been placed.` |
-| Unmapped rejection | `The order could not be placed. Check your request and try again.` |
+| Other rejection | `The order could not be placed. Check your request and try again.` |
 
 <Warning>
-  Always send each line’s `CountryCode` when ordering for a specific market. Missing or wrong country
-  data often surfaces as “not available for ordering with the supplied country or currency”.
+  Order each product for the market shown in the catalog (`countryCode`). Mismatched country or
+  currency often surfaces as “not available for ordering with the supplied country or currency”.
 </Warning>
 
 ## Orders - forbidden (`403`)
@@ -138,7 +137,7 @@ Returned by `GET /orders/{reference}`.
 
 ## Orders - bad gateway (`502`)
 
-Returned when the upstream order service cannot be reached or does not return an order id.
+Returned when the order cannot be created or processing is temporarily unavailable.
 
 | Message |
 | --- |
@@ -149,7 +148,7 @@ Returned when the upstream order service cannot be reached or does not return an
 
 <Steps>
   <Step title="Log statusCode and message">
-    Persist both fields for support and retries. Do not parse internal backend codes from `message`.
+    Persist both fields for support and retries. Treat `message` as human-readable text.
   </Step>
   <Step title="Map by productId">
     When `message` starts with `Product {id}`, attach the error to that line in your cart or order payload.

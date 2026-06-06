@@ -27,7 +27,7 @@
   "tags": [
     {
       "name": "Catalog",
-      "description": "Browse the products available in your catalog, including pricing, your commission, and open-denomination ranges."
+      "description": "Browse the products available in your catalog, including pricing, your discount, and open-denomination ranges."
     },
     {
       "name": "Orders",
@@ -175,7 +175,7 @@
       "post": {
         "tags": ["Orders"],
         "summary": "Place an order",
-        "description": "Creates an order and begins fulfilment asynchronously. The response returns immediately with an `orderId` and a `processing` status. Large orders are automatically segmented; the response includes an `estimatedReadyAt` timestamp telling you roughly when to poll for codes.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+        "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
         "operationId": "placeOrder",
         "requestBody": {
           "required": true,
@@ -259,7 +259,7 @@
             }
           },
           "502": {
-            "description": "Upstream order service unavailable or order could not be created.",
+            "description": "Order could not be created or is temporarily unavailable.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
@@ -342,7 +342,7 @@
                       "orderId": 59400,
                       "externalOrderCode": "O-12345",
                       "status": "failed",
-                      "reason": "No stock available from provider"
+                      "reason": "The order could not be completed."
                     }
                   }
                 }
@@ -598,14 +598,14 @@
       },
       "Error": {
         "type": "object",
-        "description": "Standard error response. Messages are sanitized for integrators; see the Errors concept page for the complete catalogue.",
+        "description": "Standard error response. See the Errors concept page for the complete message catalogue.",
         "required": ["statusCode", "error", "message"],
         "properties": {
           "statusCode": { "type": "integer", "example": 400 },
           "error": { "type": "string", "example": "Bad Request" },
           "message": {
             "type": "string",
-            "description": "Human-readable, client-safe explanation. May include the productId you sent.",
+            "description": "Human-readable explanation. May include the productId you sent.",
             "example": "Product 2 price mismatch: expected 10000"
           }
         }

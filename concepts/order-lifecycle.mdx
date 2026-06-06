@@ -1,6 +1,6 @@
 ---
 title: "Order lifecycle"
-description: "How async orders move from processing to completed - and how bulk orders are handled."
+description: "How async orders move from processing to completed - including large orders."
 icon: "arrows-spin"
 ---
 
@@ -44,12 +44,15 @@ then poll until the codes are ready.
   </Step>
 </Steps>
 
-## Bulk / B2B orders
+## Large orders
 
-There is **no separate bulk endpoint**. When you submit a large order, Kalixo automatically
-segments it across providers and returns an `estimatedReadyAt` sized to the quantity. Just
-poll `GET /orders/{reference}` - while it works you’ll get “Order is still processing”, and
-once finished you’ll get the codes.
+Use the same `POST /orders` endpoint for any quantity. The response includes an
+`estimatedReadyAt` timestamp that scales with the order size — larger orders may take longer
+to complete.
+
+Poll `GET /orders/{reference}` until you reach a terminal status. While the order is still
+`processing`, you’ll see `"message": "Order is still processing"`. When finished, the response
+includes your codes in `products[].pin`.
 
 <CardGroup cols={2}>
   <Card title="Polling cadence" icon="clock">
