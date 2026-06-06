@@ -32,7 +32,7 @@ mint validate        # validate docs.json + OpenAPI
 ## Branding
 
 - Palette: lime greens from `#f4fdd8` (50) through `#0a0c03` (950); primary accent `#c9f73a` (500).
-- Light mode background: `#f4fdd8`; dark mode background: `#0a0c03`. Dark mode is the default.
+- Light mode: white background with Kalixo green accents; dark mode background: `#0a0c03`. Dark mode is the default.
 - Logo: `logo/kalixo-white.svg` (dark mode) and `logo/kalixo-black.svg` (light mode).
 - Favicon: `favicon.ico` (from [kalixo.io](https://kalixo.io/favicon.ico)).
 

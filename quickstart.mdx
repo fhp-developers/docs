@@ -14,7 +14,7 @@ retrieving your codes.
 
     <Tip>
       Using **Postman**? Import the
-      [Kalixo API v2 collection](/kalixo-api-v2.postman_collection.json) and an environment
+      <a href="/kalixo-api-v2.postman_collection.json" download="kalixo-api-v2.postman_collection.json">Kalixo API v2 collection</a> and an environment
       ([Sandbox](/kalixo-api-v2.postman_environment.sandbox.json) or
       [Production](/kalixo-api-v2.postman_environment.production.json)), then set your `apiKey`
       variable. For local dev against split services, use the
@@ -24,8 +24,8 @@ retrieving your codes.
 
   <Step title="Find a product in your catalog">
     List your catalog and pick a `productId` (the `id` field). Each product also has a
-    stable `productCode` and per-locale `sku` — see [Product codes](/concepts/product-codes).
-    Filter by country, brand, category, and more.
+    `productCode` (a stable 14-digit catalog identifier) and per-locale `sku`. Filter by
+    country, brand, category, and more.
 
     <CodeGroup>
 
@@ -142,11 +142,7 @@ retrieving your codes.
   <Card title="Filtering" icon="filter" href="/concepts/filtering">
     Narrow your catalog by country, language, brand, category, and tag.
   </Card>
-  <Card
-    title="Postman collection"
-    icon="download"
-    href="/kalixo-api-v2.postman_collection.json"
-  >
-    Download the v2 collection and import the Sandbox or Production environment.
+  <Card title="Postman collection" icon="download">
+    <a href="/kalixo-api-v2.postman_collection.json" download="kalixo-api-v2.postman_collection.json">Download the v2 collection</a> and import the Sandbox or Production environment.
   </Card>
 </CardGroup>

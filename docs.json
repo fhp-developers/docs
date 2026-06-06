@@ -14,15 +14,14 @@
   },
   "background": {
     "color": {
-      "light": "#f4fdd8",
+      "light": "#ffffff",
       "dark": "#0a0c03"
-    },
-    "decoration": "gradient"
+    }
   },
   "logo": {
     "light": "/logo/kalixo-black.svg",
     "dark": "/logo/kalixo-white.svg",
-    "href": "https://kalixo.io"
+    "href": "https://developer.kalixo.io"
   },
   "favicon": "/favicon.ico",
   "styling": {
@@ -64,7 +63,6 @@
             "pages": [
               "concepts/pagination",
               "concepts/filtering",
-              "concepts/product-codes",
               "concepts/open-denomination",
               "concepts/order-lifecycle",
               "concepts/idempotency",

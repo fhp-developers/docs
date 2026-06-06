@@ -408,7 +408,7 @@
           "id": { "type": "integer", "example": 2, "description": "The product id you order with." },
           "productCode": {
             "type": "string",
-            "description": "Kalixo product code — a stable 14-digit catalog identifier (not a provider barcode).",
+            "description": "A stable 14-digit catalog identifier.",
             "example": "10020000213575"
           },
           "name": { "type": "string", "example": "PlayStation Store Gift Card" },

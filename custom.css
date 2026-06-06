@@ -12,41 +12,61 @@
   --kalixo-950: #0a0c03;
 }
 
-/* Light theme */
+/* Light theme — white canvas, brand green for accents only */
 html:not(.dark) #navbar {
-  background-color: var(--kalixo-50);
-  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-700) 12%, transparent);
+  background-color: #ffffff;
+  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-700) 14%, #e5e7eb);
 }
 
 html:not(.dark) #sidebar {
-  border-right: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, transparent);
+  background-color: #ffffff;
+  border-right: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, #e5e7eb);
 }
 
 html:not(.dark) #sidebar-content li[data-active] a {
-  background-color: var(--kalixo-200);
-  color: var(--kalixo-900);
+  background-color: var(--kalixo-50);
+  color: var(--kalixo-800);
+  font-weight: 500;
+}
+
+html:not(.dark) #sidebar-content a:hover {
+  color: var(--kalixo-700);
 }
 
 html:not(.dark) card {
-  border-color: color-mix(in srgb, var(--kalixo-700) 18%, transparent);
-  background-color: color-mix(in srgb, white 72%, var(--kalixo-50));
+  border-color: color-mix(in srgb, var(--kalixo-600) 28%, #e5e7eb);
+  background-color: #ffffff;
 }
 
 html:not(.dark) callout {
-  border-color: color-mix(in srgb, var(--kalixo-700) 22%, transparent);
-  background-color: color-mix(in srgb, white 55%, var(--kalixo-100));
+  border-color: color-mix(in srgb, var(--kalixo-600) 32%, #e5e7eb);
+  background-color: color-mix(in srgb, var(--kalixo-50) 45%, #ffffff);
 }
 
 html:not(.dark) #topbar-cta-button {
+  background-color: var(--kalixo-500);
   color: var(--kalixo-950);
 }
 
+html:not(.dark) #topbar-cta-button:hover {
+  background-color: var(--kalixo-600);
+}
+
 html:not(.dark) #table-of-contents {
-  border-left: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, #e5e7eb);
+  padding-left: 1.25rem;
 }
 
 html:not(.dark) toc-item[data-active] {
   color: var(--kalixo-800);
+}
+
+html:not(.dark) link {
+  color: var(--kalixo-700);
+}
+
+html:not(.dark) eyebrow {
+  color: var(--kalixo-700);
 }
 
 /* Dark theme */
