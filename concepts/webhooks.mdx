@@ -1,0 +1,47 @@
+---
+title: "Webhooks"
+description: "HTTP event notifications — coming soon."
+icon: "webhook"
+---
+
+<Info>
+  **Webhooks are not available yet.** Today, order completion is detected by polling
+  `GET /orders/{reference}`. Low-balance alerts are sent by email — see
+  [Notifications](/concepts/notifications).
+</Info>
+
+We are planning HTTP webhooks so you can receive events without polling. This page describes
+the **planned** shape; payloads and delivery may change before launch.
+
+## Planned events
+
+| Event | When it fires |
+| --- | --- |
+| `order.completed` | All codes for an order were delivered |
+| `order.failed` | The order finished with no codes delivered |
+| `order.partially_completed` | Some but not all codes were delivered |
+| `balance.low` | A wallet balance crossed below the configured threshold |
+
+## Draft payload shape
+
+```json
+{
+  "id": "evt_01H…",
+  "type": "order.completed",
+  "createdAt": "2026-06-02T11:05:00Z",
+  "data": {
+    "orderId": 59400,
+    "externalOrderCode": "O-12345",
+    "status": "completed"
+  }
+}
+```
+
+Webhooks will be signed so you can verify authenticity. Registration (URL + secret) will be
+documented here when the feature ships.
+
+## Until webhooks launch
+
+- Poll orders after `estimatedReadyAt` — see [Order lifecycle](/concepts/order-lifecycle).
+- Use `GET /wallet` or the embedded `wallet` field on order responses for balance checks.
+- Subscribe to email low-balance alerts — see [Notifications](/concepts/notifications).

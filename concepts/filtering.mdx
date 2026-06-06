@@ -21,7 +21,8 @@ a product must match every filter you supply. Within a single field you can pass
   Category / main category, e.g. `Gaming`.
 </ParamField>
 <ParamField query="tag" type="string">
-  Tag(s), e.g. `bestseller,gaming`.
+  Tag(s), e.g. `bestseller,gaming`. Responses return tags as a **string array**; filters
+  accept comma-separated values.
 </ParamField>
 <ParamField query="search" type="string">
   Free-text search across product name and `productCode`.

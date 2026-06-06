@@ -18,8 +18,12 @@ curl -X GET "https://api.kalixo.io/v2/wallet" \
 
 ## Sandbox vs production
 
-You receive two keys. Sandbox runs against test data and never charges your wallet; production
-is live.
+You receive two keys during onboarding. Sandbox runs against test data; production is live.
+
+<Info>
+  **Pre-release:** Base URLs below are placeholders during the pre-release period. Your
+  account manager will confirm the final endpoints when your keys are issued.
+</Info>
 
 | Environment | Base URL | Key prefix |
 | --- | --- | --- |
@@ -34,8 +38,10 @@ is live.
 </Warning>
 
 <CardGroup cols={2}>
-  <Card title="Rotate regularly" icon="rotate">
-    Ask your account manager to rotate a key if it may have leaked. The old key is revoked.
+  <Card title="Rotate if leaked" icon="rotate">
+    API keys are issued during onboarding. There is no self-serve rotation in the API today —
+    contact [integrations@kalixo.io](mailto:integrations@kalixo.io) or your account manager
+    to rotate a key. The old key is revoked once a new one is issued.
   </Card>
   <Card title="Server-side only" icon="server">
     Call the API from your backend, never from a browser or mobile app.

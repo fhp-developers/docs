@@ -1,0 +1,47 @@
+---
+title: "Changelog"
+description: "API and documentation changes by version."
+icon: "clock-rotate-left"
+---
+
+## 2.1.0 — 2026-06-06
+
+### Breaking API changes
+
+These apply to all v2 catalog and order responses:
+
+| Change | Before | After |
+| --- | --- | --- |
+| Redemption codes | `products[].pin: [{ pin: "…" }]` | `products[].codes: [{ code: "…" }]` |
+| Product tags | `"bestseller,gaming"` (string) | `["bestseller", "gaming"]` (array) |
+| Removed fields | `rrp`, `rrpCurrency`, `state` on products | Omitted — use `price` and `status` |
+
+### New validation
+
+- If you send a top-level `price` on `POST /orders`, it must equal the sum of
+  `(line price × quantity)` or the request returns `400` with
+  `Order price mismatch: expected total {n}`.
+
+### New response headers
+
+All v2 responses now include:
+
+- `X-RateLimit-Limit`
+- `X-RateLimit-Remaining`
+- `X-RateLimit-Reset`
+
+`429` responses still include `Retry-After`. See [Rate limits](/concepts/rate-limits).
+
+### Documentation
+
+- Fixed polling example to respect `estimatedReadyAt`.
+- Added guidance for `partially_completed`, sandbox, webhooks (coming soon), and cancellation.
+- Multi-line order pricing example.
+- Reference Node client in [examples/kalixo-node](/examples/kalixo-node).
+
+## 2.0.0 — initial release
+
+- Async ordering with `POST /orders` + poll `GET /orders/{reference}`.
+- Catalog filtering and pagination.
+- Wallet endpoint and embedded wallet snapshots on orders.
+- API-key authentication (`x-api-key`).

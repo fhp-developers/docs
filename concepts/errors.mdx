@@ -82,6 +82,7 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
 | `Price for product {productId} is below the minimum allowed ({min})` |
 | `Price for product {productId} exceeds the maximum allowed ({max})` |
 | `Product {productId} price mismatch: expected {expected}` |
+| `Order price mismatch: expected total {expected}` |
 
 <Info>
   Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `10000` = 100.00.

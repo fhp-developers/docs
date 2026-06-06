@@ -1,0 +1,28 @@
+---
+title: "Order cancellation"
+description: "Can you cancel an order after it has been placed?"
+icon: "ban"
+---
+
+## Via the API
+
+**Orders cannot be cancelled or voided through the Kalixo Distribution API v2.**
+
+Once `POST /orders` returns `202 Accepted`, the order is accepted for fulfilment. There is
+no `DELETE` or cancel endpoint.
+
+<Warning>
+  Do not attempt to "undo" an accepted order by reusing `externalOrderCode` with a different
+  payload — idempotency returns the original order unchanged. See [Idempotency](/concepts/idempotency).
+</Warning>
+
+## What to do instead
+
+If you placed an order in error or need to stop fulfilment:
+
+1. Note your `orderId` and `externalOrderCode`.
+2. Contact [integrations@kalixo.io](mailto:integrations@kalixo.io) as soon as possible.
+3. Kalixo support will advise based on order status and your account terms.
+
+While an order is still `processing`, support may be able to assist depending on timing and
+product type. Once codes are delivered (`completed`), standard refund policies apply.

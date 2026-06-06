@@ -1,0 +1,55 @@
+---
+title: "Node reference client"
+description: "A thin Node.js helper with estimatedReadyAt-aware polling."
+icon: "code"
+---
+
+This is a **reference implementation** — copy [`client.js`](/examples/kalixo-node/client.js) into
+your project or adapt it. It is not published to npm.
+
+## Features
+
+- `KalixoClient.sandbox()` / `.production()` factory helpers
+- `placeOrder()` with your `externalOrderCode` idempotency key
+- `waitForOrder()` — waits until `estimatedReadyAt`, then polls every 60s
+- Automatic `429` backoff using `Retry-After`
+- `newExternalOrderCode()` helper for stable idempotency keys
+
+## Usage
+
+```javascript
+import { KalixoClient, newExternalOrderCode } from './client.js';
+
+const kalixo = KalixoClient.sandbox(process.env.KALIXO_API_KEY);
+
+const { products } = await kalixo.listProducts({ country: 'GB', take: 5 });
+const product = products[0];
+
+const externalOrderCode = newExternalOrderCode();
+
+const accepted = await kalixo.placeOrder({
+  externalOrderCode,
+  currency: 'GBP',
+  price: product.price,
+  orderProducts: [
+    { productId: product.id, price: product.price, quantity: 1 },
+  ],
+});
+
+console.log('Processing until', accepted.estimatedReadyAt);
+
+const completed = await kalixo.waitForOrder(
+  accepted.orderId,
+  accepted.estimatedReadyAt,
+);
+
+console.log(completed.products[0].codes);
+```
+
+<Note>
+  Requires Node 18+ (`fetch` built in). For older Node versions, pass a `fetch` polyfill or
+  swap `fetch` for your HTTP library.
+</Note>
+
+See also the [polling example](/concepts/order-lifecycle#polling-example) for a minimal
+inline version without the client class.

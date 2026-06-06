@@ -56,7 +56,7 @@
         "groups": [
           {
             "group": "Get started",
-            "pages": ["index", "quickstart", "authentication"]
+            "pages": ["index", "quickstart", "authentication", "concepts/sandbox", "changelog"]
           },
           {
             "group": "Core concepts",
@@ -65,10 +65,13 @@
               "concepts/filtering",
               "concepts/open-denomination",
               "concepts/order-lifecycle",
+              "concepts/order-cancellation",
               "concepts/idempotency",
               "concepts/rate-limits",
               "concepts/errors",
-              "concepts/notifications"
+              "concepts/notifications",
+              "concepts/webhooks",
+              "examples/kalixo-node"
             ]
           },
           {

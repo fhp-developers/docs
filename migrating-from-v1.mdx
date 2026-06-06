@@ -43,9 +43,18 @@ v1 remains available; migrate when you’re ready.
 </Warning>
 
 <Note>
-  Product ids are stable catalog ids - keep sending the `productId` from the catalog, exactly
+  Product ids are stable catalog ids — keep sending the `productId` from the catalog, exactly
   as in v1. Catalog responses expose `productCode` (a stable 14-digit catalog identifier) and
-  per-locale `sku`. Pricing validation is
-  unchanged for fixed products (price must match) and range-checked for
-  [open-denomination](/concepts/open-denomination) products.
+  per-locale `sku`. Pricing validation is unchanged for fixed products (price must match) and
+  range-checked for [open-denomination](/concepts/open-denomination) products.
 </Note>
+
+## Response shape changes (v2.1)
+
+| v1 / early v2 | Current v2 |
+| --- | --- |
+| `PIN` / `pin: [{ pin }]` | `codes: [{ code }]` |
+| `tags` as comma-separated string | `tags` as `string[]` |
+| `rrp`, `rrpCurrency`, `state` on products | Removed — use `price` and `status` |
+
+See the [Changelog](/changelog) for the full list.

@@ -7,6 +7,12 @@ icon: "bolt"
 This guide walks you through authenticating, finding a product, placing an order, and
 retrieving your codes.
 
+<Info>
+  **Pre-release:** Base URLs in this guide are placeholders during the pre-release period.
+  Your account manager will confirm the final endpoints when your keys are issued. Start in
+  [Sandbox](/concepts/sandbox) with a `kal_test_…` key.
+</Info>
+
 <Steps>
   <Step title="Get your API key">
     Your Kalixo account manager issues a sandbox and a production key. Keep them secret and
@@ -58,9 +64,12 @@ retrieving your codes.
   </Step>
 
   <Step title="Place an order">
-    Send the `productId`, the `price` you expect to pay (for validation), the `quantity`,
-    and a unique `externalOrderCode`. The order is accepted immediately with a `processing`
-    status and an `estimatedReadyAt` timestamp.
+    Send each line's **unit** `price`, `quantity`, and `productId`, plus a unique
+    `externalOrderCode`. The optional top-level `price` is the **order total** — if you send
+    it, it must equal the sum of `(line price × quantity)`.
+
+    The order is accepted immediately with `processing`, `estimatedReadyAt`, and a `wallet`
+    snapshot.
 
     <CodeGroup>
 
@@ -74,6 +83,21 @@ retrieving your codes.
         "price": 10000,
         "orderProducts": [
           { "productId": 2, "price": 10000, "quantity": 1 }
+        ]
+      }'
+    ```
+
+    ```bash cURL — two lines (total 15000)
+    curl -X POST "https://api.kalixo.io/v2/orders" \
+      -H "x-api-key: $KALIXO_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "externalOrderCode": "O-67890",
+        "currency": "GBP",
+        "price": 15000,
+        "orderProducts": [
+          { "productId": 2, "price": 10000, "quantity": 1 },
+          { "productId": 5, "price": 5000, "quantity": 1 }
         ]
       }'
     ```
@@ -102,7 +126,8 @@ retrieving your codes.
       "orderId": 59400,
       "externalOrderCode": "O-12345",
       "status": "processing",
-      "estimatedReadyAt": "2026-06-02T11:05:00Z"
+      "estimatedReadyAt": "2026-06-02T11:05:00Z",
+      "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
     }
     ```
   </Step>
@@ -121,14 +146,21 @@ retrieving your codes.
       "status": "completed",
       "externalOrderCode": "O-12345",
       "products": [
-        { "productId": 2, "price": 10000, "quantity": 1, "pin": [{ "pin": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }] }
-      ]
+        {
+          "productId": 2,
+          "price": 10000,
+          "quantity": 1,
+          "codes": [{ "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]
+        }
+      ],
+      "wallet": { "balances": { "GBP": 96.01 }, "lowBalance": false }
     }
     ```
 
     <Tip>
-      While the order is still working you’ll get `{"status": "processing", "message": "Order is still processing"}`.
-      Read more in [Order lifecycle](/concepts/order-lifecycle).
+      While the order is still working you'll get `{"status": "processing", "message": "Order is still processing"}`.
+      Wait until `estimatedReadyAt` before polling — see the [polling example](/concepts/order-lifecycle#polling-example).
+      Or use the [Node reference client](/examples/kalixo-node).
     </Tip>
   </Step>
 </Steps>
@@ -141,6 +173,9 @@ retrieving your codes.
   </Card>
   <Card title="Filtering" icon="filter" href="/concepts/filtering">
     Narrow your catalog by country, language, brand, category, and tag.
+  </Card>
+  <Card title="Node client" icon="code" href="/examples/kalixo-node">
+    Reference SDK with `estimatedReadyAt`-aware polling.
   </Card>
   <Card title="Postman collection" icon="download">
     <a href="/kalixo-api-v2.postman_collection.json" download="kalixo-api-v2.postman_collection.json">Download the v2 collection</a> and import the Sandbox or Production environment.

@@ -1,0 +1,52 @@
+---
+title: "Sandbox"
+description: "Test your integration safely before going live."
+icon: "flask"
+---
+
+Use the **sandbox** environment to build and test your integration before switching to
+production keys.
+
+<Info>
+  **Pre-release:** Base URLs below are placeholders during the pre-release period. Your
+  account manager will confirm the final endpoints when your keys are issued.
+</Info>
+
+## Environments
+
+| | Sandbox | Production |
+| --- | --- | --- |
+| Base URL | `https://sandbox.kalixo.io/v2` | `https://api.kalixo.io/v2` |
+| API key prefix | `kal_test_…` | `kal_live_…` |
+
+See [Authentication](/authentication) for how to send your key.
+
+## Confirmed behaviour
+
+- Sandbox and production use **separate base URLs** and **separate API keys**.
+- Keys are prefixed `kal_test_` (sandbox) or `kal_live_` (production) so you can tell them apart in config.
+
+## Details pending confirmation
+
+<Info>
+  The following will be updated once Kalixo confirms sandbox policy for your account.
+  Contact [integrations@kalixo.io](mailto:integrations@kalixo.io) if you need guidance now.
+</Info>
+
+| Topic | Status |
+| --- | --- |
+| Final sandbox base URL | TBD — placeholder during pre-release |
+| Catalog contents | TBD — same as your assigned catalog vs fixed test catalog |
+| Order fulfilment | TBD — real async delivery vs instant stub |
+| Recommended test `productId`s | TBD |
+| Wallet / billing | TBD — whether sandbox orders debit a test wallet |
+
+Until confirmed, treat sandbox calls as **non-production** and avoid assuming specific
+products or delivery times.
+
+## Getting started in sandbox
+
+1. Obtain a **sandbox API key** from your account manager.
+2. Point all requests at `https://sandbox.kalixo.io/v2`.
+3. Follow the [Quickstart](/quickstart) using your sandbox key.
+4. When ready, swap the base URL and key for production.

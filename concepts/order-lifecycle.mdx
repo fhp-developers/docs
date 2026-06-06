@@ -13,10 +13,11 @@ then poll until the codes are ready.
   The order was accepted and is being fulfilled. Poll again after `estimatedReadyAt`.
 </ResponseField>
 <ResponseField name="completed" type="status">
-  All codes were delivered. The response includes `products[].pin`.
+  All codes were delivered. The response includes `products[].codes`.
 </ResponseField>
 <ResponseField name="partially_completed" type="status">
-  Some - but not all - codes were delivered. The response includes `delivered` and `total`.
+  Some — but not all — codes were delivered. The response includes `delivered` and `total`.
+  **No redemption codes are returned.** See [Partial deliveries](#partial-deliveries) below.
 </ResponseField>
 <ResponseField name="failed" type="status">
   No codes were delivered. The response includes a `reason`.
@@ -27,22 +28,68 @@ then poll until the codes are ready.
   `{"status": "processing", "message": "Order is still processing"}`.
 </Note>
 
+Every order response (place and poll) also includes a **`wallet`** snapshot with your current
+balances and low-balance flag.
+
 ## The flow
 
 <Steps>
   <Step title="Place the order">
-    `POST /orders` returns `202 Accepted` with `orderId`, `status: "processing"`, and
-    `estimatedReadyAt`.
+    `POST /orders` returns `202 Accepted` with `orderId`, `status: "processing"`,
+    `estimatedReadyAt`, and `wallet`.
   </Step>
   <Step title="Wait for the estimate">
     `estimatedReadyAt` tells you roughly when codes will be ready. It scales with the order
-    size - small orders are near-instant; large/bulk orders take longer.
+    size — small orders are near-instant; large orders take longer.
   </Step>
   <Step title="Poll the order">
     `GET /orders/{reference}` by `orderId` or `externalOrderCode`. Repeat until you get a
     terminal status (`completed`, `partially_completed`, or `failed`).
   </Step>
 </Steps>
+
+## Order pricing
+
+Each line in `orderProducts` carries a **unit price** in minor units (validated against the catalog).
+
+| Field | Meaning |
+| --- | --- |
+| `orderProducts[].price` | **Unit price** per line. Required for open-denomination products; for fixed products it must match the catalog price. |
+| Top-level `price` | **Optional order total**. If you send it, it must equal `sum(unitPrice × quantity)` across all lines. If omitted, Kalixo computes the total from your lines. |
+
+### Multi-line example
+
+Two fixed-price products totalling **15000** minor units (£100 + £50):
+
+```json
+{
+  "externalOrderCode": "O-67890",
+  "currency": "GBP",
+  "price": 15000,
+  "orderProducts": [
+    { "productId": 2, "price": 10000, "quantity": 1 },
+    { "productId": 5, "price": 5000, "quantity": 1 }
+  ]
+}
+```
+
+## Redemption codes
+
+When an order completes, each line includes a **`codes`** array — one object per delivered unit:
+
+```json
+{
+  "productId": 2,
+  "price": 10000,
+  "quantity": 2,
+  "codes": [
+    { "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" },
+    { "code": "ZYXWV-UTSRQ-PONML-KJIHG-FEDCB" }
+  ]
+}
+```
+
+Quantity `2` with two successful deliveries yields two `{ code }` entries.
 
 ## Large orders
 
@@ -51,29 +98,66 @@ Use the same `POST /orders` endpoint for any quantity. The response includes an
 to complete.
 
 Poll `GET /orders/{reference}` until you reach a terminal status. While the order is still
-`processing`, you’ll see `"message": "Order is still processing"`. When finished, the response
-includes your codes in `products[].pin`.
+`processing`, you'll see `"message": "Order is still processing"`. When finished with
+`completed`, the response includes your codes in `products[].codes`.
 
 <CardGroup cols={2}>
   <Card title="Polling cadence" icon="clock">
     Poll at or after `estimatedReadyAt`, then every minute or so. Avoid tight polling loops.
   </Card>
   <Card title="Idempotency" icon="fingerprint" href="/concepts/idempotency">
-    Re-submitting the same `externalOrderCode` returns the existing order - never a duplicate.
+    Re-submitting the same `externalOrderCode` returns the existing order — never a duplicate.
   </Card>
 </CardGroup>
+
+## Partial deliveries
+
+If you receive `partially_completed`:
+
+1. **Do not** place a new order for the missing quantity — billing and idempotency risks apply.
+2. **No codes** are included in the response (only `delivered` and `total`).
+3. **Contact support** at [integrations@kalixo.io](mailto:integrations@kalixo.io) with your
+   `orderId` and `externalOrderCode`.
+
+Kalixo will investigate and advise on next steps.
 
 ## Polling example
 
 ```javascript Node
-async function waitForOrder(ref) {
+const POLL_MS = 60_000;
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function waitUntil(iso) {
+  const ms = Math.max(0, new Date(iso).getTime() - Date.now());
+  return sleep(ms);
+}
+
+async function fetchOrder(ref) {
+  const res = await fetch(`https://api.kalixo.io/v2/orders/${ref}`, {
+    headers: { "x-api-key": process.env.KALIXO_API_KEY },
+  });
+  if (res.status === 429) {
+    const retryAfter = Number(res.headers.get("Retry-After") ?? "60");
+    await sleep(retryAfter * 1000);
+    return fetchOrder(ref);
+  }
+  if (!res.ok) throw new Error(`Order fetch failed: ${res.status}`);
+  return res.json();
+}
+
+async function waitForOrder(ref, estimatedReadyAt) {
+  if (estimatedReadyAt) await waitUntil(estimatedReadyAt);
   for (;;) {
-    const res = await fetch(`https://api.kalixo.io/v2/orders/${ref}`, {
-      headers: { "x-api-key": process.env.KALIXO_API_KEY },
-    });
-    const order = await res.json();
+    const order = await fetchOrder(ref);
     if (order.status !== "processing") return order;
-    await new Promise((r) => setTimeout(r, 60_000)); // wait 60s
+    await sleep(POLL_MS);
   }
 }
+
+// After POST /orders:
+// const { orderId, estimatedReadyAt } = await placeRes.json();
+// const order = await waitForOrder(orderId, estimatedReadyAt);
 ```
