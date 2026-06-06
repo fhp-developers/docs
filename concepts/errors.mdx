@@ -10,7 +10,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 {
   "statusCode": 400,
   "error": "Bad Request",
-  "message": "Product 2 price mismatch: expected 3299"
+  "message": "Product 2 price mismatch: expected 10000"
 }
 ```
 
@@ -85,7 +85,7 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
 | `Product {productId} price mismatch: expected {expected}` |
 
 <Info>
-  Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `3299` = 32.99.
+  Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `10000` = 100.00.
 </Info>
 
 ## Orders - backend rejection (`400`)

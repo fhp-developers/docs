@@ -71,9 +71,9 @@ retrieving your codes.
       -d '{
         "externalOrderCode": "O-12345",
         "currency": "GBP",
-        "price": 3299,
+        "price": 10000,
         "orderProducts": [
-          { "productId": 2, "price": 3299, "quantity": 1 }
+          { "productId": 2, "price": 10000, "quantity": 1 }
         ]
       }'
     ```
@@ -88,8 +88,8 @@ retrieving your codes.
       body: JSON.stringify({
         externalOrderCode: "O-12345",
         currency: "GBP",
-        price: 3299,
-        orderProducts: [{ productId: 2, price: 3299, quantity: 1 }],
+        price: 10000,
+        orderProducts: [{ productId: 2, price: 10000, quantity: 1 }],
       }),
     });
     console.log(await res.json());
@@ -121,7 +121,7 @@ retrieving your codes.
       "status": "completed",
       "externalOrderCode": "O-12345",
       "products": [
-        { "productId": 2, "price": 3299, "quantity": 1, "pin": [{ "PIN": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }] }
+        { "productId": 2, "price": 10000, "quantity": 1, "pin": [{ "pin": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }] }
       ]
     }
     ```

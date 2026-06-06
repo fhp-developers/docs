@@ -108,7 +108,12 @@
             "description": "A paginated list of catalog products.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CatalogProductList" }
+                "schema": { "$ref": "#/components/schemas/CatalogProductList" },
+                "examples": {
+                  "playstationTopUp": {
+                    "$ref": "#/components/examples/CatalogProductListExample"
+                  }
+                }
               }
             }
           },
@@ -140,7 +145,14 @@
           "200": {
             "description": "The requested product.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Product" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" },
+                "examples": {
+                  "playstationTopUp": {
+                    "$ref": "#/components/examples/CatalogProductExample"
+                  }
+                }
+              }
             }
           },
           "404": {
@@ -306,9 +318,9 @@
                       "products": [
                         {
                           "productId": 2,
-                          "price": 3299,
+                          "price": 10000,
                           "quantity": 1,
-                          "pin": [{ "PIN": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]
+                          "pin": [{ "pin": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]
                         }
                       ],
                       "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
@@ -390,13 +402,17 @@
         "type": "object",
         "properties": {
           "languageCode": { "type": "string", "example": "en" },
-          "name": { "type": "string", "example": "PlayStation Store Gift Card" },
+          "name": { "type": "string", "example": "Sony PlayStation®Network Wallet Top-Up £100" },
           "sku": {
             "type": "string",
             "description": "Locale SKU in the form `{CC}-{LL}-{productCode}` (e.g. GB-EN-10020000213575).",
             "example": "GB-EN-10020000213575"
           },
-          "image": { "type": "string", "format": "uri" },
+          "image": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
+          },
           "description": { "type": "string" },
           "tnc": { "type": "string" },
           "redemptionInstructions": { "type": "string" }
@@ -411,17 +427,21 @@
             "description": "A stable 14-digit catalog identifier.",
             "example": "10020000213575"
           },
-          "name": { "type": "string", "example": "PlayStation Store Gift Card" },
+          "name": { "type": "string", "example": "Sony PlayStation®Network Wallet Top-Up £100" },
           "shortName": { "type": "string", "example": "PSN" },
-          "image": { "type": "string", "format": "uri" },
-          "price": { "type": "integer", "description": "Selling price in minor units (e.g. pennies).", "example": 3299 },
+          "image": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
+          },
+          "price": { "type": "integer", "description": "Selling price in minor units (e.g. pennies).", "example": 10000 },
           "currencyCode": { "type": "string", "example": "GBP" },
-          "rrp": { "type": "string", "example": "32.99" },
+          "rrp": { "type": "string", "example": "100.00" },
           "rrpCurrency": { "type": "string", "example": "GBP" },
-          "buyingPrice": { "type": "number", "description": "Your buying price in minor units.", "example": 3100 },
+          "buyingPrice": { "type": "number", "description": "Your buying price in minor units.", "example": 9500 },
           "buyingCurrencyCode": { "type": "string", "example": "GBP" },
-          "resellerCommission": { "type": "number", "description": "Your commission for this product.", "example": 199 },
-          "isCurrencyMismatch": { "type": "boolean", "description": "True when your buying currency differs from the product's selling currency.", "example": false },
+          "discount": { "type": "number", "description": "Your discount for this product.", "example": 500 },
+          "currencyMismatch": { "type": "boolean", "description": "True when your buying currency differs from the product's selling currency.", "example": false },
           "denominationType": { "$ref": "#/components/schemas/DenominationType" },
           "denominationMinValue": { "type": "number", "nullable": true, "example": null },
           "denominationMaxValue": { "type": "number", "nullable": true, "example": null },
@@ -431,11 +451,17 @@
           "publisher": { "type": "string", "example": "Sony" },
           "countryCode": { "type": "string", "example": "GB" },
           "mainCategory": { "type": "string", "example": "Gaming" },
-          "subCategory": { "type": "string", "example": "Consoles" },
-          "productCategory": { "type": "string", "example": "Gaming" },
-          "productType": { "type": "string", "example": "Gift Card" },
+          "subCategory": { "type": "string", "example": "PlayStation" },
+          "productCategory": { "type": "string", "example": "PlayStation" },
+          "productType": { "type": "string", "example": "credit" },
           "platform": { "type": "string", "example": "PlayStation" },
-          "region": { "type": "string", "example": "Europe" },
+          "redeemable": { "type": "string", "description": "Where the product can be redeemed.", "example": "Europe" },
+          "preorder": { "type": "boolean", "example": true },
+          "preorderCode": { "type": "boolean", "example": true },
+          "firstSale": { "type": "string", "format": "date", "example": "2026-06-01" },
+          "playableOn": { "type": "string", "format": "date", "example": "2026-06-15" },
+          "expires": { "type": "boolean", "example": true },
+          "expiryPolicy": { "type": "string", "example": "3 years" },
           "tags": { "type": "string", "example": "bestseller,gaming" },
           "status": { "type": "string", "example": "active" },
           "state": { "type": "string", "example": "live" },
@@ -463,7 +489,7 @@
         "required": ["productId", "quantity"],
         "properties": {
           "productId": { "type": "integer", "description": "The catalog product id.", "example": 2 },
-          "price": { "type": "integer", "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.", "example": 3299 },
+          "price": { "type": "integer", "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.", "example": 10000 },
           "quantity": { "type": "integer", "minimum": 1, "example": 1 },
           "currency": { "type": "string", "example": "GBP" },
           "sku": {
@@ -483,7 +509,7 @@
             "example": "O-12345"
           },
           "currency": { "type": "string", "example": "GBP" },
-          "price": { "type": "integer", "description": "Expected order total in minor units.", "example": 4138 },
+          "price": { "type": "integer", "description": "Expected order total in minor units.", "example": 10000 },
           "orderProducts": {
             "type": "array",
             "minItems": 1,
@@ -520,14 +546,14 @@
       "Pin": {
         "type": "object",
         "properties": {
-          "PIN": { "type": "string", "example": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }
+          "pin": { "type": "string", "example": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }
         }
       },
       "OrderProductResult": {
         "type": "object",
         "properties": {
           "productId": { "type": "integer", "example": 2 },
-          "price": { "type": "integer", "example": 3299 },
+          "price": { "type": "integer", "example": 10000 },
           "quantity": { "type": "integer", "example": 1 },
           "pin": {
             "type": "array",
@@ -580,12 +606,106 @@
           "message": {
             "type": "string",
             "description": "Human-readable, client-safe explanation. May include the productId you sent.",
-            "example": "Product 2 price mismatch: expected 3299"
+            "example": "Product 2 price mismatch: expected 10000"
           }
         }
       }
     },
     "examples": {
+      "CatalogProductExample": {
+        "summary": "PlayStation wallet top-up",
+        "value": {
+          "id": 2,
+          "productCode": "10020000213575",
+          "name": "Sony PlayStation®Network Wallet Top-Up £100",
+          "shortName": "PSN",
+          "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
+          "price": 10000,
+          "currencyCode": "GBP",
+          "rrp": "100.00",
+          "rrpCurrency": "GBP",
+          "buyingPrice": 9500,
+          "buyingCurrencyCode": "GBP",
+          "discount": 500,
+          "currencyMismatch": false,
+          "denominationType": "fixed",
+          "denominationMinValue": null,
+          "denominationMaxValue": null,
+          "denominationStep": null,
+          "denominationDefaultValue": null,
+          "brand": "PlayStation",
+          "publisher": "Sony",
+          "countryCode": "GB",
+          "mainCategory": "Gaming",
+          "subCategory": "PlayStation",
+          "productCategory": "PlayStation",
+          "productType": "credit",
+          "platform": "PlayStation",
+          "redeemable": "Europe",
+          "preorder": true,
+          "preorderCode": true,
+          "firstSale": "2026-06-01",
+          "playableOn": "2026-06-15",
+          "expires": true,
+          "expiryPolicy": "3 years",
+          "tags": "bestseller,gaming",
+          "status": "active",
+          "state": "live",
+          "type": "digital",
+          "languages": [
+            {
+              "languageCode": "en",
+              "name": "Sony PlayStation®Network Wallet Top-Up £100",
+              "sku": "GB-EN-10020000213575",
+              "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
+            }
+          ]
+        }
+      },
+      "CatalogProductListExample": {
+        "summary": "Paginated list with one product",
+        "value": {
+          "count": 1,
+          "skip": 0,
+          "take": 20,
+          "products": [
+            {
+              "id": 2,
+              "productCode": "10020000213575",
+              "name": "Sony PlayStation®Network Wallet Top-Up £100",
+              "shortName": "PSN",
+              "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
+              "price": 10000,
+              "currencyCode": "GBP",
+              "rrp": "100.00",
+              "rrpCurrency": "GBP",
+              "buyingPrice": 9500,
+              "buyingCurrencyCode": "GBP",
+              "discount": 500,
+              "currencyMismatch": false,
+              "denominationType": "fixed",
+              "brand": "PlayStation",
+              "publisher": "Sony",
+              "countryCode": "GB",
+              "mainCategory": "Gaming",
+              "subCategory": "PlayStation",
+              "productCategory": "PlayStation",
+              "productType": "credit",
+              "platform": "PlayStation",
+              "redeemable": "Europe",
+              "preorder": true,
+              "preorderCode": true,
+              "firstSale": "2026-06-01",
+              "playableOn": "2026-06-15",
+              "expires": true,
+              "expiryPolicy": "3 years",
+              "status": "active",
+              "state": "live",
+              "type": "digital"
+            }
+          ]
+        }
+      },
       "ErrorMissingApiKey": {
         "summary": "Missing API key",
         "value": {
@@ -623,7 +743,7 @@
         "value": {
           "statusCode": 400,
           "error": "Bad Request",
-          "message": "Product 2 price mismatch: expected 3299"
+          "message": "Product 2 price mismatch: expected 10000"
         }
       },
       "ErrorOpenDenomRequiresPrice": {

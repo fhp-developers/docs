@@ -34,7 +34,7 @@ collection.variable = [
   { key: "productId", value: "2" },
   { key: "orderReference", value: "O-12345" },
   { key: "externalOrderCode", value: "O-12345" },
-  { key: "linePrice", value: "3299" },
+  { key: "linePrice", value: "10000" },
   { key: "currency", value: "GBP" },
 ];
 
