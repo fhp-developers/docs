@@ -31,9 +31,10 @@ mint validate        # validate docs.json + OpenAPI
 
 ## Branding
 
-- Primary: `#c9f73a` (neon green) on `#0a0a0a` (near-black). Dark mode is the default.
+- Palette: lime greens from `#f4fdd8` (50) through `#0a0c03` (950); primary accent `#c9f73a` (500).
+- Light mode background: `#f4fdd8`; dark mode background: `#0a0c03`. Dark mode is the default.
 - Logo: `logo/kalixo-white.svg` (dark mode) and `logo/kalixo-black.svg` (light mode).
-- Favicon: `favicon.svg` (green “k” monogram on black).
+- Favicon: `favicon.ico` (from [kalixo.io](https://kalixo.io/favicon.ico)).
 
 Edit colors, logo, navigation, and the playground in `docs.json`.
 
@@ -60,7 +61,8 @@ docs.json                 # site config + navigation + theme
 openapi.json              # API spec (powers the reference + Try it)
 kalixo-api-v2.postman_collection.json
 kalixo-api-v2.postman_environment.*.json
-favicon.svg
+favicon.ico
+custom.css
 logo/                     # light/dark wordmarks
 index.mdx                 # introduction (landing)
 quickstart.mdx

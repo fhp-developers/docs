@@ -4,9 +4,9 @@
   "name": "Kalixo API",
   "description": "Developer documentation for the Kalixo Distribution API v2 - catalog, ordering, bulk fulfilment and wallet.",
   "colors": {
-    "primary": "#c9f73a",
+    "primary": "#799423",
     "light": "#c9f73a",
-    "dark": "#4d6a00"
+    "dark": "#a1c62e"
   },
   "appearance": {
     "default": "dark",
@@ -14,8 +14,8 @@
   },
   "background": {
     "color": {
-      "light": "#ffffff",
-      "dark": "#0a0a0a"
+      "light": "#f4fdd8",
+      "dark": "#0a0c03"
     },
     "decoration": "gradient"
   },
@@ -24,7 +24,7 @@
     "dark": "/logo/kalixo-white.svg",
     "href": "https://kalixo.io"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.ico",
   "styling": {
     "eyebrows": "section",
     "codeblocks": "dark"
@@ -64,6 +64,7 @@
             "pages": [
               "concepts/pagination",
               "concepts/filtering",
+              "concepts/product-codes",
               "concepts/open-denomination",
               "concepts/order-lifecycle",
               "concepts/idempotency",

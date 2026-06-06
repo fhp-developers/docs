@@ -31,7 +31,7 @@ v1 remains available; migrate when you’re ready.
 | `POST /v1/orders/place-order` (sync, returns pins) | `POST /v2/orders` (async) | Returns `orderId` + `processing`; poll for pins |
 | `GET /v1/orders/retrieve-order?id=` | `GET /v2/orders/{reference}` | By `orderId` **or** `externalOrderCode`; codes only when `completed` |
 | `GET /v1/catalog/products` | `GET /v2/catalog/products` | Adds filters + `skip`/`take` (max 100) |
-| `GET /v1/catalog/product?sku=&ean=` | `GET /v2/catalog/products/{id}` | Fetch by product id |
+| `GET /v1/catalog/product?sku=` | `GET /v2/catalog/products/{id}` | Fetch by catalog `productId`; see [Product codes](/concepts/product-codes) |
 | _(none)_ | `GET /v2/wallet` | New dedicated wallet endpoint |
 
 ## Behavioural differences
@@ -44,6 +44,8 @@ v1 remains available; migrate when you’re ready.
 
 <Note>
   Product ids are stable catalog ids - keep sending the `productId` from the catalog, exactly
-  as in v1. Pricing validation is unchanged for fixed products (price must match) and
-  range-checked for [open-denomination](/concepts/open-denomination) products.
+  as in v1. Catalog responses now expose Kalixo `productCode` and locale `sku` instead of
+  provider identifiers — see [Product codes](/concepts/product-codes). Pricing validation is
+  unchanged for fixed products (price must match) and range-checked for
+  [open-denomination](/concepts/open-denomination) products.
 </Note>

@@ -1,1103 +1,1187 @@
 {
-  "item": [
-    {
-      "name": "catalog",
-      "description": "",
-      "item": [
+    "item": [
         {
-          "name": "products",
-          "description": "",
-          "item": [
-            {
-              "id": "03ffbd56-d5f4-4552-b670-e9ba76fe381c",
-              "name": "List catalog products",
-              "request": {
-                "name": "List catalog products",
-                "description": {
-                  "content": "Returns the products in your catalog. Supports filtering and pagination. Filters are AND-combined across fields; within a single field you may pass multiple comma-separated values (for example `country=GB,IE`).",
-                  "type": "text/plain"
-                },
-                "url": {
-                  "path": ["catalog", "products"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [
-                    {
-                      "disabled": false,
-                      "description": {
-                        "content": "Filter by ISO country code(s). Comma-separated for multiple.",
-                        "type": "text/plain"
-                      },
-                      "key": "country",
-                      "value": "GB"
-                    },
-                    {
-                      "disabled": true,
-                      "description": {
-                        "content": "Filter by language code(s). Comma-separated for multiple.",
-                        "type": "text/plain"
-                      },
-                      "key": "language",
-                      "value": "<string>"
-                    },
-                    {
-                      "disabled": true,
-                      "description": {
-                        "content": "Filter by brand name(s). Comma-separated for multiple.",
-                        "type": "text/plain"
-                      },
-                      "key": "brand",
-                      "value": "<string>"
-                    },
-                    {
-                      "disabled": true,
-                      "description": {
-                        "content": "Filter by category/main category. Comma-separated for multiple.",
-                        "type": "text/plain"
-                      },
-                      "key": "category",
-                      "value": "<string>"
-                    },
-                    {
-                      "disabled": true,
-                      "description": {
-                        "content": "Filter by tag(s). Comma-separated for multiple.",
-                        "type": "text/plain"
-                      },
-                      "key": "tag",
-                      "value": "<string>"
-                    },
-                    {
-                      "disabled": true,
-                      "description": {
-                        "content": "Free-text search across product name and EAN.",
-                        "type": "text/plain"
-                      },
-                      "key": "search",
-                      "value": "<string>"
-                    },
-                    {
-                      "disabled": false,
-                      "description": {
-                        "content": "Number of records to skip (offset).",
-                        "type": "text/plain"
-                      },
-                      "key": "skip",
-                      "value": "0"
-                    },
-                    {
-                      "disabled": false,
-                      "description": {
-                        "content": "Number of records to return. Maximum 100.",
-                        "type": "text/plain"
-                      },
-                      "key": "take",
-                      "value": "20"
-                    }
-                  ],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "method": "GET",
-                "body": {},
-                "auth": null
-              },
-              "response": [
+            "name": "catalog",
+            "description": "",
+            "item": [
                 {
-                  "id": "5fe4fae5-2126-47d2-9791-ad35eda9b6c5",
-                  "name": "A paginated list of catalog products.",
-                  "originalRequest": {
-                    "url": {
-                      "path": ["catalog", "products"],
-                      "host": ["{{baseUrl}}"],
-                      "query": [
+                    "name": "products",
+                    "description": "",
+                    "item": [
                         {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by ISO country code(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "country",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by language code(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "language",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by brand name(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "brand",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by category/main category. Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "category",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by tag(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "tag",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Free-text search across product name and EAN.",
-                            "type": "text/plain"
-                          },
-                          "key": "search",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Number of records to skip (offset).",
-                            "type": "text/plain"
-                          },
-                          "key": "skip",
-                          "value": "0"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Number of records to return. Maximum 100.",
-                            "type": "text/plain"
-                          },
-                          "key": "take",
-                          "value": "20"
-                        }
-                      ],
-                      "variable": []
-                    },
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: apikey",
-                          "type": "text/plain"
-                        },
-                        "key": "x-api-key",
-                        "value": "<API Key>"
-                      }
-                    ],
-                    "method": "GET",
-                    "body": {}
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"id\": \"<integer>\",\n      \"ean\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"rrp\": \"<string>\",\n      \"rrpCurrency\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"resellerCommission\": \"<number>\",\n      \"isCurrencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"region\": \"<string>\",\n      \"tags\": \"<string>\",\n      \"status\": \"<string>\",\n      \"state\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"id\": \"<integer>\",\n      \"ean\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"rrp\": \"<string>\",\n      \"rrpCurrency\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"resellerCommission\": \"<number>\",\n      \"isCurrencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"region\": \"<string>\",\n      \"tags\": \"<string>\",\n      \"status\": \"<string>\",\n      \"state\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
-                  "cookie": [],
-                  "_postman_previewlanguage": "json"
-                },
-                {
-                  "id": "4de28ded-a14b-4a9b-a205-e9b33fe0fb37",
-                  "name": "Missing or invalid API key.",
-                  "originalRequest": {
-                    "url": {
-                      "path": ["catalog", "products"],
-                      "host": ["{{baseUrl}}"],
-                      "query": [
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by ISO country code(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "country",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by language code(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "language",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by brand name(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "brand",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by category/main category. Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "category",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Filter by tag(s). Comma-separated for multiple.",
-                            "type": "text/plain"
-                          },
-                          "key": "tag",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Free-text search across product name and EAN.",
-                            "type": "text/plain"
-                          },
-                          "key": "search",
-                          "value": "<string>"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Number of records to skip (offset).",
-                            "type": "text/plain"
-                          },
-                          "key": "skip",
-                          "value": "0"
-                        },
-                        {
-                          "disabled": false,
-                          "description": {
-                            "content": "Number of records to return. Maximum 100.",
-                            "type": "text/plain"
-                          },
-                          "key": "take",
-                          "value": "20"
-                        }
-                      ],
-                      "variable": []
-                    },
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: apikey",
-                          "type": "text/plain"
-                        },
-                        "key": "x-api-key",
-                        "value": "<API Key>"
-                      }
-                    ],
-                    "method": "GET",
-                    "body": {}
-                  },
-                  "status": "Unauthorized",
-                  "code": 401,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-                  "cookie": [],
-                  "_postman_previewlanguage": "json"
-                }
-              ],
-              "event": [],
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              }
-            },
-            {
-              "name": "{productId}",
-              "description": "",
-              "item": [
-                {
-                  "id": "b1f69e4e-c941-41e5-a1f3-4c5a6c7a1451",
-                  "name": "Get a single product",
-                  "request": {
-                    "name": "Get a single product",
-                    "description": {
-                      "content": "Returns a single catalog product by its product id.",
-                      "type": "text/plain"
-                    },
-                    "url": {
-                      "path": ["catalog", "products", ":productId"],
-                      "host": ["{{baseUrl}}"],
-                      "query": [],
-                      "variable": [
-                        {
-                          "type": "any",
-                          "value": "{{productId}}",
-                          "key": "productId",
-                          "disabled": false,
-                          "description": {
-                            "content": "(Required) The product id from the catalog.",
-                            "type": "text/plain"
-                          }
-                        }
-                      ]
-                    },
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      }
-                    ],
-                    "method": "GET",
-                    "body": {},
-                    "auth": null
-                  },
-                  "response": [
-                    {
-                      "id": "1abe782b-fb93-4789-a074-13c6dae38c30",
-                      "name": "The requested product.",
-                      "originalRequest": {
-                        "url": {
-                          "path": ["catalog", "products", ":productId"],
-                          "host": ["{{baseUrl}}"],
-                          "query": [],
-                          "variable": []
-                        },
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: apikey",
-                              "type": "text/plain"
+                            "id": "57df73e4-e99d-468d-af56-de2fd5405cf0",
+                            "name": "List catalog products",
+                            "request": {
+                                "name": "List catalog products",
+                                "description": {
+                                    "content": "Returns the products in your catalog. Supports filtering and pagination. Filters are AND-combined across fields; within a single field you may pass multiple comma-separated values (for example `country=GB,IE`).",
+                                    "type": "text/plain"
+                                },
+                                "url": {
+                                    "path": [
+                                        "catalog",
+                                        "products"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "Filter by ISO country code(s). Comma-separated for multiple.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "country",
+                                            "value": "GB"
+                                        },
+                                        {
+                                            "disabled": true,
+                                            "description": {
+                                                "content": "Filter by language code(s). Comma-separated for multiple.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "language",
+                                            "value": "<string>"
+                                        },
+                                        {
+                                            "disabled": true,
+                                            "description": {
+                                                "content": "Filter by brand name(s). Comma-separated for multiple.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "brand",
+                                            "value": "<string>"
+                                        },
+                                        {
+                                            "disabled": true,
+                                            "description": {
+                                                "content": "Filter by category/main category. Comma-separated for multiple.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "category",
+                                            "value": "<string>"
+                                        },
+                                        {
+                                            "disabled": true,
+                                            "description": {
+                                                "content": "Filter by tag(s). Comma-separated for multiple.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "tag",
+                                            "value": "<string>"
+                                        },
+                                        {
+                                            "disabled": true,
+                                            "description": {
+                                                "content": "Free-text search across product name and productCode.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "search",
+                                            "value": "<string>"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "Number of records to skip (offset).",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "skip",
+                                            "value": "0"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "Number of records to return. Maximum 100.",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "take",
+                                            "value": "20"
+                                        }
+                                    ],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
                             },
-                            "key": "x-api-key",
-                            "value": "<API Key>"
-                          }
-                        ],
-                        "method": "GET",
-                        "body": {}
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "application/json"
-                        }
-                      ],
-                      "body": "{\n  \"id\": \"<integer>\",\n  \"ean\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"rrp\": \"<string>\",\n  \"rrpCurrency\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"resellerCommission\": \"<number>\",\n  \"isCurrencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"fixed\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"region\": \"<string>\",\n  \"tags\": \"<string>\",\n  \"status\": \"<string>\",\n  \"state\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
-                      "cookie": [],
-                      "_postman_previewlanguage": "json"
-                    },
-                    {
-                      "id": "cce2dd66-ea87-42f9-806e-d0ec39cad253",
-                      "name": "Product not found in your catalog.",
-                      "originalRequest": {
-                        "url": {
-                          "path": ["catalog", "products", ":productId"],
-                          "host": ["{{baseUrl}}"],
-                          "query": [],
-                          "variable": []
+                            "response": [
+                                {
+                                    "id": "e2c43640-b7ed-4b11-be03-c817dccac4a1",
+                                    "name": "A paginated list of catalog products.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "catalog",
+                                                "products"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by ISO country code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "country",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by language code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "language",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by brand name(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "brand",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by category/main category. Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "category",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by tag(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "tag",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Free-text search across product name and productCode.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "search",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to skip (offset).",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "skip",
+                                                    "value": "0"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to return. Maximum 100.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "take",
+                                                    "value": "20"
+                                                }
+                                            ],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"rrp\": \"<string>\",\n      \"rrpCurrency\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"resellerCommission\": \"<number>\",\n      \"isCurrencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"region\": \"<string>\",\n      \"tags\": \"<string>\",\n      \"status\": \"<string>\",\n      \"state\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"rrp\": \"<string>\",\n      \"rrpCurrency\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"resellerCommission\": \"<number>\",\n      \"isCurrencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"region\": \"<string>\",\n      \"tags\": \"<string>\",\n      \"status\": \"<string>\",\n      \"state\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "52f825f6-49af-4385-ad37-d7f15487037f",
+                                    "name": "Missing or invalid API key.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "catalog",
+                                                "products"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by ISO country code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "country",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by language code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "language",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by brand name(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "brand",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by category/main category. Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "category",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by tag(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "tag",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Free-text search across product name and productCode.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "search",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to skip (offset).",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "skip",
+                                                    "value": "0"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to return. Maximum 100.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "take",
+                                                    "value": "20"
+                                                }
+                                            ],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Unauthorized",
+                                    "code": 401,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                }
+                            ],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
                         },
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: apikey",
-                              "type": "text/plain"
-                            },
-                            "key": "x-api-key",
-                            "value": "<API Key>"
-                          }
-                        ],
-                        "method": "GET",
-                        "body": {}
-                      },
-                      "status": "Not Found",
-                      "code": 404,
-                      "header": [
                         {
-                          "key": "Content-Type",
-                          "value": "application/json"
+                            "name": "{productId}",
+                            "description": "",
+                            "item": [
+                                {
+                                    "id": "32b1f3a3-6e04-4369-a86e-4d9f83cde047",
+                                    "name": "Get a single product",
+                                    "request": {
+                                        "name": "Get a single product",
+                                        "description": {
+                                            "content": "Returns a single catalog product by its product id.",
+                                            "type": "text/plain"
+                                        },
+                                        "url": {
+                                            "path": [
+                                                "catalog",
+                                                "products",
+                                                ":productId"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "value": "{{productId}}",
+                                                    "key": "productId",
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "(Required) The product id from the catalog.",
+                                                        "type": "text/plain"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {},
+                                        "auth": null
+                                    },
+                                    "response": [
+                                        {
+                                            "id": "d48056a2-a43e-4574-844e-146c558ed113",
+                                            "name": "The requested product.",
+                                            "originalRequest": {
+                                                "url": {
+                                                    "path": [
+                                                        "catalog",
+                                                        "products",
+                                                        ":productId"
+                                                    ],
+                                                    "host": [
+                                                        "{{baseUrl}}"
+                                                    ],
+                                                    "query": [],
+                                                    "variable": []
+                                                },
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application/json"
+                                                    },
+                                                    {
+                                                        "description": {
+                                                            "content": "Added as a part of security scheme: apikey",
+                                                            "type": "text/plain"
+                                                        },
+                                                        "key": "x-api-key",
+                                                        "value": "<API Key>"
+                                                    }
+                                                ],
+                                                "method": "GET",
+                                                "body": {}
+                                            },
+                                            "status": "OK",
+                                            "code": 200,
+                                            "header": [
+                                                {
+                                                    "key": "Content-Type",
+                                                    "value": "application/json"
+                                                }
+                                            ],
+                                            "body": "{\n  \"id\": \"<integer>\",\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"rrp\": \"<string>\",\n  \"rrpCurrency\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"resellerCommission\": \"<number>\",\n  \"isCurrencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"open\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"region\": \"<string>\",\n  \"tags\": \"<string>\",\n  \"status\": \"<string>\",\n  \"state\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
+                                            "cookie": [],
+                                            "_postman_previewlanguage": "json"
+                                        },
+                                        {
+                                            "id": "25907fc5-7728-4db8-96b4-0fb830272dc1",
+                                            "name": "Product not found in your catalog.",
+                                            "originalRequest": {
+                                                "url": {
+                                                    "path": [
+                                                        "catalog",
+                                                        "products",
+                                                        ":productId"
+                                                    ],
+                                                    "host": [
+                                                        "{{baseUrl}}"
+                                                    ],
+                                                    "query": [],
+                                                    "variable": []
+                                                },
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application/json"
+                                                    },
+                                                    {
+                                                        "description": {
+                                                            "content": "Added as a part of security scheme: apikey",
+                                                            "type": "text/plain"
+                                                        },
+                                                        "key": "x-api-key",
+                                                        "value": "<API Key>"
+                                                    }
+                                                ],
+                                                "method": "GET",
+                                                "body": {}
+                                            },
+                                            "status": "Not Found",
+                                            "code": 404,
+                                            "header": [
+                                                {
+                                                    "key": "Content-Type",
+                                                    "value": "application/json"
+                                                }
+                                            ],
+                                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                                            "cookie": [],
+                                            "_postman_previewlanguage": "json"
+                                        }
+                                    ],
+                                    "event": [],
+                                    "protocolProfileBehavior": {
+                                        "disableBodyPruning": true
+                                    }
+                                }
+                            ]
                         }
-                      ],
-                      "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-                      "cookie": [],
-                      "_postman_previewlanguage": "json"
-                    }
-                  ],
-                  "event": [],
-                  "protocolProfileBehavior": {
-                    "disableBodyPruning": true
-                  }
+                    ]
                 }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "orders",
-      "description": "",
-      "item": [
-        {
-          "id": "802e2de7-d066-4a8d-bb00-12d84032c3c4",
-          "name": "Place an order",
-          "request": {
-            "name": "Place an order",
-            "description": {
-              "content": "Creates an order and begins fulfilment asynchronously. The response returns immediately with an `orderId` and a `processing` status. Large orders are automatically segmented; the response includes an `estimatedReadyAt` timestamp telling you roughly when to poll for codes.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
-              "type": "text/plain"
-            },
-            "url": {
-              "path": ["orders"],
-              "host": ["{{ordersBaseUrl}}"],
-              "query": [],
-              "variable": []
-            },
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productId\": {{productId}},\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "auth": null
-          },
-          "response": [
-            {
-              "id": "2a8032cb-88eb-4ed9-83fc-c06b623b4888",
-              "name": "Order accepted and now processing.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Accepted",
-              "code": 202,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"sed2b\": \"<number>\",\n      \"laborum_a78\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            },
-            {
-              "id": "faedb0c5-b269-41ed-888e-f3b8cddf1a8a",
-              "name": "Validation or order rejection. See the Errors guide for the full message catalogue.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Bad Request",
-              "code": 400,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            },
-            {
-              "id": "92a53d13-bdec-424f-a425-9fcf163c4847",
-              "name": "API ordering disabled for your account.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Forbidden",
-              "code": 403,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            },
-            {
-              "id": "531e0574-8d01-4734-9965-703cd333a491",
-              "name": "An order with the same externalOrderCode already exists.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Conflict",
-              "code": 409,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            },
-            {
-              "id": "be97cf42-a31b-429e-9e79-d7c80dbec31f",
-              "name": "Order limit exceeded or product not available for purchase.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-              "code": 422,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            },
-            {
-              "id": "6bf00f00-2370-43ff-a233-1fb45b87a6b8",
-              "name": "Upstream order service unavailable or order could not be created.",
-              "originalRequest": {
-                "url": {
-                  "path": ["orders"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "POST",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "Bad Gateway",
-              "code": 502,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            }
-          ],
-          "event": [],
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          }
+            ]
         },
         {
-          "name": "{reference}",
-          "description": "",
-          "item": [
-            {
-              "id": "d3e5cdee-3133-4c08-8557-253618ff6e75",
-              "name": "Retrieve an order",
-              "request": {
-                "name": "Retrieve an order",
-                "description": {
-                  "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nCodes (PINs) are returned **only when the order status is `completed`**. While the order is `processing` you receive the status and `estimatedReadyAt`; `failed` returns a reason; `partially_completed` returns delivered/total counts.",
-                  "type": "text/plain"
-                },
-                "url": {
-                  "path": ["orders", ":reference"],
-                  "host": ["{{ordersBaseUrl}}"],
-                  "query": [],
-                  "variable": [
-                    {
-                      "type": "any",
-                      "value": "{{orderReference}}",
-                      "key": "reference",
-                      "disabled": false,
-                      "description": {
-                        "content": "(Required) The numeric orderId or your externalOrderCode.",
-                        "type": "text/plain"
-                      }
-                    }
-                  ]
-                },
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "method": "GET",
-                "body": {},
-                "auth": null
-              },
-              "response": [
+            "name": "orders",
+            "description": "",
+            "item": [
                 {
-                  "id": "d534abd6-0bf7-4eee-89ae-324adcdaf354",
-                  "name": "The order and its current status.",
-                  "originalRequest": {
-                    "url": {
-                      "path": ["orders", ":reference"],
-                      "host": ["{{baseUrl}}"],
-                      "query": [],
-                      "variable": []
-                    },
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
+                    "id": "51ca2b12-fefb-4244-b01d-3a7db17a7072",
+                    "name": "Place an order",
+                    "request": {
+                        "name": "Place an order",
                         "description": {
-                          "content": "Added as a part of security scheme: apikey",
-                          "type": "text/plain"
+                            "content": "Creates an order and begins fulfilment asynchronously. The response returns immediately with an `orderId` and a `processing` status. Large orders are automatically segmented; the response includes an `estimatedReadyAt` timestamp telling you roughly when to poll for codes.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+                            "type": "text/plain"
                         },
-                        "key": "x-api-key",
-                        "value": "<API Key>"
-                      }
+                        "url": {
+                            "path": [
+                                "orders"
+                            ],
+                            "host": [
+                                "{{ordersBaseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productId\": {{productId}},\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
+                            "options": {
+                                "raw": {
+                                    "headerFamily": "json",
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": null
+                    },
+                    "response": [
+                        {
+                            "id": "74ffb1c2-6639-4505-8d8c-32926be3f95c",
+                            "name": "Order accepted and now processing.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Accepted",
+                            "code": 202,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"Excepteur4d\": \"<number>\",\n      \"Duisc\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "7968c22c-1304-4dd6-a615-df010d72216b",
+                            "name": "Validation or order rejection. See the Errors guide for the full message catalogue.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "a78a3227-faa6-413c-a2f6-3d042e6de030",
+                            "name": "API ordering disabled for your account.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Forbidden",
+                            "code": 403,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "94fd5caf-95f3-41ca-827b-c9688064acb7",
+                            "name": "An order with the same externalOrderCode already exists.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Conflict",
+                            "code": 409,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "b49f4db6-ee76-4d04-811f-4e689d2905d2",
+                            "name": "Order limit exceeded or product not available for purchase.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+                            "code": 422,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "1f497c37-008f-43c1-8af3-b1734f2fd138",
+                            "name": "Upstream order service unavailable or order could not be created.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Bad Gateway",
+                            "code": 502,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        }
                     ],
-                    "method": "GET",
-                    "body": {}
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
                     }
-                  ],
-                  "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"completed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"pin\": [\n        {\n          \"PIN\": \"<string>\"\n        },\n        {\n          \"PIN\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"pin\": [\n        {\n          \"PIN\": \"<string>\"\n        },\n        {\n          \"PIN\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"veniam_58\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
-                  "cookie": [],
-                  "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "11e671cf-5093-444d-a196-480f951e124b",
-                  "name": "Order not found.",
-                  "originalRequest": {
-                    "url": {
-                      "path": ["orders", ":reference"],
-                      "host": ["{{baseUrl}}"],
-                      "query": [],
-                      "variable": []
-                    },
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: apikey",
-                          "type": "text/plain"
-                        },
-                        "key": "x-api-key",
-                        "value": "<API Key>"
-                      }
-                    ],
-                    "method": "GET",
-                    "body": {}
-                  },
-                  "status": "Not Found",
-                  "code": 404,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
-                  "cookie": [],
-                  "_postman_previewlanguage": "json"
+                    "name": "{reference}",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "28c026de-4a31-4845-af9b-1306955a6876",
+                            "name": "Retrieve an order",
+                            "request": {
+                                "name": "Retrieve an order",
+                                "description": {
+                                    "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nCodes (PINs) are returned **only when the order status is `completed`**. While the order is `processing` you receive the status and `estimatedReadyAt`; `failed` returns a reason; `partially_completed` returns delivered/total counts.",
+                                    "type": "text/plain"
+                                },
+                                "url": {
+                                    "path": [
+                                        "orders",
+                                        ":reference"
+                                    ],
+                                    "host": [
+                                        "{{ordersBaseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": [
+                                        {
+                                            "type": "any",
+                                            "value": "{{orderReference}}",
+                                            "key": "reference",
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "(Required) The numeric orderId or your externalOrderCode.",
+                                                "type": "text/plain"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [
+                                {
+                                    "id": "3ac7b1b7-f0bb-4f14-abe4-95f16a0991d3",
+                                    "name": "The order and its current status.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "orders",
+                                                ":reference"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"pin\": [\n        {\n          \"PIN\": \"<string>\"\n        },\n        {\n          \"PIN\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"pin\": [\n        {\n          \"PIN\": \"<string>\"\n        },\n        {\n          \"PIN\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"culpa2f4\": \"<number>\",\n      \"elit_6d\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "40f2ede8-528c-4bec-b439-62973f595864",
+                                    "name": "Order not found.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "orders",
+                                                ":reference"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Not Found",
+                                    "code": 404,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                }
+                            ],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
                 }
-              ],
-              "event": [],
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "wallet",
-      "description": "",
-      "item": [
+            ]
+        },
         {
-          "id": "657b345c-61f7-4b22-9d2e-a81bdf5e2166",
-          "name": "Get wallet balances",
-          "request": {
-            "name": "Get wallet balances",
-            "description": {
-              "content": "Returns your current wallet balances per currency, plus a low-balance flag and the configured threshold.",
-              "type": "text/plain"
-            },
-            "url": {
-              "path": ["wallet"],
-              "host": ["{{ordersBaseUrl}}"],
-              "query": [],
-              "variable": []
-            },
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "method": "GET",
-            "body": {},
-            "auth": null
-          },
-          "response": [
-            {
-              "id": "91717448-b7ac-4d1d-9fb9-e594305ab294",
-              "name": "Current wallet snapshot.",
-              "originalRequest": {
-                "url": {
-                  "path": ["wallet"],
-                  "host": ["{{baseUrl}}"],
-                  "query": [],
-                  "variable": []
-                },
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: apikey",
-                      "type": "text/plain"
-                    },
-                    "key": "x-api-key",
-                    "value": "<API Key>"
-                  }
-                ],
-                "method": "GET",
-                "body": {}
-              },
-              "status": "OK",
-              "code": 200,
-              "header": [
+            "name": "wallet",
+            "description": "",
+            "item": [
                 {
-                  "key": "Content-Type",
-                  "value": "application/json"
+                    "id": "c07c1625-6482-4a2b-af6a-d2e3d1d8d8db",
+                    "name": "Get wallet balances",
+                    "request": {
+                        "name": "Get wallet balances",
+                        "description": {
+                            "content": "Returns your current wallet balances per currency, plus a low-balance flag and the configured threshold.",
+                            "type": "text/plain"
+                        },
+                        "url": {
+                            "path": [
+                                "wallet"
+                            ],
+                            "host": [
+                                "{{ordersBaseUrl}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "method": "GET",
+                        "body": {},
+                        "auth": null
+                    },
+                    "response": [
+                        {
+                            "id": "09073eaf-2d24-4130-a964-0b52865b7671",
+                            "name": "Current wallet snapshot.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "wallet"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {}
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"balances\": {\n    \"nostrud_f0\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        }
+                    ],
+                    "event": [],
+                    "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                    }
                 }
-              ],
-              "body": "{\n  \"balances\": {\n    \"dolor_2d2\": \"<number>\",\n    \"laborum_3\": \"<number>\",\n    \"exercitationd9b\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
-              "cookie": [],
-              "_postman_previewlanguage": "json"
-            }
-          ],
-          "event": [],
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          }
+            ]
         }
-      ]
+    ],
+    "auth": {
+        "type": "apikey",
+        "apikey": [
+            {
+                "type": "any",
+                "value": "x-api-key",
+                "key": "key"
+            },
+            {
+                "type": "any",
+                "value": "{{apiKey}}",
+                "key": "value"
+            },
+            {
+                "type": "any",
+                "value": "header",
+                "key": "in"
+            }
+        ]
+    },
+    "event": [],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://sandbox.kalixo.io/v2"
+        },
+        {
+            "key": "apiKey",
+            "value": ""
+        },
+        {
+            "key": "productId",
+            "value": "2"
+        },
+        {
+            "key": "orderReference",
+            "value": "O-12345"
+        },
+        {
+            "key": "externalOrderCode",
+            "value": "O-12345"
+        },
+        {
+            "key": "linePrice",
+            "value": "3299"
+        },
+        {
+            "key": "currency",
+            "value": "GBP"
+        },
+        {
+            "key": "ordersBaseUrl",
+            "value": "https://sandbox.kalixo.io/v2"
+        }
+    ],
+    "info": {
+        "_postman_id": "3d99f95e-1cc6-402c-9e8a-b05d4251e5e0",
+        "name": "Kalixo API v2",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": {
+            "content": "Kalixo Distribution API v2 - catalog, async orders, and wallet.\n\nSetup:\n1. Import this collection and an environment file from the docs repo.\n2. Set `apiKey` to your sandbox or production key.\n3. Select the **Sandbox** or **Production** environment.\n\nAuth: collection uses `x-api-key` → `{{apiKey}}`.\nRegenerate from `openapi.json` with `npm run postman:generate`.\n\nContact: integrations@kalixo.io",
+            "type": "text/plain"
+        }
     }
-  ],
-  "auth": {
-    "type": "apikey",
-    "apikey": [
-      {
-        "type": "any",
-        "value": "x-api-key",
-        "key": "key"
-      },
-      {
-        "type": "any",
-        "value": "{{apiKey}}",
-        "key": "value"
-      },
-      {
-        "type": "any",
-        "value": "header",
-        "key": "in"
-      }
-    ]
-  },
-  "event": [],
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "https://sandbox.kalixo.io/v2"
-    },
-    {
-      "key": "apiKey",
-      "value": ""
-    },
-    {
-      "key": "productId",
-      "value": "2"
-    },
-    {
-      "key": "orderReference",
-      "value": "O-12345"
-    },
-    {
-      "key": "externalOrderCode",
-      "value": "O-12345"
-    },
-    {
-      "key": "linePrice",
-      "value": "3299"
-    },
-    {
-      "key": "currency",
-      "value": "GBP"
-    },
-    {
-      "key": "ordersBaseUrl",
-      "value": "https://sandbox.kalixo.io/v2"
-    }
-  ],
-  "info": {
-    "_postman_id": "c1c45dd4-1b53-464c-9497-524dbc0913cb",
-    "name": "Kalixo API v2",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": {
-      "content": "Kalixo Distribution API v2 - catalog, async orders, and wallet.\n\nSetup:\n1. Import this collection and an environment file from the docs repo.\n2. Set `apiKey` to your sandbox or production key.\n3. Select the **Sandbox** or **Production** environment.\n\nAuth: collection uses `x-api-key` → `{{apiKey}}`.\nRegenerate from `openapi.json` with `npm run postman:generate`.\n\nContact: integrations@kalixo.io",
-      "type": "text/plain"
-    }
-  }
 }

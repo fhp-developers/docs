@@ -1,0 +1,65 @@
+:root {
+  --kalixo-50: #f4fdd8;
+  --kalixo-100: #f4fdd8;
+  --kalixo-200: #e9fcb0;
+  --kalixo-300: #dffa89;
+  --kalixo-400: #d4f961;
+  --kalixo-500: #c9f73a;
+  --kalixo-600: #a1c62e;
+  --kalixo-700: #799423;
+  --kalixo-800: #506317;
+  --kalixo-900: #28310c;
+  --kalixo-950: #0a0c03;
+}
+
+/* Light theme */
+html:not(.dark) #navbar {
+  background-color: var(--kalixo-50);
+  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-700) 12%, transparent);
+}
+
+html:not(.dark) #sidebar {
+  border-right: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, transparent);
+}
+
+html:not(.dark) #sidebar-content li[data-active] a {
+  background-color: var(--kalixo-200);
+  color: var(--kalixo-900);
+}
+
+html:not(.dark) card {
+  border-color: color-mix(in srgb, var(--kalixo-700) 18%, transparent);
+  background-color: color-mix(in srgb, white 72%, var(--kalixo-50));
+}
+
+html:not(.dark) callout {
+  border-color: color-mix(in srgb, var(--kalixo-700) 22%, transparent);
+  background-color: color-mix(in srgb, white 55%, var(--kalixo-100));
+}
+
+html:not(.dark) #topbar-cta-button {
+  color: var(--kalixo-950);
+}
+
+html:not(.dark) #table-of-contents {
+  border-left: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, transparent);
+}
+
+html:not(.dark) toc-item[data-active] {
+  color: var(--kalixo-800);
+}
+
+/* Dark theme */
+.dark #sidebar-content li[data-active] a {
+  background-color: color-mix(in srgb, var(--kalixo-500) 14%, transparent);
+}
+
+.dark card {
+  border-color: color-mix(in srgb, var(--kalixo-500) 20%, transparent);
+  background-color: color-mix(in srgb, var(--kalixo-950) 88%, var(--kalixo-900));
+}
+
+.dark callout {
+  border-color: color-mix(in srgb, var(--kalixo-500) 24%, transparent);
+  background-color: color-mix(in srgb, var(--kalixo-950) 80%, var(--kalixo-900));
+}

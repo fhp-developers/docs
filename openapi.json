@@ -84,7 +84,7 @@
           {
             "name": "search",
             "in": "query",
-            "description": "Free-text search across product name and EAN.",
+            "description": "Free-text search across product name and productCode.",
             "required": false,
             "schema": { "type": "string" }
           },
@@ -391,7 +391,11 @@
         "properties": {
           "languageCode": { "type": "string", "example": "en" },
           "name": { "type": "string", "example": "PlayStation Store Gift Card" },
-          "sku": { "type": "string", "example": "GB-EN-4251604177278" },
+          "sku": {
+            "type": "string",
+            "description": "Locale SKU in the form `{CC}-{LL}-{productCode}` (e.g. GB-EN-10020000213575).",
+            "example": "GB-EN-10020000213575"
+          },
           "image": { "type": "string", "format": "uri" },
           "description": { "type": "string" },
           "tnc": { "type": "string" },
@@ -402,7 +406,11 @@
         "type": "object",
         "properties": {
           "id": { "type": "integer", "example": 2, "description": "The product id you order with." },
-          "ean": { "type": "string", "example": "4251604177278" },
+          "productCode": {
+            "type": "string",
+            "description": "Kalixo product code — a stable 14-digit catalog identifier (not a provider barcode).",
+            "example": "10020000213575"
+          },
           "name": { "type": "string", "example": "PlayStation Store Gift Card" },
           "shortName": { "type": "string", "example": "PSN" },
           "image": { "type": "string", "format": "uri" },
@@ -458,7 +466,11 @@
           "price": { "type": "integer", "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.", "example": 3299 },
           "quantity": { "type": "integer", "minimum": 1, "example": 1 },
           "currency": { "type": "string", "example": "GBP" },
-          "sku": { "type": "string", "example": "GB-EN-4251604177278" }
+          "sku": {
+            "type": "string",
+            "description": "Optional locale SKU from the catalog (`{CC}-{LL}-{productCode}`).",
+            "example": "GB-EN-10020000213575"
+          }
         }
       },
       "PlaceOrderRequest": {

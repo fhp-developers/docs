@@ -1,0 +1,71 @@
+---
+title: "Product codes"
+description: "How Kalixo identifies catalog products with productCode and locale SKU."
+icon: "barcode"
+---
+
+Every product in your catalog has a **Kalixo product code** (`productCode`) — a stable,
+14-digit identifier assigned by Kalixo. It is **not** a provider barcode and never changes
+when fulfilment routes or linked inventory change.
+
+Each locale row also has a **SKU** in the form:
+
+```
+{CC}-{LL}-{productCode}
+```
+
+For example: `GB-EN-10020000213575` (United Kingdom, English, product code `10020000213575`).
+
+## Where they appear
+
+<ResponseField name="productCode" type="string">
+  On every catalog product object. Use it for search (`search` query param) and for
+  storing a stable reference in your own systems.
+</ResponseField>
+
+<ResponseField name="languages[].sku" type="string">
+  Per-locale SKU on each language row. Optional on order lines when your integration
+  sends a locale-specific identifier.
+</ResponseField>
+
+## Example catalog product
+
+```json
+{
+  "id": 21357,
+  "productCode": "10020000213575",
+  "name": "PlayStation Store Gift Card",
+  "countryCode": "GB",
+  "languages": [
+    {
+      "languageCode": "en",
+      "name": "PlayStation Store Gift Card",
+      "sku": "GB-EN-10020000213575"
+    }
+  ]
+}
+```
+
+<Note>
+  Always order with the catalog **`productId`** (`id` in the response). `productCode` and
+  `sku` are for identification, search, and display — not a substitute for `productId` on
+  `POST /v2/orders`.
+</Note>
+
+## Product code format (v1)
+
+Kalixo product codes are 14 numeric digits:
+
+```
+1{brand}{parentId}{checkDigit}
+```
+
+| Segment | Meaning |
+| --- | --- |
+| Leading `1` | Schema version |
+| Next 4 digits | Brand identifier (zero-padded) |
+| Next 8 digits | Internal catalog product id (zero-padded) |
+| Final digit | Check digit |
+
+You do not need to parse this structure to integrate — treat `productCode` as an opaque
+stable string. The breakdown is documented for support and debugging.
