@@ -64,6 +64,7 @@
               "concepts/pagination",
               "concepts/filtering",
               "concepts/open-denomination",
+              "concepts/promotions",
               "concepts/order-lifecycle",
               "concepts/order-cancellation",
               "concepts/idempotency",

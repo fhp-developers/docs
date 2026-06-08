@@ -16,16 +16,18 @@ then poll until the codes are ready.
   All codes were delivered. The response includes `products[].codes`.
 </ResponseField>
 <ResponseField name="partially_completed" type="status">
-  Some — but not all — codes were delivered. The response includes `delivered` and `total`.
-  **No redemption codes are returned.** See [Partial deliveries](#partial-deliveries) below.
+  Some — but not all — codes were delivered. The response includes `delivered`, `total`, and
+  `products[].codes` for **every code that was delivered** (fewer than `quantity` on each line).
+  See [Partial deliveries](#partial-deliveries) below.
 </ResponseField>
 <ResponseField name="failed" type="status">
   No codes were delivered. The response includes a `reason`.
 </ResponseField>
 
 <Note>
-  **Codes are returned only when `status` is `completed`.** While `processing`, you receive
-  `{"status": "processing", "message": "Order is still processing"}`.
+  **Codes are returned when `status` is `completed` or `partially_completed`.** While
+  `processing`, you receive
+  `{"status": "processing", "message": "Order is still processing"}` with no codes.
 </Note>
 
 Every order response (place and poll) also includes a **`wallet`** snapshot with your current
@@ -75,7 +77,8 @@ Two fixed-price products totalling **15000** minor units (£100 + £50):
 
 ## Redemption codes
 
-When an order completes, each line includes a **`codes`** array — one object per delivered unit:
+When an order completes — or partially completes — each line includes a **`codes`** array with
+one object per **delivered** unit:
 
 ```json
 {
@@ -89,7 +92,8 @@ When an order completes, each line includes a **`codes`** array — one object p
 }
 ```
 
-Quantity `2` with two successful deliveries yields two `{ code }` entries.
+Quantity `2` with two successful deliveries yields two `{ code }` entries. On a
+`partially_completed` order, `codes.length` may be less than `quantity` for a line.
 
 ## Large orders
 
@@ -98,8 +102,8 @@ Use the same `POST /orders` endpoint for any quantity. The response includes an
 to complete.
 
 Poll `GET /orders/{reference}` until you reach a terminal status. While the order is still
-`processing`, you'll see `"message": "Order is still processing"`. When finished with
-`completed`, the response includes your codes in `products[].codes`.
+`processing`, you'll see `"message": "Order is still processing"`. When `completed` or
+`partially_completed`, the response includes delivered codes in `products[].codes`.
 
 <CardGroup cols={2}>
   <Card title="Polling cadence" icon="clock">
@@ -114,12 +118,36 @@ Poll `GET /orders/{reference}` until you reach a terminal status. While the orde
 
 If you receive `partially_completed`:
 
-1. **Do not** place a new order for the missing quantity — billing and idempotency risks apply.
-2. **No codes** are included in the response (only `delivered` and `total`).
-3. **Contact support** at [integrations@kalixo.io](mailto:integrations@kalixo.io) with your
-   `orderId` and `externalOrderCode`.
+1. **Save the codes** in `products[].codes` — these are the units that were delivered.
+2. Compare `delivered` and `total`, and each line's `codes.length` vs `quantity`, to see what is still outstanding.
+3. **Do not** place a new order for the missing quantity — billing and idempotency risks apply.
+4. **Contact support** at [integrations@kalixo.io](mailto:integrations@kalixo.io) with your
+   `orderId` and `externalOrderCode` for the remaining units.
 
-Kalixo will investigate and advise on next steps.
+Example — 3 of 5 codes delivered:
+
+```json
+{
+  "orderId": 59400,
+  "externalOrderCode": "O-12345",
+  "status": "partially_completed",
+  "delivered": 3,
+  "total": 5,
+  "products": [
+    {
+      "productId": 2,
+      "price": 10000,
+      "quantity": 5,
+      "codes": [
+        { "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
+        { "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
+        { "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" }
+      ]
+    }
+  ],
+  "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
+}
+```
 
 ## Polling example
 

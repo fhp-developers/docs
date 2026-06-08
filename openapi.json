@@ -289,7 +289,7 @@
       "get": {
         "tags": ["Orders"],
         "summary": "Retrieve an order",
-        "description": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nCodes (PINs) are returned **only when the order status is `completed`**. While the order is `processing` you receive the status and `estimatedReadyAt`; `failed` returns a reason; `partially_completed` returns delivered/total counts.",
+        "description": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.",
         "operationId": "getOrder",
         "parameters": [
           {
@@ -335,13 +335,26 @@
                     }
                   },
                   "partially_completed": {
-                    "summary": "Partial delivery",
+                    "summary": "Partial delivery with codes",
                     "value": {
                       "orderId": 59400,
                       "externalOrderCode": "O-12345",
                       "status": "partially_completed",
                       "delivered": 3,
-                      "total": 5
+                      "total": 5,
+                      "products": [
+                        {
+                          "productId": 2,
+                          "price": 10000,
+                          "quantity": 5,
+                          "codes": [
+                            { "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
+                            { "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
+                            { "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" }
+                          ]
+                        }
+                      ],
+                      "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
                     }
                   },
                   "failed": {
@@ -483,7 +496,11 @@
           "productCategory": { "type": "string", "example": "PlayStation" },
           "productType": { "type": "string", "example": "credit" },
           "platform": { "type": "string", "example": "PlayStation" },
-          "redeemable": { "type": "string", "description": "Where the product can be redeemed.", "example": "Europe" },
+          "redeemable": {
+            "type": "string",
+            "description": "Country or market where the product can be redeemed (derived from `countryCode`).",
+            "example": "United Kingdom"
+          },
           "preorder": { "type": "boolean", "example": true },
           "preorderCode": { "type": "boolean", "example": true },
           "firstSale": { "type": "string", "format": "date", "example": "2026-06-01" },
@@ -499,6 +516,34 @@
             "type": "string",
             "description": "Product availability in the catalog (e.g. active, inactive, preorder).",
             "example": "active"
+          },
+          "promotion": {
+            "type": "boolean",
+            "description": "True when a promotion applies to this product.",
+            "example": true
+          },
+          "promotionType": {
+            "type": "string",
+            "enum": ["Discount", "Value Off", "Added Value"],
+            "description": "Kind of promotional offer.",
+            "example": "Discount"
+          },
+          "promotionDetails": {
+            "type": "string",
+            "description": "Offer detail (e.g. percentage, amount off, or bonus item description).",
+            "example": "5"
+          },
+          "promotionStartDate": {
+            "type": "string",
+            "format": "date",
+            "description": "First day the promotion applies.",
+            "example": "2026-07-20"
+          },
+          "promotionEndDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day the promotion applies.",
+            "example": "2026-07-30"
           },
           "type": { "type": "string", "example": "digital" },
           "languages": {
@@ -622,7 +667,7 @@
           "total": { "type": "integer", "nullable": true, "description": "Total codes in the order." },
           "products": {
             "type": "array",
-            "description": "Present only when status is `completed`.",
+            "description": "Present when status is `completed` or `partially_completed`. Each line includes `codes` for delivered units only.",
             "items": { "$ref": "#/components/schemas/OrderProductResult" }
           },
           "wallet": { "$ref": "#/components/schemas/WalletSnapshot" }
@@ -683,7 +728,7 @@
           "productCategory": "PlayStation",
           "productType": "credit",
           "platform": "PlayStation",
-          "redeemable": "Europe",
+          "redeemable": "United Kingdom",
           "preorder": true,
           "preorderCode": true,
           "firstSale": "2026-06-01",
@@ -731,7 +776,7 @@
               "productCategory": "PlayStation",
               "productType": "credit",
               "platform": "PlayStation",
-              "redeemable": "Europe",
+              "redeemable": "United Kingdom",
               "preorder": true,
               "preorderCode": true,
               "firstSale": "2026-06-01",

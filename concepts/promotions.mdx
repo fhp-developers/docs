@@ -1,0 +1,56 @@
+---
+title: "Promotions"
+description: "Optional promotional metadata on catalog products."
+icon: "tags"
+---
+
+Some catalog products include **promotion** fields when a time-limited offer applies. These
+fields are omitted when no promotion is active for the product.
+
+## Fields
+
+<ResponseField name="promotion" type="boolean">
+  `true` when the product has an active or upcoming promotion.
+</ResponseField>
+<ResponseField name="promotionType" type="string">
+  The kind of offer: `Discount`, `Value Off`, or `Added Value`.
+</ResponseField>
+<ResponseField name="promotionDetails" type="string">
+  Human-readable detail for the offer — for example `5` (percent or amount off) or a description
+  of added value such as `free item`.
+</ResponseField>
+<ResponseField name="promotionStartDate" type="date">
+  First day the promotion applies (`YYYY-MM-DD`).
+</ResponseField>
+<ResponseField name="promotionEndDate" type="date">
+  Last day the promotion applies (`YYYY-MM-DD`).
+</ResponseField>
+
+## Examples by type
+
+| `promotionType` | Example `promotionDetails` | Meaning |
+| --- | --- | --- |
+| `Discount` | `5` | 5% off the selling price |
+| `Value Off` | `5` | Fixed amount off (same currency as the product) |
+| `Added Value` | `free item` | Bonus content or bundle item included |
+
+## Example product excerpt
+
+```json
+{
+  "id": 2,
+  "name": "Sony PlayStation®Network Wallet Top-Up £100",
+  "price": 10000,
+  "currencyCode": "GBP",
+  "promotion": true,
+  "promotionType": "Discount",
+  "promotionDetails": "5",
+  "promotionStartDate": "2026-07-20",
+  "promotionEndDate": "2026-07-30"
+}
+```
+
+<Note>
+  Promotions affect catalog display and pricing visibility only. Always send the current
+  catalog `price` when placing an order — see [Order lifecycle](/concepts/order-lifecycle).
+</Note>
