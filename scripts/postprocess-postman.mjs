@@ -85,6 +85,41 @@ function walkItems(items) {
     if (item.name === "Retrieve an order" && req.url?.variable) {
       const v = req.url.variable.find((x) => x.key === "reference");
       if (v) v.value = "{{orderReference}}";
+      if (!item.response) item.response = [];
+      const partialBody = {
+        orderId: 59400,
+        externalOrderCode: "O-12345",
+        status: "partially_completed",
+        delivered: 3,
+        total: 5,
+        products: [
+          {
+            productId: 2,
+            price: 10000,
+            quantity: 5,
+            codes: [
+              { code: "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
+              { code: "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
+              { code: "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" },
+            ],
+          },
+        ],
+        wallet: { balances: { GBP: 196.01 }, lowBalance: false },
+      };
+      const hasPartial = item.response.some(
+        (r) => r.name === "Partially completed with codes",
+      );
+      if (!hasPartial) {
+        item.response.push({
+          name: "Partially completed with codes",
+          originalRequest: item.request,
+          status: "OK",
+          code: 200,
+          header: [{ key: "Content-Type", value: "application/json" }],
+          body: JSON.stringify(partialBody, null, 2),
+          _postman_previewlanguage: "json",
+        });
+      }
     }
 
     const firstPath = req.url?.path?.[0];

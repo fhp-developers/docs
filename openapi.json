@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Kalixo Distribution API",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "The Kalixo Distribution API lets partners browse their product catalog, place and track digital gift-card orders (single or bulk), and monitor their wallet balance. All v2 ordering is asynchronous: place an order, then poll it until the codes are delivered.",
     "contact": {
       "name": "Kalixo Integrations",
@@ -289,7 +289,7 @@
       "get": {
         "tags": ["Orders"],
         "summary": "Retrieve an order",
-        "description": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.",
+        "description": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
         "operationId": "getOrder",
         "parameters": [
           {
@@ -335,27 +335,7 @@
                     }
                   },
                   "partially_completed": {
-                    "summary": "Partial delivery with codes",
-                    "value": {
-                      "orderId": 59400,
-                      "externalOrderCode": "O-12345",
-                      "status": "partially_completed",
-                      "delivered": 3,
-                      "total": 5,
-                      "products": [
-                        {
-                          "productId": 2,
-                          "price": 10000,
-                          "quantity": 5,
-                          "codes": [
-                            { "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
-                            { "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
-                            { "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" }
-                          ]
-                        }
-                      ],
-                      "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
-                    }
+                    "$ref": "#/components/examples/OrderPartiallyCompleted"
                   },
                   "failed": {
                     "summary": "Failed",
@@ -788,6 +768,30 @@
               "type": "digital"
             }
           ]
+        }
+      },
+      "OrderPartiallyCompleted": {
+        "summary": "Partial delivery with codes",
+        "description": "Three of five codes delivered. `products[].codes` contains every code received so far.",
+        "value": {
+          "orderId": 59400,
+          "externalOrderCode": "O-12345",
+          "status": "partially_completed",
+          "delivered": 3,
+          "total": 5,
+          "products": [
+            {
+              "productId": 2,
+              "price": 10000,
+              "quantity": 5,
+              "codes": [
+                { "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
+                { "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
+                { "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" }
+              ]
+            }
+          ],
+          "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
         }
       },
       "ErrorMissingApiKey": {

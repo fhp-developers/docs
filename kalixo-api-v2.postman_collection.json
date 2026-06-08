@@ -9,7 +9,7 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "9edecf50-92b6-44e7-b937-2cbdbae6798b",
+                            "id": "1c299004-59bd-4ff5-a4e1-accc21e34bf8",
                             "name": "List catalog products",
                             "request": {
                                 "name": "List catalog products",
@@ -113,7 +113,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "baa21047-98c5-43cd-aa7b-1b1407d76ee0",
+                                    "id": "dc28c1a9-251f-4556-92b6-39afa504e42a",
                                     "name": "A paginated list of catalog products.",
                                     "originalRequest": {
                                         "url": {
@@ -225,12 +225,12 @@
                                             "value": "application/json"
                                         }
                                     ],
-                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discount\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Added Value\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discount\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Discount\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discount\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Discount\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discount\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Value Off\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "3ade1668-33b4-4654-a634-7d963765b8f4",
+                                    "id": "99019978-2339-42d1-a451-02a5f008a286",
                                     "name": "Missing or invalid API key.",
                                     "originalRequest": {
                                         "url": {
@@ -357,7 +357,7 @@
                             "description": "",
                             "item": [
                                 {
-                                    "id": "53270452-bdee-4bf7-9e0c-0f4acfde3975",
+                                    "id": "00346384-b8ce-4b90-873f-6dfb79231a66",
                                     "name": "Get a single product",
                                     "request": {
                                         "name": "Get a single product",
@@ -400,7 +400,7 @@
                                     },
                                     "response": [
                                         {
-                                            "id": "f82ed463-9aed-4160-9efe-92b25fce8937",
+                                            "id": "cd7291fd-0116-422b-a072-97d7512b7882",
                                             "name": "The requested product.",
                                             "originalRequest": {
                                                 "url": {
@@ -440,12 +440,12 @@
                                                     "value": "application/json"
                                                 }
                                             ],
-                                            "body": "{\n  \"id\": \"<integer>\",\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discount\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"open\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Added Value\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
+                                            "body": "{\n  \"id\": \"<integer>\",\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discount\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"fixed\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Added Value\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
                                             "cookie": [],
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "3c74d6f0-9e76-4c40-8e90-c42f132462da",
+                                            "id": "4c52a93a-5e40-450a-a853-88040b7646e4",
                                             "name": "Product not found in your catalog.",
                                             "originalRequest": {
                                                 "url": {
@@ -506,7 +506,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "f71ac2d5-8378-4a72-bced-fb06ba9dac3a",
+                    "id": "c34bded4-845a-437d-9cd3-3436b43e43b0",
                     "name": "Place an order",
                     "request": {
                         "name": "Place an order",
@@ -549,7 +549,7 @@
                     },
                     "response": [
                         {
-                            "id": "531c5eac-f7a3-414e-a4aa-e550069399c0",
+                            "id": "df4b144a-5d32-420e-98a2-efaa928bd7c7",
                             "name": "Order accepted and now processing.",
                             "originalRequest": {
                                 "url": {
@@ -627,12 +627,12 @@
                                     "value": ""
                                 }
                             ],
-                            "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"magna_7\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                            "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"sed_590\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "e2df5542-8dd7-4984-a3c6-e5a559afc016",
+                            "id": "7afdbcc4-40a4-4316-ba84-5ad77acc5ee8",
                             "name": "Validation or order rejection. See the Errors guide for the full message catalogue.",
                             "originalRequest": {
                                 "url": {
@@ -688,7 +688,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "0f0b491e-4dc4-49b8-abe5-8fd7ea70cc18",
+                            "id": "fa5f3e32-38ca-436c-ba65-36a4759f2f39",
                             "name": "API ordering disabled for your account.",
                             "originalRequest": {
                                 "url": {
@@ -744,7 +744,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "5b2da74b-0e87-46d7-af1e-a053e513fd79",
+                            "id": "c9f1123f-3c05-426d-863f-3a207f7dc550",
                             "name": "An order with the same externalOrderCode already exists.",
                             "originalRequest": {
                                 "url": {
@@ -800,7 +800,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a3bd1f55-20bb-49ee-8954-edd9dd49bffd",
+                            "id": "a14635ee-44ee-484a-b4bc-3f0840f696f0",
                             "name": "Order limit exceeded or product not available for purchase.",
                             "originalRequest": {
                                 "url": {
@@ -856,7 +856,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "f2379fd0-5154-440a-909b-acd75ac661e8",
+                            "id": "a2b33df5-ea45-49e6-9e66-e5cbd9495275",
                             "name": "Order could not be created or is temporarily unavailable.",
                             "originalRequest": {
                                 "url": {
@@ -922,12 +922,12 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "6c867b1d-e8b9-4120-bd43-06bb18148e5e",
+                            "id": "d40fdedd-b109-4a91-8876-e4dba08d0386",
                             "name": "Retrieve an order",
                             "request": {
                                 "name": "Retrieve an order",
                                 "description": {
-                                    "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.",
+                                    "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
                                     "type": "text/plain"
                                 },
                                 "url": {
@@ -964,7 +964,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "0103be1b-5c54-45fd-ae15-b85a1868f56a",
+                                    "id": "dffcc166-1df2-4721-b4a3-8043f3d3a1b8",
                                     "name": "The order and its current status.",
                                     "originalRequest": {
                                         "url": {
@@ -1003,12 +1003,12 @@
                                             "value": "application/json"
                                         }
                                     ],
-                                    "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"sunt_52a\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                                    "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"completed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"reprehenderit_1\": \"<number>\",\n      \"dolore_cc\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "3245388f-9b68-437c-b0e0-0080d90f43f3",
+                                    "id": "425ffe8e-8c68-4b9f-96bc-93146767f27c",
                                     "name": "Order not found.",
                                     "originalRequest": {
                                         "url": {
@@ -1050,6 +1050,57 @@
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "name": "Partially completed with codes",
+                                    "originalRequest": {
+                                        "name": "Retrieve an order",
+                                        "description": {
+                                            "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
+                                            "type": "text/plain"
+                                        },
+                                        "url": {
+                                            "path": [
+                                                "orders",
+                                                ":reference"
+                                            ],
+                                            "host": [
+                                                "{{ordersBaseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": [
+                                                {
+                                                    "type": "any",
+                                                    "value": "{{orderReference}}",
+                                                    "key": "reference",
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "(Required) The numeric orderId or your externalOrderCode.",
+                                                        "type": "text/plain"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {},
+                                        "auth": null
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        }
+                                    ],
+                                    "body": "{\n  \"orderId\": 59400,\n  \"externalOrderCode\": \"O-12345\",\n  \"status\": \"partially_completed\",\n  \"delivered\": 3,\n  \"total\": 5,\n  \"products\": [\n    {\n      \"productId\": 2,\n      \"price\": 10000,\n      \"quantity\": 5,\n      \"codes\": [\n        {\n          \"code\": \"AAAAA-BBBBB-CCCCC-DDDDD-EEEEE\"\n        },\n        {\n          \"code\": \"FFFFF-GGGGG-HHHHH-IIIII-JJJJJ\"\n        },\n        {\n          \"code\": \"KKKKK-LLLLL-MMMMM-NNNNN-OOOOO\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"GBP\": 196.01\n    },\n    \"lowBalance\": false\n  }\n}",
+                                    "_postman_previewlanguage": "json"
                                 }
                             ],
                             "event": [],
@@ -1066,7 +1117,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "b2a5bd0b-1061-4447-b345-4e94ae81160b",
+                    "id": "8255dac6-deb9-4f69-a6af-74e47991dd2b",
                     "name": "Get wallet balances",
                     "request": {
                         "name": "Get wallet balances",
@@ -1096,7 +1147,7 @@
                     },
                     "response": [
                         {
-                            "id": "4b872060-f5d0-4a26-86b1-90490e9027fb",
+                            "id": "826ef408-4b9b-42e5-86fc-5653647e25dd",
                             "name": "Current wallet snapshot.",
                             "originalRequest": {
                                 "url": {
@@ -1134,7 +1185,7 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"balances\": {\n    \"ete\": \"<number>\",\n    \"ipsumd5\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
+                            "body": "{\n  \"balances\": {\n    \"sunt3\": \"<number>\",\n    \"in4c6\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         }
@@ -1203,7 +1254,7 @@
         }
     ],
     "info": {
-        "_postman_id": "dc167163-08c1-49b1-9c65-bba7e9333b02",
+        "_postman_id": "2096a654-14b7-49f6-9ec7-4bf660ff04d0",
         "name": "Kalixo API v2",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
         "description": {

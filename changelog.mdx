@@ -6,17 +6,22 @@ icon: "clock-rotate-left"
 
 ## 2.1.1 — 2026-06-06
 
+### API reference
+
+- **Retrieve order → partially_completed** response example now explicitly includes
+  `products[].codes` for all delivered units (not only `delivered` / `total`).
+
+## 2.1.0 — 2026-06-06
+
 ### Order behaviour
 
-- `partially_completed` responses now include `products[].codes` for every delivered unit,
+- `partially_completed` responses include `products[].codes` for every delivered unit,
   alongside `delivered` and `total`.
 
 ### Catalog
 
 - `redeemable` is derived from `countryCode` (e.g. `GB` → `United Kingdom`), not the internal region field.
 - Documented optional `promotion*` fields on catalog products (see [Promotions](/concepts/promotions)).
-
-## 2.1.0 — 2026-06-06
 
 ### Breaking API changes
 
