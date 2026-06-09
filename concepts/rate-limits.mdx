@@ -9,7 +9,7 @@ Requests are rate limited per API key to keep the platform fast and fair.
 <Note>
   The default limit is **60 requests per minute per API key**. When you exceed it, responses
   include a `Retry-After` header (in seconds). Higher limits can be arranged with your account
-  manager — always design your integration to respect `429` responses.
+  manager - always design your integration to respect `429` responses.
 </Note>
 
 ## Response headers
@@ -21,7 +21,7 @@ Every v2 response includes rate-limit headers:
 | `X-RateLimit-Limit` | Maximum requests allowed in the current window |
 | `X-RateLimit-Remaining` | Requests remaining in the current window |
 | `X-RateLimit-Reset` | Unix timestamp (seconds) when the window resets |
-| `Retry-After` | Present on `429` only — seconds to wait before retrying |
+| `Retry-After` | Present on `429` only - seconds to wait before retrying |
 
 Use `X-RateLimit-Remaining` to slow down proactively before hitting the limit.
 
@@ -44,12 +44,12 @@ You receive `429 Too Many Requests`:
     On `429`, wait for `Retry-After` (or read `X-RateLimit-Reset`) before retrying.
   </Card>
   <Card title="Poll sensibly" icon="clock">
-    Poll orders at or after `estimatedReadyAt`, then about once a minute — not in a tight loop.
+    Poll orders at or after `estimatedReadyAt`, then about once a minute - not in a tight loop.
   </Card>
   <Card title="Batch reads" icon="layer-group">
     Use `take=100` and [filters](/concepts/filtering) to reduce the number of calls.
   </Card>
   <Card title="Cache the catalog" icon="database">
-    The catalog changes infrequently — cache it and refresh periodically.
+    The catalog changes infrequently - cache it and refresh periodically.
   </Card>
 </CardGroup>

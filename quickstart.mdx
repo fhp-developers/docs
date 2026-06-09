@@ -65,7 +65,7 @@ retrieving your codes.
 
   <Step title="Place an order">
     Send each line's **unit** `price`, `quantity`, and `productId`, plus a unique
-    `externalOrderCode`. The optional top-level `price` is the **order total** — if you send
+    `externalOrderCode`. The optional top-level `price` is the **order total** - if you send
     it, it must equal the sum of `(line price × quantity)`.
 
     The order is accepted immediately with `processing`, `estimatedReadyAt`, and a `wallet`
@@ -87,7 +87,7 @@ retrieving your codes.
       }'
     ```
 
-    ```bash cURL — two lines (total 15000)
+    ```bash cURL - two lines (total 15000)
     curl -X POST "https://api.kalixo.io/v2/orders" \
       -H "x-api-key: $KALIXO_API_KEY" \
       -H "Content-Type: application/json" \
@@ -159,7 +159,7 @@ retrieving your codes.
 
     <Tip>
       While the order is still working you'll get `{"status": "processing", "message": "Order is still processing"}`.
-      Wait until `estimatedReadyAt` before polling — see the [polling example](/concepts/order-lifecycle#polling-example).
+      Wait until `estimatedReadyAt` before polling - see the [polling example](/concepts/order-lifecycle#polling-example).
       Or use the [Node reference client](/examples/kalixo-node).
     </Tip>
   </Step>

@@ -4,14 +4,14 @@ description: "API and documentation changes by version."
 icon: "clock-rotate-left"
 ---
 
-## 2.1.1 — 2026-06-06
+## 2.1.1 - 2026-06-06
 
 ### API reference
 
 - **Retrieve order → partially_completed** response example now explicitly includes
   `products[].codes` for all delivered units (not only `delivered` / `total`).
 
-## 2.1.0 — 2026-06-06
+## 2.1.0 - 2026-06-06
 
 ### Order behaviour
 
@@ -31,7 +31,7 @@ These apply to all v2 catalog and order responses:
 | --- | --- | --- |
 | Redemption codes | `products[].pin: [{ pin: "…" }]` | `products[].codes: [{ code: "…" }]` |
 | Product tags | `"bestseller,gaming"` (string) | `["bestseller", "gaming"]` (array) |
-| Removed fields | `rrp`, `rrpCurrency`, `state` on products | Omitted — use `price` and `status` |
+| Removed fields | `rrp`, `rrpCurrency`, `state` on products | Omitted - use `price` and `status` |
 
 ### New validation
 
@@ -56,7 +56,7 @@ All v2 responses now include:
 - Multi-line order pricing example.
 - Reference Node client in [examples/kalixo-node](/examples/kalixo-node).
 
-## 2.0.0 — initial release
+## 2.0.0 - initial release
 
 - Async ordering with `POST /orders` + poll `GET /orders/{reference}`.
 - Catalog filtering and pagination.

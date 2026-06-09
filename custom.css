@@ -12,7 +12,7 @@
   --kalixo-950: #0a0c03;
 }
 
-/* Light theme — white canvas, brand green for accents only */
+/* Light theme - white canvas, brand green for accents only */
 html:not(.dark) #navbar {
   background-color: #ffffff;
   border-bottom: 1px solid color-mix(in srgb, var(--kalixo-700) 14%, #e5e7eb);
@@ -76,10 +76,18 @@ html:not(.dark) eyebrow {
 
 .dark card {
   border-color: color-mix(in srgb, var(--kalixo-500) 20%, transparent);
-  background-color: color-mix(in srgb, var(--kalixo-950) 88%, var(--kalixo-900));
+  background-color: color-mix(
+    in srgb,
+    var(--kalixo-950) 88%,
+    var(--kalixo-900)
+  );
 }
 
 .dark callout {
   border-color: color-mix(in srgb, var(--kalixo-500) 24%, transparent);
-  background-color: color-mix(in srgb, var(--kalixo-950) 80%, var(--kalixo-900));
+  background-color: color-mix(
+    in srgb,
+    var(--kalixo-950) 80%,
+    var(--kalixo-900)
+  );
 }

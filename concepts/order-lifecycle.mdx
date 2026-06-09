@@ -16,7 +16,7 @@ then poll until the codes are ready.
   All codes were delivered. The response includes `products[].codes`.
 </ResponseField>
 <ResponseField name="partially_completed" type="status">
-  Some — but not all — codes were delivered. The response includes `delivered`, `total`, and
+  Some - but not all - codes were delivered. The response includes `delivered`, `total`, and
   `products[].codes` for **every code that was delivered** (fewer than `quantity` on each line).
   See [Partial deliveries](#partial-deliveries) below.
 </ResponseField>
@@ -42,7 +42,7 @@ balances and low-balance flag.
   </Step>
   <Step title="Wait for the estimate">
     `estimatedReadyAt` tells you roughly when codes will be ready. It scales with the order
-    size — small orders are near-instant; large orders take longer.
+    size - small orders are near-instant; large orders take longer.
   </Step>
   <Step title="Poll the order">
     `GET /orders/{reference}` by `orderId` or `externalOrderCode`. Repeat until you get a
@@ -77,7 +77,7 @@ Two fixed-price products totalling **15000** minor units (£100 + £50):
 
 ## Redemption codes
 
-When an order completes — or partially completes — each line includes a **`codes`** array with
+When an order completes - or partially completes - each line includes a **`codes`** array with
 one object per **delivered** unit:
 
 ```json
@@ -98,7 +98,7 @@ Quantity `2` with two successful deliveries yields two `{ code }` entries. On a
 ## Large orders
 
 Use the same `POST /orders` endpoint for any quantity. The response includes an
-`estimatedReadyAt` timestamp that scales with the order size — larger orders may take longer
+`estimatedReadyAt` timestamp that scales with the order size - larger orders may take longer
 to complete.
 
 Poll `GET /orders/{reference}` until you reach a terminal status. While the order is still
@@ -110,7 +110,7 @@ Poll `GET /orders/{reference}` until you reach a terminal status. While the orde
     Poll at or after `estimatedReadyAt`, then every minute or so. Avoid tight polling loops.
   </Card>
   <Card title="Idempotency" icon="fingerprint" href="/concepts/idempotency">
-    Re-submitting the same `externalOrderCode` returns the existing order — never a duplicate.
+    Re-submitting the same `externalOrderCode` returns the existing order - never a duplicate.
   </Card>
 </CardGroup>
 
@@ -118,13 +118,13 @@ Poll `GET /orders/{reference}` until you reach a terminal status. While the orde
 
 If you receive `partially_completed`:
 
-1. **Save the codes** in `products[].codes` — these are the units that were delivered.
+1. **Save the codes** in `products[].codes` - these are the units that were delivered.
 2. Compare `delivered` and `total`, and each line's `codes.length` vs `quantity`, to see what is still outstanding.
-3. **Do not** place a new order for the missing quantity — billing and idempotency risks apply.
+3. **Do not** place a new order for the missing quantity - billing and idempotency risks apply.
 4. **Contact support** at [integrations@kalixo.io](mailto:integrations@kalixo.io) with your
    `orderId` and `externalOrderCode` for the remaining units.
 
-Example — 3 of 5 codes delivered:
+Example - 3 of 5 codes delivered:
 
 ```json
 {

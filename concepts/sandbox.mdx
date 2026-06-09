@@ -7,11 +7,6 @@ icon: "flask"
 Use the **sandbox** environment to build and test your integration before switching to
 production keys.
 
-<Info>
-  **Pre-release:** Base URLs below are placeholders during the pre-release period. Your
-  account manager will confirm the final endpoints when your keys are issued.
-</Info>
-
 ## Environments
 
 | | Sandbox | Production |
@@ -21,32 +16,48 @@ production keys.
 
 See [Authentication](/authentication) for how to send your key.
 
-## Confirmed behaviour
+## How it works
 
-- Sandbox and production use **separate base URLs** and **separate API keys**.
-- Keys are prefixed `kal_test_` (sandbox) or `kal_live_` (production) so you can tell them apart in config.
+1. **Catalog** - Your assigned products are listed **plus** Kalixo Test products
+   (brand **Kalixo Test**, field `isSandboxProduct: true`). Test products are
+   included automatically - you do not need to request them separately.
+2. **Orders** - Same `POST /v2/orders` and `GET /v2/orders/{reference}` flow as
+   production, including price validation, wallet balances on responses, and
+   balance debits when wallet ordering is enabled for your account.
+3. **Codes** - Orders return test redemption codes prefixed with `SANDBOX-`. No
+   real inventory is purchased and no live provider fulfilment occurs.
 
-## Details pending confirmation
+## Kalixo Test products
 
-<Info>
-  The following will be updated once Kalixo confirms sandbox policy for your account.
-  Contact [integrations@kalixo.io](mailto:integrations@kalixo.io) if you need guidance now.
-</Info>
+Call **`GET /v2/sandbox/scenarios`** with your sandbox API key for the current
+list of test `productId`s, sample order lines, and expected outcomes.
 
-| Topic | Status |
-| --- | --- |
-| Final sandbox base URL | TBD — placeholder during pre-release |
-| Catalog contents | TBD — same as your assigned catalog vs fixed test catalog |
-| Order fulfilment | TBD — real async delivery vs instant stub |
-| Recommended test `productId`s | TBD |
-| Wallet / billing | TBD — whether sandbox orders debit a test wallet |
+| Product | EAN | Expected outcome |
+| --- | --- | --- |
+| Success (Fixed) | `KTEST-OK` | `completed` + codes |
+| Success (Open) | `KTEST-OPEN` | `completed` - send line `price` |
+| Async failure | `KTEST-FAIL` | `failed` |
+| Partial | `KTEST-PARTIAL` | `partially_completed` when qty ≥ 2 |
+| Slow | `KTEST-SLOW` | `processing` ~10s, then `completed` |
 
-Until confirmed, treat sandbox calls as **non-production** and avoid assuming specific
-products or delivery times.
+**Mixed partial:** order `KTEST-OK` and `KTEST-FAIL` in one request →
+`partially_completed`.
 
-## Getting started in sandbox
+**Your catalog products:** any product returned by `GET /v2/catalog/products` can
+also be ordered in sandbox; codes are still test-only.
 
-1. Obtain a **sandbox API key** from your account manager.
+## Wallet
+
+If wallet ordering is enabled for your account, sandbox orders **debit your test
+wallet** the same way production would. Top up your sandbox balance through your
+account manager if you need to test low-balance behaviour.
+
+## Getting started
+
+1. Obtain a **sandbox API key** (`kal_test_…`) from your account manager.
 2. Point all requests at `https://sandbox.kalixo.io/v2`.
-3. Follow the [Quickstart](/quickstart) using your sandbox key.
-4. When ready, swap the base URL and key for production.
+3. Call `GET /v2/sandbox/scenarios` to list test products.
+4. Follow the [Quickstart](/quickstart) - place an order, poll until
+   `completed`, and read the `SANDBOX-*` codes from the response.
+5. When you are ready to go live, switch to `https://api.kalixo.io/v2` and your
+   production key (`kal_live_…`).

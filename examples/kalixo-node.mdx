@@ -4,14 +4,14 @@ description: "A thin Node.js helper with estimatedReadyAt-aware polling."
 icon: "code"
 ---
 
-This is a **reference implementation** — copy [`client.js`](/examples/kalixo-node/client.js) into
+This is a **reference implementation** - copy [`client.js`](/examples/kalixo-node/client.js) into
 your project or adapt it. It is not published to npm.
 
 ## Features
 
 - `KalixoClient.sandbox()` / `.production()` factory helpers
 - `placeOrder()` with your `externalOrderCode` idempotency key
-- `waitForOrder()` — waits until `estimatedReadyAt`, then polls every 60s
+- `waitForOrder()` - waits until `estimatedReadyAt`, then polls every 60s
 - Automatic `429` backoff using `Retry-After`
 - `newExternalOrderCode()` helper for stable idempotency keys
 

@@ -1,5 +1,5 @@
 /**
- * Kalixo Distribution API v2 — reference Node client.
+ * Kalixo Distribution API v2 - reference Node client.
  * Copy into your project or adapt as needed. Not published to npm.
  */
 
