@@ -1,0 +1,47 @@
+---
+title: "Service fee"
+description: "Optional service fee metadata on catalog products."
+icon: "receipt"
+---
+
+Some catalog products include **service fee** fields when Kalixo applies an additional
+processing fee on top of the sell price. These fields are omitted when no service fee
+applies to the product.
+
+## Fields
+
+<ResponseField name="serviceFee" type="boolean">
+  `true` when a service fee applies to this product.
+</ResponseField>
+<ResponseField name="serviceFeeType" type="string">
+  How the fee is calculated: `Percentage` or `Amount`.
+</ResponseField>
+<ResponseField name="serviceFeeValue" type="string">
+  The fee rate or fixed amount. See [Examples by type](#examples-by-type) below.
+</ResponseField>
+
+## Examples by type
+
+| `serviceFeeType` | Example `serviceFeeValue` | Meaning |
+| --- | --- | --- |
+| `Percentage` | `2.5` | 2.5% of the selling price |
+| `Amount` | `250` | Fixed fee of 250 minor units (e.g. £2.50 when `currencyCode` is `GBP`) |
+
+## Example product excerpt
+
+```json
+{
+  "id": 2,
+  "name": "Sony PlayStation®Network Wallet Top-Up £100",
+  "price": 10000,
+  "currencyCode": "GBP",
+  "serviceFee": true,
+  "serviceFeeType": "Amount",
+  "serviceFeeValue": "250"
+}
+```
+
+<Note>
+  Service fees are catalog metadata for display and pricing visibility. Always send the
+  current catalog `price` when placing an order - see [Order lifecycle](/concepts/order-lifecycle).
+</Note>

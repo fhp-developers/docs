@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Kalixo Distribution API",
-    "version": "2.1.1",
+    "version": "2.1.3",
     "description": "The Kalixo Distribution API lets partners browse their product catalog, place and track digital gift-card orders (single or bulk), and monitor their wallet balance. All v2 ordering is asynchronous: place an order, then poll it until the codes are delivered.",
     "contact": {
       "name": "Kalixo Integrations",
@@ -26,8 +26,12 @@
   ],
   "tags": [
     {
+      "name": "Ping",
+      "description": "Verify API connectivity once your API key is issued and your IP is whitelisted."
+    },
+    {
       "name": "Catalog",
-      "description": "Browse the products available in your catalog, including pricing, your discount, and open-denomination ranges."
+      "description": "Browse the products available in your catalog, including pricing, your discount amount and percentage, and open-denomination ranges."
     },
     {
       "name": "Orders",
@@ -39,6 +43,29 @@
     }
   ],
   "paths": {
+    "/ping": {
+      "get": {
+        "tags": ["Ping"],
+        "summary": "Ping",
+        "description": "Returns a simple success payload so you can verify that the Kalixo API is reachable from your network. Requires your `x-api-key` and a whitelisted IP address — contact your account manager to issue a key and allowlist your egress IPs before calling this endpoint.",
+        "operationId": "ping",
+        "responses": {
+          "200": {
+            "description": "API is reachable.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PingResponse" },
+                "examples": {
+                  "ok": { "$ref": "#/components/examples/PingOk" }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/catalog/products": {
       "get": {
         "tags": ["Catalog"],
@@ -117,12 +144,8 @@
               }
             }
           },
-          "401": {
-            "description": "Missing or invalid API key.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
-            }
-          }
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -155,19 +178,10 @@
               }
             }
           },
-          "404": {
-            "description": "Product not found in your catalog.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "examples": {
-                  "productNotFound": {
-                    "$ref": "#/components/examples/ErrorCatalogProductNotFound"
-                  }
-                }
-              }
-            }
-          }
+          "400": { "$ref": "#/components/responses/BadRequestInvalidProductId" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/CatalogProductNotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -266,6 +280,9 @@
               }
             }
           },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/CatalogProductNotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" },
           "502": {
             "description": "Order could not be created or is temporarily unavailable.",
             "content": {
@@ -350,19 +367,9 @@
               }
             }
           },
-          "404": {
-            "description": "Order not found.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "examples": {
-                  "orderNotFound": {
-                    "$ref": "#/components/examples/ErrorOrderNotFound"
-                  }
-                }
-              }
-            }
-          }
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/OrderNotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -378,12 +385,72 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/Wallet" } }
             }
-          }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     }
   },
   "components": {
+    "responses": {
+      "Unauthorized": {
+        "description": "Missing or invalid `x-api-key`.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "missingApiKey": { "$ref": "#/components/examples/ErrorMissingApiKey" },
+              "invalidApiKey": { "$ref": "#/components/examples/ErrorInvalidApiKey" }
+            }
+          }
+        }
+      },
+      "BadRequestInvalidProductId": {
+        "description": "Invalid `productId` path parameter (must be a numeric catalog id).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "invalidProductId": { "$ref": "#/components/examples/ErrorInvalidProductId" }
+            }
+          }
+        }
+      },
+      "CatalogProductNotFound": {
+        "description": "Product not found in your active catalog.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "productNotFound": { "$ref": "#/components/examples/ErrorCatalogProductNotFound" }
+            }
+          }
+        }
+      },
+      "OrderNotFound": {
+        "description": "Order not found for the supplied reference.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "orderNotFound": { "$ref": "#/components/examples/ErrorOrderNotFound" }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Unexpected server error.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "internalServerError": { "$ref": "#/components/examples/ErrorInternalServerError" }
+            }
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "apiKey": {
         "type": "apiKey",
@@ -412,6 +479,23 @@
       }
     },
     "schemas": {
+      "PingResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"],
+            "description": "Always `ok` when the API is reachable.",
+            "example": "ok"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC timestamp when the response was generated.",
+            "example": "2026-06-05T12:00:00.000Z"
+          }
+        }
+      },
       "DenominationType": {
         "type": "string",
         "enum": ["fixed", "open"],
@@ -461,7 +545,8 @@
           "currencyCode": { "type": "string", "example": "GBP" },
           "buyingPrice": { "type": "number", "description": "Your buying price in minor units.", "example": 9500 },
           "buyingCurrencyCode": { "type": "string", "example": "GBP" },
-          "discount": { "type": "number", "description": "Your discount for this product.", "example": 500 },
+          "discountAmount": { "type": "number", "description": "Your discount amount in minor units (sell price minus your buying price, or the monetary equivalent of your commission rate).", "example": 500 },
+          "discountPercentage": { "type": "number", "description": "Your commission rate as a percentage of the sell price.", "example": 5 },
           "currencyMismatch": { "type": "boolean", "description": "True when your buying currency differs from the product's selling currency.", "example": false },
           "denominationType": { "$ref": "#/components/schemas/DenominationType" },
           "denominationMinValue": { "type": "number", "nullable": true, "example": null },
@@ -524,6 +609,22 @@
             "format": "date",
             "description": "Last day the promotion applies.",
             "example": "2026-07-30"
+          },
+          "serviceFee": {
+            "type": "boolean",
+            "description": "True when a service fee applies to this product.",
+            "example": true
+          },
+          "serviceFeeType": {
+            "type": "string",
+            "enum": ["Percentage", "Amount"],
+            "description": "How the service fee is calculated.",
+            "example": "Amount"
+          },
+          "serviceFeeValue": {
+            "type": "string",
+            "description": "Fee rate or amount. For `Percentage`, the percentage of sell price (e.g. `\"2.5\"` for 2.5%). For `Amount`, the fixed fee in minor units (e.g. `\"250\"` for £2.50).",
+            "example": "250"
           },
           "type": { "type": "string", "example": "digital" },
           "languages": {
@@ -668,10 +769,14 @@
       "Error": {
         "type": "object",
         "description": "Standard error response. See the Errors concept page for the complete message catalogue.",
-        "required": ["statusCode", "error", "message"],
+        "required": ["statusCode", "message"],
         "properties": {
           "statusCode": { "type": "integer", "example": 400 },
-          "error": { "type": "string", "example": "Bad Request" },
+          "error": {
+            "type": "string",
+            "description": "Short label for the status (for example `Bad Request`, `Not Found`). Omitted on some `500` responses.",
+            "example": "Bad Request"
+          },
           "message": {
             "type": "string",
             "description": "Human-readable explanation. May include the productId you sent.",
@@ -681,6 +786,13 @@
       }
     },
     "examples": {
+      "PingOk": {
+        "summary": "API reachable",
+        "value": {
+          "status": "ok",
+          "timestamp": "2026-06-05T12:00:00.000Z"
+        }
+      },
       "CatalogProductExample": {
         "summary": "PlayStation wallet top-up",
         "value": {
@@ -693,7 +805,8 @@
           "currencyCode": "GBP",
           "buyingPrice": 9500,
           "buyingCurrencyCode": "GBP",
-          "discount": 500,
+          "discountAmount": 500,
+          "discountPercentage": 5,
           "currencyMismatch": false,
           "denominationType": "fixed",
           "denominationMinValue": null,
@@ -717,6 +830,14 @@
           "expiryPolicy": "3 years",
           "tags": ["bestseller", "gaming"],
           "status": "active",
+          "promotion": true,
+          "promotionType": "Discount",
+          "promotionDetails": "5",
+          "promotionStartDate": "2026-07-20",
+          "promotionEndDate": "2026-07-30",
+          "serviceFee": true,
+          "serviceFeeType": "Amount",
+          "serviceFeeValue": "250",
           "type": "digital",
           "languages": [
             {
@@ -745,7 +866,8 @@
               "currencyCode": "GBP",
               "buyingPrice": 9500,
               "buyingCurrencyCode": "GBP",
-              "discount": 500,
+              "discountAmount": 500,
+              "discountPercentage": 5,
               "currencyMismatch": false,
               "denominationType": "fixed",
               "brand": "PlayStation",
@@ -765,6 +887,14 @@
               "expiryPolicy": "3 years",
               "tags": ["bestseller", "gaming"],
               "status": "active",
+              "promotion": true,
+              "promotionType": "Discount",
+              "promotionDetails": "5",
+              "promotionStartDate": "2026-07-20",
+              "promotionEndDate": "2026-07-30",
+              "serviceFee": true,
+              "serviceFeeType": "Amount",
+              "serviceFeeValue": "250",
               "type": "digital"
             }
           ]
@@ -928,6 +1058,21 @@
           "statusCode": 502,
           "error": "Bad Gateway",
           "message": "Order could not be created. Please try again later."
+        }
+      },
+      "ErrorInvalidProductId": {
+        "summary": "Invalid product id path parameter",
+        "value": {
+          "statusCode": 400,
+          "error": "Bad Request",
+          "message": "Validation failed (numeric string is expected)"
+        }
+      },
+      "ErrorInternalServerError": {
+        "summary": "Unexpected server error",
+        "value": {
+          "statusCode": 500,
+          "message": "Internal server error"
         }
       }
     }

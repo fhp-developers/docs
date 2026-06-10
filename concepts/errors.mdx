@@ -43,6 +43,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 | `422` | `Unprocessable Entity` | Account order limit exceeded, or product not available for purchase |
 | `429` | `Too Many Requests` | [Rate limit](/concepts/rate-limits) exceeded |
 | `502` | `Bad Gateway` | Order could not be created or is temporarily unavailable |
+| `500` | — | Unexpected server error |
 
 ## Authentication (`401`)
 
@@ -144,6 +145,16 @@ Returned when the order cannot be created or processing is temporarily unavailab
 | --- |
 | `Order processing is temporarily unavailable. Please try again later.` |
 | `Order could not be created. Please try again later.` |
+
+## Server errors (`500`)
+
+Returned when an unexpected error occurs. Retry with backoff; contact support if the problem persists.
+
+| Message |
+| --- |
+| `Internal server error` |
+
+The `error` field is omitted on some `500` responses.
 
 ## Handling errors in your integration
 

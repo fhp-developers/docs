@@ -5,7 +5,8 @@ icon: "key"
 ---
 
 The Kalixo API authenticates requests with an **API key** sent in the `x-api-key` header.
-Each key is scoped to a single partner account.
+Each key is scoped to a single partner account. Your egress IP must also be whitelisted
+before you can reach the API — use `GET /ping` to confirm connectivity once both are in place.
 
 ```bash
 curl -X GET "https://api.kalixo.io/v2/wallet" \

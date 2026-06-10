@@ -10,50 +10,91 @@
   --kalixo-800: #506317;
   --kalixo-900: #28310c;
   --kalixo-950: #0a0c03;
+  --kalixo-accent-light: #a1c62e;
+  --kalixo-accent-soft: #e9fcb0;
 }
 
-/* Light theme - white canvas, brand green for accents only */
+/* Light theme - white canvas, lighter brand green for accents */
 html:not(.dark) #navbar {
   background-color: #ffffff;
-  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-700) 14%, #e5e7eb);
+  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 18%, #e5e7eb);
 }
 
 html:not(.dark) #sidebar {
   background-color: #ffffff;
-  border-right: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, #e5e7eb);
+  border-right: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 14%, #e5e7eb);
 }
 
-html:not(.dark) #sidebar-content li[data-active] a {
+/* Only highlight the current page, not every parent in the sidebar tree */
+html:not(.dark) #sidebar-content li[data-active] > a {
+  background-color: transparent;
+  color: inherit;
+  font-weight: inherit;
+}
+
+html:not(.dark) #sidebar-content li[data-active]:not(:has(li[data-active])) > a {
   background-color: var(--kalixo-50);
   color: var(--kalixo-800);
   font-weight: 500;
 }
 
+html:not(.dark) sidebar-group[data-active] sidebar-group-header {
+  background-color: transparent;
+}
+
 html:not(.dark) #sidebar-content a:hover {
-  color: var(--kalixo-700);
+  color: var(--kalixo-accent-light);
 }
 
 html:not(.dark) card {
-  border-color: color-mix(in srgb, var(--kalixo-600) 28%, #e5e7eb);
+  border-color: color-mix(in srgb, var(--kalixo-accent-light) 24%, #e5e7eb);
   background-color: #ffffff;
 }
 
 html:not(.dark) callout {
-  border-color: color-mix(in srgb, var(--kalixo-600) 32%, #e5e7eb);
+  border-color: color-mix(in srgb, var(--kalixo-accent-light) 28%, #e5e7eb);
   background-color: color-mix(in srgb, var(--kalixo-50) 45%, #ffffff);
 }
 
-html:not(.dark) #topbar-cta-button {
-  background-color: var(--kalixo-500);
-  color: var(--kalixo-950);
+/* Get an API key — Mintlify uses an inner overlay + text-white span */
+#topbar-cta-button {
+  background-color: transparent;
 }
 
-html:not(.dark) #topbar-cta-button:hover {
+#topbar-cta-button span.absolute.inset-0 {
+  display: none !important;
+}
+
+#topbar-cta-button a {
   background-color: var(--kalixo-600);
+  color: var(--kalixo-950) !important;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+#topbar-cta-button a span.z-10,
+#topbar-cta-button a svg {
+  color: inherit !important;
+}
+
+#topbar-cta-button a:hover {
+  background-color: var(--kalixo-700);
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+.dark #topbar-cta-button a {
+  background-color: var(--kalixo-500);
+  color: var(--kalixo-950) !important;
+}
+
+.dark #topbar-cta-button a:hover {
+  background-color: var(--kalixo-400);
+  color: var(--kalixo-950) !important;
 }
 
 html:not(.dark) #table-of-contents {
-  border-left: 1px solid color-mix(in srgb, var(--kalixo-700) 10%, #e5e7eb);
+  border-left: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 14%, #e5e7eb);
   padding-left: 1.25rem;
 }
 
@@ -62,16 +103,44 @@ html:not(.dark) toc-item[data-active] {
 }
 
 html:not(.dark) link {
-  color: var(--kalixo-700);
+  color: var(--kalixo-accent-light);
 }
 
 html:not(.dark) eyebrow {
-  color: var(--kalixo-700);
+  color: var(--kalixo-accent-light);
+}
+
+/* Code language dropdown (cURL, JavaScript, Python, PHP) in dark code blocks */
+html:not(.dark) .bg-codeblock [role="menuitem"]:hover,
+html:not(.dark) .bg-codeblock [role="menuitem"]:focus-visible {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html:not(.dark) .bg-codeblock [role="menuitem"]:hover *,
+html:not(.dark) .bg-codeblock [role="menuitem"]:focus-visible * {
+  color: inherit !important;
+}
+
+html:not(.dark) .bg-codeblock [role="menuitem"][data-active="true"] {
+  color: var(--kalixo-500) !important;
+}
+
+html:not(.dark) .bg-codeblock [role="menuitem"][data-active="true"] * {
+  color: inherit !important;
 }
 
 /* Dark theme */
-.dark #sidebar-content li[data-active] a {
+.dark #sidebar-content li[data-active] > a {
+  background-color: transparent;
+}
+
+.dark #sidebar-content li[data-active]:not(:has(li[data-active])) > a {
   background-color: color-mix(in srgb, var(--kalixo-500) 14%, transparent);
+}
+
+.dark sidebar-group[data-active] sidebar-group-header {
+  background-color: transparent;
 }
 
 .dark card {

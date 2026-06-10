@@ -4,6 +4,26 @@ description: "API and documentation changes by version."
 icon: "clock-rotate-left"
 ---
 
+## 2.1.3 - 2026-06-06
+
+### Ping
+
+- Added `GET /ping` — returns `{ status, timestamp }` to verify API connectivity.
+  Requires `x-api-key` and a whitelisted IP address.
+
+## 2.1.2 - 2026-06-06
+
+### Catalog
+
+- Replaced ambiguous `discount` on catalog products with explicit
+  `discountAmount` (minor units) and `discountPercentage` (commission rate).
+
+### Breaking API changes
+
+| Change | Before | After |
+| --- | --- | --- |
+| Catalog discount | `discount` (mixed meaning) | `discountAmount` + `discountPercentage` |
+
 ## 2.1.1 - 2026-06-06
 
 ### API reference
@@ -22,6 +42,7 @@ icon: "clock-rotate-left"
 
 - `redeemable` is derived from `countryCode` (e.g. `GB` → `United Kingdom`), not the internal region field.
 - Documented optional `promotion*` fields on catalog products (see [Promotions](/concepts/promotions)).
+- Documented optional `serviceFee*` fields on catalog products (see [Service fee](/concepts/service-fee)).
 
 ### Breaking API changes
 

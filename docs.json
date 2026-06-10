@@ -4,9 +4,9 @@
   "name": "Kalixo API",
   "description": "Developer documentation for the Kalixo Distribution API v2 - catalog, ordering, and wallet.",
   "colors": {
-    "primary": "#799423",
+    "primary": "#a1c62e",
     "light": "#c9f73a",
-    "dark": "#a1c62e"
+    "dark": "#799423"
   },
   "appearance": {
     "default": "dark",
@@ -35,12 +35,8 @@
         "href": "mailto:integrations@kalixo.io"
       },
       {
-        "label": "Status",
-        "href": "https://status.kalixo.io"
-      },
-      {
         "label": "Postman",
-        "href": "/kalixo-api-v2.postman_collection.json"
+        "href": "/quickstart#postman-collection"
       }
     ],
     "primary": {
@@ -65,6 +61,7 @@
               "concepts/filtering",
               "concepts/open-denomination",
               "concepts/promotions",
+              "concepts/service-fee",
               "concepts/order-lifecycle",
               "concepts/order-cancellation",
               "concepts/idempotency",

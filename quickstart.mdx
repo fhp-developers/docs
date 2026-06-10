@@ -15,8 +15,9 @@ retrieving your codes.
 
 <Steps>
   <Step title="Get your API key">
-    Your Kalixo account manager issues a sandbox and a production key. Keep them secret and
-    send them in the `x-api-key` header on every request. See [Authentication](/authentication).
+    Your Kalixo account manager issues a sandbox and a production key, and whitelists your
+    egress IP addresses. Keep keys secret and send them in the `x-api-key` header on every
+    request. See [Authentication](/authentication).
 
     <Tip>
       Using **Postman**? Import the
@@ -26,6 +27,17 @@ retrieving your codes.
       variable. For local dev against split services, use the
       [Local environment](/kalixo-api-v2.postman_environment.local.json).
     </Tip>
+  </Step>
+
+  <Step title="Verify connectivity (optional)">
+    Once your key is issued and your IP is whitelisted, confirm the API is reachable:
+
+    ```bash cURL
+    curl -X GET "https://api.kalixo.io/v2/ping" \
+      -H "x-api-key: $KALIXO_API_KEY"
+    ```
+
+    A `200` response with `{ "status": "ok", "timestamp": "..." }` means the API is up.
   </Step>
 
   <Step title="Find a product in your catalog">
@@ -177,7 +189,10 @@ retrieving your codes.
   <Card title="Node client" icon="code" href="/examples/kalixo-node">
     Reference SDK with `estimatedReadyAt`-aware polling.
   </Card>
-  <Card title="Postman collection" icon="download">
-    <a href="/kalixo-api-v2.postman_collection.json" download="kalixo-api-v2.postman_collection.json">Download the v2 collection</a> and import the Sandbox or Production environment.
-  </Card>
 </CardGroup>
+
+## Postman collection {#postman-collection}
+
+<Card title="Postman collection" icon="download">
+  <a href="/kalixo-api-v2.postman_collection.json" download="kalixo-api-v2.postman_collection.json">Download the v2 collection</a> and import the Sandbox or Production environment.
+</Card>
