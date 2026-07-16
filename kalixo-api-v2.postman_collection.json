@@ -5,7 +5,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "8b1ecf58-b094-4a4a-ac1d-16c49a7ee38b",
+                    "id": "8bc0baa5-b3b6-441b-957d-3f7df0036b39",
                     "name": "Ping",
                     "request": {
                         "name": "Ping",
@@ -35,7 +35,7 @@
                     },
                     "response": [
                         {
-                            "id": "4c4aad56-6e40-4491-b66d-dcd21056f2f7",
+                            "id": "039e6462-59b4-437a-995e-542405f99a44",
                             "name": "API is reachable.",
                             "originalRequest": {
                                 "url": {
@@ -78,7 +78,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "14ddff78-b2b0-46b3-9bba-2ca71e054977",
+                            "id": "1095ae1c-f3e7-4973-b3d1-7ab55d01ee31",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -121,7 +121,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "862a0828-7767-4621-8ecf-3df45e7a879c",
+                            "id": "9ee45e7f-a2f1-4270-98d7-6c87e86950e5",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -180,7 +180,7 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "cfeadb22-f730-4e93-9819-7292b1d7c142",
+                            "id": "604697c2-77ca-497f-ac0b-387078448d20",
                             "name": "List catalog products",
                             "request": {
                                 "name": "List catalog products",
@@ -284,7 +284,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "6d66e565-6168-4c45-ac9f-26215ebc82d8",
+                                    "id": "6d5f4f61-66f3-491a-9348-b9f559734323",
                                     "name": "A paginated list of catalog products.",
                                     "originalRequest": {
                                         "url": {
@@ -396,12 +396,12 @@
                                             "value": "application/json"
                                         }
                                     ],
-                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Value Off\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"id\": \"<integer>\",\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Value Off\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Amount\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Added Value\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Value Off\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "6f4eb0c1-3f31-406a-8d1c-fe6fa7b4894c",
+                                    "id": "e68d16cb-3a96-45a9-9398-b2b71a41a328",
                                     "name": "Missing or invalid `x-api-key`.",
                                     "originalRequest": {
                                         "url": {
@@ -518,7 +518,7 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "949c54c9-5a2b-4617-97ed-250dae9ca051",
+                                    "id": "e175adc4-9ec7-4a7d-8853-2835a3d5a661",
                                     "name": "Unexpected server error.",
                                     "originalRequest": {
                                         "url": {
@@ -641,23 +641,23 @@
                             }
                         },
                         {
-                            "name": "{productId}",
+                            "name": "{productCode}",
                             "description": "",
                             "item": [
                                 {
-                                    "id": "01cacc72-4617-48e6-9888-30f59b574996",
+                                    "id": "a5753706-d167-4d63-8bc2-7f5f180e69f6",
                                     "name": "Get a single product",
                                     "request": {
                                         "name": "Get a single product",
                                         "description": {
-                                            "content": "Returns a single catalog product by its product id.",
+                                            "content": "Returns a single catalog product by its `productCode`.",
                                             "type": "text/plain"
                                         },
                                         "url": {
                                             "path": [
                                                 "catalog",
                                                 "products",
-                                                ":productId"
+                                                ":productCode"
                                             ],
                                             "host": [
                                                 "{{baseUrl}}"
@@ -666,11 +666,11 @@
                                             "variable": [
                                                 {
                                                     "type": "any",
-                                                    "value": "{{productId}}",
-                                                    "key": "productId",
+                                                    "value": "{{productCode}}",
+                                                    "key": "productCode",
                                                     "disabled": false,
                                                     "description": {
-                                                        "content": "(Required) The product id from the catalog.",
+                                                        "content": "(Required) The product code from the catalog. Stable and identical across sandbox and production.",
                                                         "type": "text/plain"
                                                     }
                                                 }
@@ -688,14 +688,14 @@
                                     },
                                     "response": [
                                         {
-                                            "id": "2fb4ad72-e517-4a6f-9d4c-d111139f47cb",
+                                            "id": "9575a875-fd45-476b-9215-8e6de7e2259a",
                                             "name": "The requested product.",
                                             "originalRequest": {
                                                 "url": {
                                                     "path": [
                                                         "catalog",
                                                         "products",
-                                                        ":productId"
+                                                        ":productCode"
                                                     ],
                                                     "host": [
                                                         "{{baseUrl}}"
@@ -728,64 +728,19 @@
                                                     "value": "application/json"
                                                 }
                                             ],
-                                            "body": "{\n  \"id\": \"<integer>\",\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discountAmount\": \"<number>\",\n  \"discountPercentage\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"open\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Discount\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"serviceFee\": \"<boolean>\",\n  \"serviceFeeType\": \"Amount\",\n  \"serviceFeeValue\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
+                                            "body": "{\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discountAmount\": \"<number>\",\n  \"discountPercentage\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"open\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Discount\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"serviceFee\": \"<boolean>\",\n  \"serviceFeeType\": \"Percentage\",\n  \"serviceFeeValue\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
                                             "cookie": [],
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "ba29bd32-7003-4772-9603-edff4fc0f877",
-                                            "name": "Invalid `productId` path parameter (must be a numeric catalog id).",
-                                            "originalRequest": {
-                                                "url": {
-                                                    "path": [
-                                                        "catalog",
-                                                        "products",
-                                                        ":productId"
-                                                    ],
-                                                    "host": [
-                                                        "{{baseUrl}}"
-                                                    ],
-                                                    "query": [],
-                                                    "variable": []
-                                                },
-                                                "header": [
-                                                    {
-                                                        "key": "Accept",
-                                                        "value": "application/json"
-                                                    },
-                                                    {
-                                                        "description": {
-                                                            "content": "Added as a part of security scheme: apikey",
-                                                            "type": "text/plain"
-                                                        },
-                                                        "key": "x-api-key",
-                                                        "value": "<API Key>"
-                                                    }
-                                                ],
-                                                "method": "GET",
-                                                "body": {}
-                                            },
-                                            "status": "Bad Request",
-                                            "code": 400,
-                                            "header": [
-                                                {
-                                                    "key": "Content-Type",
-                                                    "value": "application/json"
-                                                }
-                                            ],
-                                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
-                                            "cookie": [],
-                                            "_postman_previewlanguage": "json"
-                                        },
-                                        {
-                                            "id": "16449c10-42b0-4d00-a8eb-a7ff1fed7a1f",
+                                            "id": "3b7faea6-a504-48b6-b3b0-8d2bf8399fb1",
                                             "name": "Missing or invalid `x-api-key`.",
                                             "originalRequest": {
                                                 "url": {
                                                     "path": [
                                                         "catalog",
                                                         "products",
-                                                        ":productId"
+                                                        ":productCode"
                                                     ],
                                                     "host": [
                                                         "{{baseUrl}}"
@@ -823,14 +778,14 @@
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "e50b4ca2-1789-4e56-abde-16f1657bb017",
+                                            "id": "95403f35-f3c2-438f-8dee-d2520a18b198",
                                             "name": "Product not found in your active catalog.",
                                             "originalRequest": {
                                                 "url": {
                                                     "path": [
                                                         "catalog",
                                                         "products",
-                                                        ":productId"
+                                                        ":productCode"
                                                     ],
                                                     "host": [
                                                         "{{baseUrl}}"
@@ -868,14 +823,14 @@
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "309b526e-a8c8-43b6-9397-7ca340743bd5",
+                                            "id": "ddf9475b-17a1-43dc-a757-9d5d9cafb7fa",
                                             "name": "Unexpected server error.",
                                             "originalRequest": {
                                                 "url": {
                                                     "path": [
                                                         "catalog",
                                                         "products",
-                                                        ":productId"
+                                                        ":productCode"
                                                     ],
                                                     "host": [
                                                         "{{baseUrl}}"
@@ -929,12 +884,12 @@
             "description": "",
             "item": [
                 {
-                    "id": "0f42d4d8-0f49-4d05-92b6-4e5ed86dd242",
+                    "id": "d8034c47-dd02-4c83-8fd2-6db6664b831f",
                     "name": "Place an order",
                     "request": {
                         "name": "Place an order",
                         "description": {
-                            "content": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+                            "content": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
                             "type": "text/plain"
                         },
                         "url": {
@@ -960,7 +915,7 @@
                         "method": "POST",
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productId\": {{productId}},\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
+                            "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productCode\": \"{{productCode}}\",\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
                             "options": {
                                 "raw": {
                                     "headerFamily": "json",
@@ -972,7 +927,7 @@
                     },
                     "response": [
                         {
-                            "id": "8e8ffdbd-d9d9-4f3a-b007-61a9b80df606",
+                            "id": "376198b3-32e7-4a19-9e0e-0ff746205d9a",
                             "name": "Order accepted and now processing.",
                             "originalRequest": {
                                 "url": {
@@ -1006,7 +961,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1050,12 +1005,12 @@
                                     "value": ""
                                 }
                             ],
-                            "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"proident20b\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                            "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"proident19_\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "3d29ce9a-94d0-488f-bbee-a1e0470520ee",
+                            "id": "180b6369-079f-44f6-a190-d6a022b93ddf",
                             "name": "Validation or order rejection. See the Errors guide for the full message catalogue.",
                             "originalRequest": {
                                 "url": {
@@ -1089,7 +1044,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1111,7 +1066,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "23661821-da71-48a6-8807-c49586e1b43a",
+                            "id": "ea72e316-7afb-4b90-9547-766627092d29",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -1145,7 +1100,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1167,7 +1122,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "344874ad-8e6d-4ff2-9c96-506c24ced522",
+                            "id": "a7e11ce8-f4a6-4a4e-a366-812668dbd2ba",
                             "name": "API ordering disabled for your account.",
                             "originalRequest": {
                                 "url": {
@@ -1201,7 +1156,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1223,7 +1178,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "e11a8f54-c7b6-4614-88c6-f3f6d0632bf1",
+                            "id": "61c9e3a6-86be-4cb6-8f3a-9039460919d5",
                             "name": "Product not found in your active catalog.",
                             "originalRequest": {
                                 "url": {
@@ -1257,7 +1212,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1279,7 +1234,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "1fe359b6-3247-4f77-835f-bec01122739e",
+                            "id": "7789cd0f-5bc1-4931-bc0d-ab36bccfde90",
                             "name": "An order with the same externalOrderCode already exists.",
                             "originalRequest": {
                                 "url": {
@@ -1313,7 +1268,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1335,8 +1290,8 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "98a4e4de-8cfc-4bc6-aaba-bba0156c11b6",
-                            "name": "Order limit exceeded or product not available for purchase.",
+                            "id": "8d3fa6ea-5571-419b-aed2-fdcc58a6693e",
+                            "name": "Order limit exceeded, insufficient wallet funds, or product not available for purchase.",
                             "originalRequest": {
                                 "url": {
                                     "path": [
@@ -1369,7 +1324,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1391,7 +1346,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "6206892c-6901-4ea7-8e80-a3c452985c17",
+                            "id": "5acc3171-5c91-4036-9ff8-0580136ba199",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -1425,7 +1380,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1447,7 +1402,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "15f63421-32fa-4f43-8560-f690f657999a",
+                            "id": "243e0af9-d26a-472d-8ed1-a6750210e73d",
                             "name": "Order could not be created or is temporarily unavailable.",
                             "originalRequest": {
                                 "url": {
@@ -1481,7 +1436,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productId\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1513,12 +1468,12 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "71867d79-0a30-4c19-99e0-9a0c2ef13d42",
+                            "id": "422b0df8-97eb-46da-b11b-580b106b8157",
                             "name": "Retrieve an order",
                             "request": {
                                 "name": "Retrieve an order",
                                 "description": {
-                                    "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
+                                    "content": "Fetches an order by the UUID `orderId` returned on placement or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
                                     "type": "text/plain"
                                 },
                                 "url": {
@@ -1537,7 +1492,7 @@
                                             "key": "reference",
                                             "disabled": false,
                                             "description": {
-                                                "content": "(Required) The numeric orderId or your externalOrderCode.",
+                                                "content": "(Required) The UUID orderId returned on placement, or your externalOrderCode.",
                                                 "type": "text/plain"
                                             }
                                         }
@@ -1555,7 +1510,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "347ca2a3-f1e9-4210-a157-45a7ca413cb9",
+                                    "id": "2328eabb-49ce-4b11-bfc5-9ed01f05ca0b",
                                     "name": "The order and its current status.",
                                     "originalRequest": {
                                         "url": {
@@ -1594,12 +1549,12 @@
                                             "value": "application/json"
                                         }
                                     ],
-                                    "body": "{\n  \"orderId\": \"<integer>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"failed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productId\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"adb\": \"<number>\",\n      \"ex5f\": \"<number>\",\n      \"dolor830\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                                    "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"failed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"magna_79c\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "77eb1513-1f96-4409-9c42-be80f48f043a",
+                                    "id": "152654e8-d58f-45d3-9609-b4882ac9efdd",
                                     "name": "Missing or invalid `x-api-key`.",
                                     "originalRequest": {
                                         "url": {
@@ -1643,7 +1598,7 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "86038a4e-631a-40a4-9fa0-01cea12c9cf4",
+                                    "id": "cf71b730-80b9-4578-8097-f507a7a59366",
                                     "name": "Order not found for the supplied reference.",
                                     "originalRequest": {
                                         "url": {
@@ -1687,7 +1642,7 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "5c35fb1a-5ea1-446b-9c4d-159567890101",
+                                    "id": "44f4a29a-3c22-42d0-82fa-317e9003329a",
                                     "name": "Unexpected server error.",
                                     "originalRequest": {
                                         "url": {
@@ -1735,7 +1690,7 @@
                                     "originalRequest": {
                                         "name": "Retrieve an order",
                                         "description": {
-                                            "content": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
+                                            "content": "Fetches an order by the UUID `orderId` returned on placement or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
                                             "type": "text/plain"
                                         },
                                         "url": {
@@ -1754,7 +1709,7 @@
                                                     "key": "reference",
                                                     "disabled": false,
                                                     "description": {
-                                                        "content": "(Required) The numeric orderId or your externalOrderCode.",
+                                                        "content": "(Required) The UUID orderId returned on placement, or your externalOrderCode.",
                                                         "type": "text/plain"
                                                     }
                                                 }
@@ -1778,7 +1733,7 @@
                                             "value": "application/json"
                                         }
                                     ],
-                                    "body": "{\n  \"orderId\": 59400,\n  \"externalOrderCode\": \"O-12345\",\n  \"status\": \"partially_completed\",\n  \"delivered\": 3,\n  \"total\": 5,\n  \"products\": [\n    {\n      \"productId\": 2,\n      \"price\": 10000,\n      \"quantity\": 5,\n      \"codes\": [\n        {\n          \"code\": \"AAAAA-BBBBB-CCCCC-DDDDD-EEEEE\"\n        },\n        {\n          \"code\": \"FFFFF-GGGGG-HHHHH-IIIII-JJJJJ\"\n        },\n        {\n          \"code\": \"KKKKK-LLLLL-MMMMM-NNNNN-OOOOO\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"GBP\": 196.01\n    },\n    \"lowBalance\": false\n  }\n}",
+                                    "body": "{\n  \"orderId\": \"b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10\",\n  \"externalOrderCode\": \"O-12345\",\n  \"status\": \"partially_completed\",\n  \"delivered\": 3,\n  \"total\": 5,\n  \"products\": [\n    {\n      \"productCode\": \"10020000213575\",\n      \"price\": 10000,\n      \"quantity\": 5,\n      \"codes\": [\n        {\n          \"code\": \"AAAAA-BBBBB-CCCCC-DDDDD-EEEEE\"\n        },\n        {\n          \"code\": \"FFFFF-GGGGG-HHHHH-IIIII-JJJJJ\"\n        },\n        {\n          \"code\": \"KKKKK-LLLLL-MMMMM-NNNNN-OOOOO\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"GBP\": 196.01\n    },\n    \"lowBalance\": false\n  }\n}",
                                     "_postman_previewlanguage": "json"
                                 }
                             ],
@@ -1796,7 +1751,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "45d9793a-f8a4-49f8-9e8a-d1270f9897db",
+                    "id": "b78e67d8-880b-42e9-97dc-e2488eb36117",
                     "name": "Get wallet balances",
                     "request": {
                         "name": "Get wallet balances",
@@ -1826,7 +1781,7 @@
                     },
                     "response": [
                         {
-                            "id": "f5302017-3466-42f0-b07f-08168ac565eb",
+                            "id": "75c9cfa1-8246-4c14-b0b5-a926755fc964",
                             "name": "Current wallet snapshot.",
                             "originalRequest": {
                                 "url": {
@@ -1864,12 +1819,12 @@
                                     "value": "application/json"
                                 }
                             ],
-                            "body": "{\n  \"balances\": {\n    \"veniam_1c8\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
+                            "body": "{\n  \"balances\": {\n    \"ina\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "e4efa213-96c1-4414-acb0-56e55c4da91f",
+                            "id": "fd7e76b2-cd51-4b7f-92c2-8c7deac2a669",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -1912,7 +1867,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "755d88d5-6c59-4cb6-850e-c377c808eaff",
+                            "id": "ebfdde48-b056-4274-a3bc-8aa4c205ec21",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -1994,8 +1949,8 @@
             "value": ""
         },
         {
-            "key": "productId",
-            "value": "2"
+            "key": "productCode",
+            "value": "10020000213575"
         },
         {
             "key": "orderReference",
@@ -2019,7 +1974,7 @@
         }
     ],
     "info": {
-        "_postman_id": "41139119-2a1e-43a1-a393-e1826dd527e7",
+        "_postman_id": "5281ce31-b4a6-4241-b48a-a8417056e928",
         "name": "Kalixo API v2",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
         "description": {

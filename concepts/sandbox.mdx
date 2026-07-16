@@ -30,17 +30,19 @@ See [Authentication](/authentication) for how to send your key.
 ## Kalixo Test products
 
 Call **`GET /v2/sandbox/scenarios`** with your sandbox API key for the current
-list of test `productId`s, sample order lines, and expected outcomes.
+list of test `productCode`s, sample order lines, and expected outcomes. Each
+scenario includes a `sampleOrderLine` (with `productCode`, `quantity`, and
+`price`) that you can send to `POST /v2/orders` as-is.
 
-| Product | EAN | Expected outcome |
-| --- | --- | --- |
-| Success (Fixed) | `KTEST-OK` | `completed` + codes |
-| Success (Open) | `KTEST-OPEN` | `completed` - send line `price` |
-| Async failure | `KTEST-FAIL` | `failed` |
-| Partial | `KTEST-PARTIAL` | `partially_completed` when qty ≥ 2 |
-| Slow | `KTEST-SLOW` | `processing` ~10s, then `completed` |
+| Product | Expected outcome |
+| --- | --- |
+| Success (Fixed) | `completed` + codes |
+| Success (Open) | `completed` - send line `price` |
+| Async failure | `failed` |
+| Partial | `partially_completed` when qty ≥ 2 |
+| Slow | `processing` ~10s, then `completed` |
 
-**Mixed partial:** order `KTEST-OK` and `KTEST-FAIL` in one request →
+**Mixed partial:** order the success and failure products in one request →
 `partially_completed`.
 
 **Your catalog products:** any product returned by `GET /v2/catalog/products` can
@@ -60,4 +62,5 @@ account manager if you need to test low-balance behaviour.
 4. Follow the [Quickstart](/quickstart) - place an order, poll until
    `completed`, and read the `SANDBOX-*` codes from the response.
 5. When you are ready to go live, switch to `https://api.kalixo.io/v2` and your
-   production key (`kal_live_…`).
+   production key (`kal_live_…`). Catalog `productCode`s are identical in sandbox
+   and production, so the codes you integrated against keep working unchanged.

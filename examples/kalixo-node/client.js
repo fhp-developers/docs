@@ -71,8 +71,8 @@ export class KalixoClient {
     return this.request(`/catalog/products${q ? `?${q}` : ''}`);
   }
 
-  getProduct(productId: number) {
-    return this.request(`/catalog/products/${productId}`);
+  getProduct(productCode: string) {
+    return this.request(`/catalog/products/${productCode}`);
   }
 
   placeOrder(payload: {
@@ -80,7 +80,7 @@ export class KalixoClient {
     currency: string;
     price?: number;
     orderProducts: Array<{
-      productId: number;
+      productCode: string;
       price?: number;
       quantity: number;
       currency?: string;
@@ -92,7 +92,8 @@ export class KalixoClient {
     });
   }
 
-  getOrder(reference: string | number) {
+  /** Fetch an order by its UUID orderId or your externalOrderCode. */
+  getOrder(reference: string) {
     return this.request(`/orders/${reference}`);
   }
 
@@ -102,7 +103,7 @@ export class KalixoClient {
 
   /** Wait until estimatedReadyAt, then poll until a terminal status. */
   async waitForOrder(
-    reference: string | number,
+    reference: string,
     estimatedReadyAt?: string,
   ) {
     if (estimatedReadyAt) {

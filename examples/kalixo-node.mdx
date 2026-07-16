@@ -32,7 +32,7 @@ const accepted = await kalixo.placeOrder({
   currency: 'GBP',
   price: product.price,
   orderProducts: [
-    { productId: product.id, price: product.price, quantity: 1 },
+    { productCode: product.productCode, price: product.price, quantity: 1 },
   ],
 });
 

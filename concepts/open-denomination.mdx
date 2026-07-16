@@ -13,7 +13,7 @@ Each catalog product includes denomination metadata:
 
 ```json
 {
-  "id": 814,
+  "productCode": "10001000000814",
   "name": "Flexible Top-Up",
   "currencyCode": "GBP",
   "denominationType": "open",
@@ -53,7 +53,7 @@ curl -X POST "https://api.kalixo.io/v2/orders" \
     "currency": "GBP",
     "price": 5000,
     "orderProducts": [
-      { "productId": 814, "price": 5000, "quantity": 1 }
+      { "productCode": "10001000000814", "price": 5000, "quantity": 1 }
     ]
   }'
 ```

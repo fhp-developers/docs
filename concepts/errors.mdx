@@ -10,7 +10,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 {
   "statusCode": 400,
   "error": "Bad Request",
-  "message": "Product 2 price mismatch: expected 10000"
+  "message": "Product 10020000213575 price mismatch: expected 10000"
 }
 ```
 
@@ -22,11 +22,11 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 </ResponseField>
 <ResponseField name="message" type="string">
   A human-readable explanation you can show to operators or log for support. When a message
-  refers to a product, it uses the **`productId` you sent** in the request.
+  refers to a product, it uses the **`productCode` you sent** in the request.
 </ResponseField>
 
 <Note>
-  Placeholders below use `{productId}`, `{reference}`, `{min}`, `{max}`, `{expected}`,
+  Placeholders below use `{productCode}`, `{reference}`, `{min}`, `{max}`, `{expected}`,
   `{productCurrency}`, `{requested}`, and `{seconds}` for values that depend on your request.
   All other text is returned **exactly** as shown.
 </Note>
@@ -40,7 +40,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 | `403` | `Forbidden` | API ordering disabled for your account |
 | `404` | `Not Found` | Unknown catalog product or order |
 | `409` | `Conflict` | Duplicate `externalOrderCode` |
-| `422` | `Unprocessable Entity` | Account order limit exceeded, or product not available for purchase |
+| `422` | `Unprocessable Entity` | Account order limit exceeded, insufficient wallet funds, or product not available for purchase |
 | `429` | `Too Many Requests` | [Rate limit](/concepts/rate-limits) exceeded |
 | `502` | `Bad Gateway` | Order could not be created or is temporarily unavailable |
 | `500` | — | Unexpected server error |
@@ -64,11 +64,11 @@ The `Retry-After` response header matches `{seconds}`. See [Rate limits](/concep
 
 ## Catalog (`404`)
 
-Returned by `GET /catalog/products/{productId}` when the id is not in your active catalog.
+Returned by `GET /catalog/products/{productCode}` when the productCode is not in your active catalog.
 
 | Message |
 | --- |
-| `Product {productId} was not found in your catalog` |
+| `Product {productCode} was not found in your catalog` |
 
 ## Orders - request validation (`400`)
 
@@ -77,12 +77,12 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
 | Message |
 | --- |
 | `orderProducts must not be empty` |
-| `Each line requires a productId and a quantity of at least 1` |
-| `Product {productId} is priced in {productCurrency}, not {requested}` |
-| `Product {productId} is open-denomination and requires a price` |
-| `Price for product {productId} is below the minimum allowed ({min})` |
-| `Price for product {productId} exceeds the maximum allowed ({max})` |
-| `Product {productId} price mismatch: expected {expected}` |
+| `Each line requires a productCode and a quantity of at least 1` |
+| `Product {productCode} is priced in {productCurrency}, not {requested}` |
+| `Product {productCode} is open-denomination and requires a price` |
+| `Price for product {productCode} is below the minimum allowed ({min})` |
+| `Price for product {productCode} exceeds the maximum allowed ({max})` |
+| `Product {productCode} price mismatch: expected {expected}` |
 | `Order price mismatch: expected total {expected}` |
 
 <Info>
@@ -95,11 +95,11 @@ Returned by `POST /orders` when the order cannot be accepted after validation.
 
 | Typical situation | Message |
 | --- | --- |
-| Product not orderable for country/currency | `Product {productId} is not available for ordering with the supplied country or currency.` |
-| Product inactive | `Product {productId} is not currently available.` |
-| Wrong order currency | `Product {productId} cannot be ordered in the requested currency.` |
-| Open denomination, price missing | `Product {productId} is open-denomination and requires a price.` |
-| Order data invalid | `The order could not be validated. Check product ids, prices, and currency.` |
+| Product not orderable for country/currency | `Product {productCode} is not available for ordering with the supplied country or currency.` |
+| Product inactive | `Product {productCode} is not currently available.` |
+| Wrong order currency | `Product {productCode} cannot be ordered in the requested currency.` |
+| Open denomination, price missing | `Product {productCode} is open-denomination and requires a price.` |
+| Order data invalid | `The order could not be validated. Check product codes, prices, and currency.` |
 | Order already placed | `This order has already been placed.` |
 | Other rejection | `The order could not be placed. Check your request and try again.` |
 
@@ -125,7 +125,8 @@ Returned by `POST /orders` when the order cannot be accepted after validation.
 | Message |
 | --- |
 | `Your account order limit has been exceeded. Contact support for assistance.` |
-| `Product {productId} is not available for purchase.` |
+| `Insufficient funds. Please top up your wallet and try again.` |
+| `Product {productCode} is not available for purchase.` |
 
 ## Orders - not found (`404`)
 
@@ -135,7 +136,7 @@ Returned by `GET /orders/{reference}`.
 | --- |
 | `Order {reference} not found` |
 
-`{reference}` is the path value you sent (numeric `orderId` or your `externalOrderCode`).
+`{reference}` is the path value you sent (the UUID `orderId` or your `externalOrderCode`).
 
 ## Orders - bad gateway (`502`)
 
@@ -162,8 +163,8 @@ The `error` field is omitted on some `500` responses.
   <Step title="Log statusCode and message">
     Persist both fields for support and retries. Treat `message` as human-readable text.
   </Step>
-  <Step title="Map by productId">
-    When `message` starts with `Product {id}`, attach the error to that line in your cart or order payload.
+  <Step title="Map by productCode">
+    When `message` starts with `Product {productCode}`, attach the error to that line in your cart or order payload.
   </Step>
   <Step title="Retry only when appropriate">
     Retry `502` and `429` with backoff. Do not retry `400`, `403`, `404`, `409`, or `422` without fixing the request.

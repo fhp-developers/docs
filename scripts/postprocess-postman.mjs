@@ -31,7 +31,7 @@ collection.info.description = {
 collection.variable = [
   { key: "baseUrl", value: "https://sandbox.kalixo.io/v2" },
   { key: "apiKey", value: "" },
-  { key: "productId", value: "2" },
+  { key: "productCode", value: "10020000213575" },
   { key: "orderReference", value: "O-12345" },
   { key: "externalOrderCode", value: "O-12345" },
   { key: "linePrice", value: "10000" },
@@ -44,7 +44,7 @@ const placeOrderBody = `{
   "price": {{linePrice}},
   "orderProducts": [
     {
-      "productId": {{productId}},
+      "productCode": "{{productCode}}",
       "price": {{linePrice}},
       "quantity": 1
     }
@@ -74,8 +74,8 @@ function walkItems(items) {
     }
 
     if (item.name === "Get a single product" && req.url?.variable) {
-      const v = req.url.variable.find((x) => x.key === "productId");
-      if (v) v.value = "{{productId}}";
+      const v = req.url.variable.find((x) => x.key === "productCode");
+      if (v) v.value = "{{productCode}}";
     }
 
     if (item.name === "Place an order" && req.body?.mode === "raw") {
@@ -87,14 +87,14 @@ function walkItems(items) {
       if (v) v.value = "{{orderReference}}";
       if (!item.response) item.response = [];
       const partialBody = {
-        orderId: 59400,
+        orderId: "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
         externalOrderCode: "O-12345",
         status: "partially_completed",
         delivered: 3,
         total: 5,
         products: [
           {
-            productId: 2,
+            productCode: "10020000213575",
             price: 10000,
             quantity: 5,
             codes: [

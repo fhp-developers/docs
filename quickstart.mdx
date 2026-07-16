@@ -41,9 +41,9 @@ retrieving your codes.
   </Step>
 
   <Step title="Find a product in your catalog">
-    List your catalog and pick a `productId` (the `id` field). Each product also has a
-    `productCode` (a stable 14-digit catalog identifier) and per-locale `sku`. Filter by
-    country, brand, category, and more.
+    List your catalog and pick a `productCode` - a stable 14-digit catalog identifier that
+    is identical in sandbox and production. Each product also has per-locale `sku` values.
+    Filter by country, brand, category, and more.
 
     <CodeGroup>
 
@@ -76,7 +76,7 @@ retrieving your codes.
   </Step>
 
   <Step title="Place an order">
-    Send each line's **unit** `price`, `quantity`, and `productId`, plus a unique
+    Send each line's **unit** `price`, `quantity`, and `productCode`, plus a unique
     `externalOrderCode`. The optional top-level `price` is the **order total** - if you send
     it, it must equal the sum of `(line price × quantity)`.
 
@@ -94,7 +94,7 @@ retrieving your codes.
         "currency": "GBP",
         "price": 10000,
         "orderProducts": [
-          { "productId": 2, "price": 10000, "quantity": 1 }
+          { "productCode": "10020000213575", "price": 10000, "quantity": 1 }
         ]
       }'
     ```
@@ -108,8 +108,8 @@ retrieving your codes.
         "currency": "GBP",
         "price": 15000,
         "orderProducts": [
-          { "productId": 2, "price": 10000, "quantity": 1 },
-          { "productId": 5, "price": 5000, "quantity": 1 }
+          { "productCode": "10020000213575", "price": 10000, "quantity": 1 },
+          { "productCode": "10001000000421", "price": 5000, "quantity": 1 }
         ]
       }'
     ```
@@ -125,7 +125,7 @@ retrieving your codes.
         externalOrderCode: "O-12345",
         currency: "GBP",
         price: 10000,
-        orderProducts: [{ productId: 2, price: 10000, quantity: 1 }],
+        orderProducts: [{ productCode: "10020000213575", price: 10000, quantity: 1 }],
       }),
     });
     console.log(await res.json());
@@ -135,7 +135,7 @@ retrieving your codes.
 
     ```json Response
     {
-      "orderId": 59400,
+      "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
       "externalOrderCode": "O-12345",
       "status": "processing",
       "estimatedReadyAt": "2026-06-02T11:05:00Z",
@@ -154,12 +154,12 @@ retrieving your codes.
 
     ```json Response (completed)
     {
-      "orderId": 59400,
+      "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
       "status": "completed",
       "externalOrderCode": "O-12345",
       "products": [
         {
-          "productId": 2,
+          "productCode": "10020000213575",
           "price": 10000,
           "quantity": 1,
           "codes": [{ "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]

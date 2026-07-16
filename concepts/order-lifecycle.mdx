@@ -69,8 +69,8 @@ Two fixed-price products totalling **15000** minor units (£100 + £50):
   "currency": "GBP",
   "price": 15000,
   "orderProducts": [
-    { "productId": 2, "price": 10000, "quantity": 1 },
-    { "productId": 5, "price": 5000, "quantity": 1 }
+    { "productCode": "10020000213575", "price": 10000, "quantity": 1 },
+    { "productCode": "10001000000421", "price": 5000, "quantity": 1 }
   ]
 }
 ```
@@ -82,7 +82,7 @@ one object per **delivered** unit:
 
 ```json
 {
-  "productId": 2,
+  "productCode": "10020000213575",
   "price": 10000,
   "quantity": 2,
   "codes": [
@@ -128,14 +128,14 @@ Example - 3 of 5 codes delivered:
 
 ```json
 {
-  "orderId": 59400,
+  "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
   "externalOrderCode": "O-12345",
   "status": "partially_completed",
   "delivered": 3,
   "total": 5,
   "products": [
     {
-      "productId": 2,
+      "productCode": "10020000213575",
       "price": 10000,
       "quantity": 5,
       "codes": [

@@ -149,19 +149,19 @@
         }
       }
     },
-    "/catalog/products/{productId}": {
+    "/catalog/products/{productCode}": {
       "get": {
         "tags": ["Catalog"],
         "summary": "Get a single product",
-        "description": "Returns a single catalog product by its product id.",
+        "description": "Returns a single catalog product by its `productCode`.",
         "operationId": "getCatalogProduct",
         "parameters": [
           {
-            "name": "productId",
+            "name": "productCode",
             "in": "path",
             "required": true,
-            "description": "The product id from the catalog.",
-            "schema": { "type": "integer", "example": 2 }
+            "description": "The product code from the catalog. Stable and identical across sandbox and production.",
+            "schema": { "type": "string", "example": "10020000213575" }
           }
         ],
         "responses": {
@@ -178,7 +178,6 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequestInvalidProductId" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "404": { "$ref": "#/components/responses/CatalogProductNotFound" },
           "500": { "$ref": "#/components/responses/InternalServerError" }
@@ -189,7 +188,7 @@
       "post": {
         "tags": ["Orders"],
         "summary": "Place an order",
-        "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productId` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+        "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
         "operationId": "placeOrder",
         "requestBody": {
           "required": true,
@@ -265,13 +264,16 @@
             }
           },
           "422": {
-            "description": "Order limit exceeded or product not available for purchase.",
+            "description": "Order limit exceeded, insufficient wallet funds, or product not available for purchase.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "examples": {
                   "orderLimitExceeded": {
                     "$ref": "#/components/examples/ErrorOrderLimitExceeded"
+                  },
+                  "insufficientFunds": {
+                    "$ref": "#/components/examples/ErrorInsufficientFunds"
                   },
                   "productNotAvailableForPurchase": {
                     "$ref": "#/components/examples/ErrorProductNotAvailableForPurchase"
@@ -306,14 +308,14 @@
       "get": {
         "tags": ["Orders"],
         "summary": "Retrieve an order",
-        "description": "Fetches an order by its numeric `orderId` or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
+        "description": "Fetches an order by the UUID `orderId` returned on placement or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
         "operationId": "getOrder",
         "parameters": [
           {
             "name": "reference",
             "in": "path",
             "required": true,
-            "description": "The numeric orderId or your externalOrderCode.",
+            "description": "The UUID orderId returned on placement, or your externalOrderCode.",
             "schema": { "type": "string", "example": "O-12345" }
           }
         ],
@@ -327,7 +329,7 @@
                   "processing": {
                     "summary": "Still processing",
                     "value": {
-                      "orderId": 59400,
+                      "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
                       "externalOrderCode": "O-12345",
                       "status": "processing",
                       "estimatedReadyAt": "2026-06-02T11:05:00Z",
@@ -337,12 +339,12 @@
                   "completed": {
                     "summary": "Completed with codes",
                     "value": {
-                      "orderId": 59400,
+                      "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
                       "externalOrderCode": "O-12345",
                       "status": "completed",
                       "products": [
                         {
-                          "productId": 2,
+                          "productCode": "10020000213575",
                           "price": 10000,
                           "quantity": 1,
                           "codes": [{ "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]
@@ -357,7 +359,7 @@
                   "failed": {
                     "summary": "Failed",
                     "value": {
-                      "orderId": 59400,
+                      "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
                       "externalOrderCode": "O-12345",
                       "status": "failed",
                       "reason": "The order could not be completed."
@@ -402,17 +404,6 @@
             "examples": {
               "missingApiKey": { "$ref": "#/components/examples/ErrorMissingApiKey" },
               "invalidApiKey": { "$ref": "#/components/examples/ErrorInvalidApiKey" }
-            }
-          }
-        }
-      },
-      "BadRequestInvalidProductId": {
-        "description": "Invalid `productId` path parameter (must be a numeric catalog id).",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "examples": {
-              "invalidProductId": { "$ref": "#/components/examples/ErrorInvalidProductId" }
             }
           }
         }
@@ -524,10 +515,9 @@
       "Product": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "example": 2, "description": "The product id you order with." },
           "productCode": {
             "type": "string",
-            "description": "A stable 14-digit catalog identifier.",
+            "description": "The product code you order with - a stable 14-digit catalog identifier, identical across sandbox and production.",
             "example": "10020000213575"
           },
           "name": { "type": "string", "example": "Sony PlayStation®Network Wallet Top-Up £100" },
@@ -647,9 +637,9 @@
       },
       "OrderLine": {
         "type": "object",
-        "required": ["productId", "quantity"],
+        "required": ["productCode", "quantity"],
         "properties": {
-          "productId": { "type": "integer", "description": "The catalog product id.", "example": 2 },
+          "productCode": { "type": "string", "description": "The catalog product code.", "example": "10020000213575" },
           "price": { "type": "integer", "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.", "example": 10000 },
           "quantity": { "type": "integer", "minimum": 1, "example": 1 },
           "currency": {
@@ -700,7 +690,7 @@
       "OrderAccepted": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "integer", "example": 59400 },
+          "orderId": { "type": "string", "format": "uuid", "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10" },
           "externalOrderCode": { "type": "string", "example": "O-12345" },
           "status": { "type": "string", "enum": ["processing"], "example": "processing" },
           "estimatedReadyAt": {
@@ -721,7 +711,7 @@
       "OrderProductResult": {
         "type": "object",
         "properties": {
-          "productId": { "type": "integer", "example": 2 },
+          "productCode": { "type": "string", "example": "10020000213575" },
           "price": { "type": "integer", "example": 10000 },
           "quantity": { "type": "integer", "example": 1 },
           "codes": {
@@ -734,7 +724,7 @@
       "OrderStatus": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "integer", "example": 59400 },
+          "orderId": { "type": "string", "format": "uuid", "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10" },
           "externalOrderCode": { "type": "string", "example": "O-12345" },
           "status": {
             "type": "string",
@@ -779,8 +769,8 @@
           },
           "message": {
             "type": "string",
-            "description": "Human-readable explanation. May include the productId you sent.",
-            "example": "Product 2 price mismatch: expected 10000"
+            "description": "Human-readable explanation. May include the productCode you sent.",
+            "example": "Product 10020000213575 price mismatch: expected 10000"
           }
         }
       }
@@ -796,7 +786,6 @@
       "CatalogProductExample": {
         "summary": "PlayStation wallet top-up",
         "value": {
-          "id": 2,
           "productCode": "10020000213575",
           "name": "Sony PlayStation®Network Wallet Top-Up £100",
           "shortName": "PSN",
@@ -857,7 +846,6 @@
           "take": 20,
           "products": [
             {
-              "id": 2,
               "productCode": "10020000213575",
               "name": "Sony PlayStation®Network Wallet Top-Up £100",
               "shortName": "PSN",
@@ -904,14 +892,14 @@
         "summary": "Partial delivery with codes",
         "description": "Three of five codes delivered. `products[].codes` contains every code received so far.",
         "value": {
-          "orderId": 59400,
+          "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
           "externalOrderCode": "O-12345",
           "status": "partially_completed",
           "delivered": 3,
           "total": 5,
           "products": [
             {
-              "productId": 2,
+              "productCode": "10020000213575",
               "price": 10000,
               "quantity": 5,
               "codes": [
@@ -953,7 +941,7 @@
         "value": {
           "statusCode": 404,
           "error": "Not Found",
-          "message": "Product 3 was not found in your catalog"
+          "message": "Product 10001000000999 was not found in your catalog"
         }
       },
       "ErrorPriceMismatch": {
@@ -961,7 +949,7 @@
         "value": {
           "statusCode": 400,
           "error": "Bad Request",
-          "message": "Product 2 price mismatch: expected 10000"
+          "message": "Product 10020000213575 price mismatch: expected 10000"
         }
       },
       "ErrorOrderTotalMismatch": {
@@ -977,7 +965,7 @@
         "value": {
           "statusCode": 400,
           "error": "Bad Request",
-          "message": "Product 2 is open-denomination and requires a price"
+          "message": "Product 10001000000814 is open-denomination and requires a price"
         }
       },
       "ErrorCurrencyMismatch": {
@@ -985,7 +973,7 @@
         "value": {
           "statusCode": 400,
           "error": "Bad Request",
-          "message": "Product 2 is priced in GBP, not EUR"
+          "message": "Product 10020000213575 is priced in GBP, not EUR"
         }
       },
       "ErrorProductNotOrderable": {
@@ -993,7 +981,7 @@
         "value": {
           "statusCode": 400,
           "error": "Bad Request",
-          "message": "Product 405 is not available for ordering with the supplied country or currency."
+          "message": "Product 10001000000405 is not available for ordering with the supplied country or currency."
         }
       },
       "ErrorOrderCouldNotBePlaced": {
@@ -1033,7 +1021,15 @@
         "value": {
           "statusCode": 422,
           "error": "Unprocessable Entity",
-          "message": "Product 2 is not available for purchase."
+          "message": "Product 10020000213575 is not available for purchase."
+        }
+      },
+      "ErrorInsufficientFunds": {
+        "summary": "Insufficient wallet funds",
+        "value": {
+          "statusCode": 422,
+          "error": "Unprocessable Entity",
+          "message": "Insufficient funds. Please top up your wallet and try again."
         }
       },
       "ErrorOrderNotFound": {
@@ -1058,14 +1054,6 @@
           "statusCode": 502,
           "error": "Bad Gateway",
           "message": "Order could not be created. Please try again later."
-        }
-      },
-      "ErrorInvalidProductId": {
-        "summary": "Invalid product id path parameter",
-        "value": {
-          "statusCode": 400,
-          "error": "Bad Request",
-          "message": "Validation failed (numeric string is expected)"
         }
       },
       "ErrorInternalServerError": {

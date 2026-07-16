@@ -29,9 +29,9 @@ v1 remains available; migrate when you’re ready.
 | v1 | v2 | Notes |
 | --- | --- | --- |
 | `POST /v1/orders/place-order` (sync, returns pins) | `POST /v2/orders` (async) | Returns `orderId` + `processing`; poll for pins |
-| `GET /v1/orders/retrieve-order?id=` | `GET /v2/orders/{reference}` | By `orderId` **or** `externalOrderCode`; codes only when `completed` |
+| `GET /v1/orders/retrieve-order?id=` | `GET /v2/orders/{reference}` | By UUID `orderId` **or** `externalOrderCode`; codes only when `completed` |
 | `GET /v1/catalog/products` | `GET /v2/catalog/products` | Adds filters + `skip`/`take` (max 100) |
-| `GET /v1/catalog/product?sku=` | `GET /v2/catalog/products/{id}` | Fetch by catalog `productId` |
+| `GET /v1/catalog/product?sku=` | `GET /v2/catalog/products/{productCode}` | Fetch by catalog `productCode` |
 | _(none)_ | `GET /v2/wallet` | New dedicated wallet endpoint |
 
 ## Behavioural differences
@@ -43,16 +43,28 @@ v1 remains available; migrate when you’re ready.
 </Warning>
 
 <Note>
-  Product ids are stable catalog ids - keep sending the `productId` from the catalog, exactly
-  as in v1. Catalog responses expose `productCode` (a stable 14-digit catalog identifier) and
-  per-locale `sku`. Pricing validation is unchanged for fixed products (price must match) and
-  range-checked for [open-denomination](/concepts/open-denomination) products.
+  v2 identifies products by **`productCode`** - a stable 14-digit string identifier (for
+  example `10020000213575`) used in order lines and product URLs. Internal numeric product
+  ids are no longer exposed. productCodes are stable **and identical in sandbox and
+  production**: integrate against sandbox, then switch the base URL and API key and the same
+  productCodes work in production. Catalog responses also expose per-locale `sku` values.
+  Pricing validation is unchanged for fixed products (price must match) and range-checked
+  for [open-denomination](/concepts/open-denomination) products.
+</Note>
+
+<Note>
+  v1 returned numeric order ids. v2 returns a UUID **`orderId`** (for example
+  `b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10`) when you place an order. Poll
+  `GET /v2/orders/{reference}` with that UUID or with your own `externalOrderCode` -
+  numeric order ids are not accepted.
 </Note>
 
 ## Response shape changes (v2.1)
 
 | v1 / early v2 | Current v2 |
 | --- | --- |
+| Numeric product `id` / `productId` | `productCode` (string) in catalog, order lines, and order status |
+| Numeric order id | `orderId` as a UUID string |
 | `PIN` / `pin: [{ pin }]` | `codes: [{ code }]` |
 | `tags` as comma-separated string | `tags` as `string[]` |
 | `rrp`, `rrpCurrency`, `state` on products | Removed - use `price` and `status` |
