@@ -1,0 +1,67 @@
+---
+title: "Event catalogue"
+description: "Every event type, when it fires and which object it carries."
+icon: "list"
+---
+
+```json
+{
+  "id": "evt_01JABCDEF0123456789ABCDEF",
+  "type": "payment.captured",
+  "api_version": "2026-10-01",
+  "created_at": "2026-10-13T16:20:00Z",
+  "livemode": true,
+  "partner_id": "ptn_01J...",
+  "data": {
+    "object": {
+      "id": "pay_01J...",
+      "object": "payment",
+      "status": "captured",
+      "amount": 4999,
+      "currency": "EUR",
+      "amount_authorized": 4999,
+      "amount_captured": 4999,
+      "amount_refunded": 0,
+      "amount_disputed": 0,
+      "amount_mismatch": false,
+      "reference": "order-1001",
+      "metadata": { "cartId": "abc" },
+      "version": 3
+    }
+  }
+}
+```
+
+`data.object` is always a full snapshot. Some events add `data.related`, for example
+the payment of a refund event.
+
+| Event | Object | When |
+| --- | --- | --- |
+| `checkout_session.completed` | checkout session | The session's payment was authorised |
+| `checkout_session.expired` | checkout session | The session expired without a payment |
+| `payment.authorized` | payment | The payment was authorised |
+| `payment.captured` | payment | The full amount was captured (automatic capture sends this right after `payment.authorized`) |
+| `payment.partially_captured` | payment | Part of a manual-capture payment was captured |
+| `payment.failed` | payment | An attempt was declined; the shopper can retry while the session is open |
+| `payment.canceled` | payment | An authorisation was canceled |
+| `payment.expired` | payment | The payment or its last attempt expired |
+| `payment.amount_updated` | payment | The authorised amount changed |
+| `payment.amount_mismatch` | payment | The provider reported a different amount; Kalixo reverses the payment. Do not fulfil |
+| `payment.fraud_reported` | payment | The issuer reported fraud; a dispute may follow |
+| `capture.failed` | capture | A capture was rejected |
+| `refund.succeeded` | refund | A refund succeeded |
+| `refund.failed` | refund | A refund failed or was reversed |
+| `dispute.created` | dispute | A dispute or information request was opened |
+| `dispute.updated` | dispute | The dispute changed (for example a defense was submitted) |
+| `dispute.funds_withdrawn` | dispute | The disputed amount was debited |
+| `dispute.won` | dispute | The dispute was won |
+| `dispute.lost` | dispute | The dispute was lost or accepted |
+| `payment_method.attached` | payment method | A card was saved for a customer |
+| `payment_method.updated` | payment method | A saved card was updated |
+| `payment_method.detached` | payment method | A saved card was removed |
+
+## Fulfilment rule of thumb
+
+Fulfil on `payment.captured` when `amount_captured` equals your order total, `currency`
+matches and `amount_mismatch` is `false`. With manual capture, ship on
+`payment.authorized` and capture when you ship.

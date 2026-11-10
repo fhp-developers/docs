@@ -1,0 +1,39 @@
+---
+title: "Testing"
+description: "Sandbox environment and test cards."
+icon: "flask"
+---
+
+The sandbox (`https://sandbox.checkout.kalixo.io`) behaves like live but never moves
+money. Use your `kc_sk_test_` and `kc_pk_test_` keys.
+
+## Test cards
+
+Enter any future expiry date and any CVC.
+
+| Card number | Result |
+| --- | --- |
+| `4111 1111 1111 1111` | Authorised |
+| `4000 0000 0000 0002` | Declined (`generic_decline`) |
+| `4000 0000 0000 9995` | Declined (`insufficient_funds`) |
+| `4000 0000 0000 3220` | 3D Secure challenge; approve or decline in the test dialog |
+| `4000 0000 0000 0077` | Pending; the outcome arrives by webhook only |
+| `4000 0000 0000 0119` | Processing error |
+| `4000 0000 0000 0101` | The provider reports a different amount: triggers `payment.amount_mismatch` and an automatic reversal |
+
+Refunds of exactly `666` minor units fail (`refund.failed`).
+
+<Note>
+  Kalixo may route your sandbox account to a provider's test environment instead.
+  The checkout then shows that provider's test form and test cards; your integration
+  does not change.
+</Note>
+
+## What to test before going live
+
+- Successful payment and fulfilment on `payment.captured`.
+- Declined payment and retry on the same session.
+- Pending payment that completes by webhook only.
+- Webhook signature verification and duplicate deliveries (deduplicate on `id`).
+- Amount mismatch handling (do not fulfil when `amount_mismatch` is `true`).
+- Full and partial refunds.

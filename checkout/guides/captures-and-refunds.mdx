@@ -1,0 +1,44 @@
+---
+title: "Captures, cancellations and refunds"
+description: "Capture later, capture partially, cancel, and refund in full or in parts."
+icon: "rotate-left"
+---
+
+## Automatic or manual capture
+
+By default, payments are captured automatically: you receive `payment.authorized`
+and then `payment.captured`.
+
+Set `capture_method: "manual"` on the checkout session to authorise first and capture
+later, for example when you ship.
+
+```javascript
+await kalixo.payments.capture('pay_...', { amount: 600 }); // partial capture
+await kalixo.payments.capture('pay_...');                  // the remaining amount
+```
+
+- A capture is `pending` until `payment.captured`, `payment.partially_captured` or `capture.failed` arrives.
+- The total captured can never exceed the authorised amount (`amount_too_large`).
+- Not every payment method supports separate or partial captures. Authorisations expire
+  after a few days depending on the method; capture as soon as you can.
+
+## Cancel
+
+```javascript
+await kalixo.payments.cancel('pay_...');
+```
+
+Cancels an authorised payment that has not been captured. You receive `payment.canceled`.
+
+## Refund
+
+```javascript
+await kalixo.refunds.create({ payment: 'pay_...', amount: 300, reason: 'requested_by_customer' });
+await kalixo.refunds.create({ payment: 'pay_...' }); // the rest of the captured amount
+```
+
+- Multiple partial refunds are allowed. The total refunded can never exceed the captured
+  amount, even when requests arrive at the same time.
+- A refund is `pending` until `refund.succeeded` or `refund.failed`.
+- Disputed payments cannot be refunded (`payment_disputed`); the dispute decides the outcome.
+- With automatic capture, wait for `payment.captured` before refunding.

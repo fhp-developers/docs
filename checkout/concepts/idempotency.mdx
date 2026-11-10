@@ -1,0 +1,28 @@
+---
+title: "Idempotency"
+description: "Retry safely without charging or refunding twice."
+icon: "repeat"
+---
+
+Every `POST` with a secret key requires an `Idempotency-Key` header (1 to 255 characters).
+
+```bash
+curl https://sandbox.checkout.kalixo.io/v1/refunds \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: refund-request-8812" \
+  -H "Content-Type: application/json" \
+  -d '{ "payment": "pay_01J...", "amount": 500 }'
+```
+
+| You send | Kalixo returns |
+| --- | --- |
+| A new key | Executes the request |
+| The same key and the same body | The stored response, with header `Idempotent-Replayed: true` |
+| The same key and a different body | `409 idempotency_key_reused` |
+| The same key while the first request is still running | `409 idempotency_request_in_progress` (retry later) |
+
+- Derive keys from your own records (`order-1001-checkout`, `refund-request-8812`) so
+  every retry of the same action uses the same key.
+- Keys are kept for 24 hours.
+- Client errors (4xx) are stored and replayed. Server errors (5xx) release the key so you can retry.
+- `@kalixo/checkout-node` sends a key on every `POST` and reuses it for its automatic retries.

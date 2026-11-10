@@ -1,0 +1,33 @@
+---
+title: "Amount integrity"
+description: "The amount you send is exactly the amount Kalixo charges."
+icon: "shield-check"
+---
+
+- **You set the amount, only from your server.** `amount` and `currency` come from
+  `POST /v1/checkout-sessions` with your secret key. The browser can never change them.
+- **The amount locks when the shopper starts paying.** You can `PATCH` `amount`,
+  `currency` and `line_items` until the first payment attempt; after that the API
+  returns `amount_locked`. Expire the session and create a new one if the order changes.
+- **Line items must add up.** When you send `line_items`, the sum of
+  `quantity * unit_amount` must equal `amount` (`line_items_mismatch` otherwise).
+- **Every provider event is checked.** If the provider ever reports a different amount,
+  Kalixo sets `amount_mismatch: true`, sends `payment.amount_mismatch`, and cancels or
+  refunds the payment automatically. Never fulfil a payment with `amount_mismatch: true`.
+- **Confirm on your server, from Kalixo's records.** Do not fulfil on browser events,
+  `return_url` redirects, or `checkout_session.status` alone. Fulfil only after
+  `payment.captured` (or `payment.authorized` for manual capture) and
+  `amount_mismatch` is `false` on `GET /v1/payments/{id}`.
+- **Totals are enforced.** Captures never exceed the authorised amount and refunds never
+  exceed the captured amount, even under concurrent requests.
+- **Everything is echoed back.** Payments and events carry `amount`, `currency`,
+  `amount_authorized`, `amount_captured`, `amount_refunded`, `amount_disputed`, your
+  `reference` and your `metadata`, unchanged.
+
+## Minor units
+
+| Currency | Example | `amount` |
+| --- | --- | --- |
+| EUR, GBP, USD, SAR, AED | 49.99 | `4999` |
+| KWD, BHD, OMR, JOD | 1.500 | `1500` |
+| JPY | 1500 | `1500` |

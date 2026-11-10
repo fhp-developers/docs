@@ -1,14 +1,20 @@
-# Kalixo API v2 - Developer Docs
+# Kalixo Developer Docs
 
-Mintlify-powered developer documentation for the Kalixo Distribution API v2.
+Mintlify-powered developer documentation for two Kalixo products, with a product switcher at
+the top of the sidebar:
+
+- **Distribution API** (v2): catalog, ordering and wallet. Pages live at the root of this repo.
+- **Checkout**: payments with Kalixo as merchant of record. Pages live under `checkout/`.
+
 Modern theme, Kalixo branding, and an interactive **“Try it”** API playground driven by
-the bundled OpenAPI spec.
+each product's OpenAPI spec.
 
 ## Stack
 
 - **[Mintlify](https://mintlify.com)** - docs framework + hosting + API playground.
-- `docs.json` - site config (theme, colors, navigation, API playground).
-- `openapi.json` - OpenAPI 3.1 spec that generates the API reference and the live playground.
+- `docs.json` - site config (theme, colors, product switcher and navigation, API playground).
+- `openapi.json` - Distribution API OpenAPI 3.1 spec that generates its API reference and playground.
+- `checkout/openapi.yaml` - Checkout OpenAPI spec, synced from the `kalixo-checkout` repo (see below).
 - MDX pages - guides and core-concept pages.
 
 ## Local development
@@ -72,13 +78,25 @@ concepts/                 # pagination, filtering, open-denomination,
                           # errors, notifications
 migrating-from-v1.mdx
 api-reference/introduction.mdx
+checkout/                 # Kalixo Checkout: every page and its openapi.yaml
 ```
 
 ## Editing the API reference
 
-The API reference is generated from `openapi.json`. To add or change an endpoint, edit the
-spec - the reference pages and the interactive playground update automatically. Use
+The Distribution API reference is generated from `openapi.json`. To add or change an endpoint,
+edit the spec - the reference pages and the interactive playground update automatically. Use
 `x-default` on the `apiKey` security scheme to pre-fill a placeholder key in the playground.
+
+The Checkout API reference is generated from `checkout/openapi.yaml`. Don't edit that file here:
+change `openapi/kalixo-checkout.v1.yaml` in the `kalixo-checkout` repo, then copy it over with
+the repo checked out next to this one:
+
+```bash
+npm run sync-checkout-openapi
+```
+
+Links in Checkout pages must start with `/checkout/`; without the prefix they open a
+Distribution API page.
 
 ## Deployment
 

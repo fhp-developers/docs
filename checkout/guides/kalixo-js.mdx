@@ -1,0 +1,105 @@
+---
+title: "Kalixo.js"
+description: "Embed the Kalixo checkout in your own page."
+icon: "code"
+---
+
+Kalixo.js renders the payment form for a checkout session. Kalixo decides which
+payment form to show, so your integration never changes when Kalixo changes providers.
+
+## Load Kalixo.js
+
+Always load Kalixo.js from `js.kalixo.io`. Do not bundle or self-host it: Kalixo
+ships security fixes and new payment methods through this URL.
+
+<CodeGroup>
+```html Script tag
+<script src="https://js.kalixo.io/v1/kalixo.js"></script>
+```
+
+```javascript npm
+import { loadKalixoCheckout } from '@kalixo/checkout-js';
+
+const KalixoCheckout = await loadKalixoCheckout();
+```
+</CodeGroup>
+
+To pin a release, load `https://js.kalixo.io/v1/<version>/kalixo.js` with the
+`integrity` hash from the release notes.
+
+## Mount the checkout
+
+```javascript
+const kalixo = await KalixoCheckout.init({ publishableKey: 'kc_pk_live_...', locale: 'nl-NL' });
+const checkout = kalixo.checkout({ sessionId, clientSecret });
+
+checkout.on('ready', () => hideSpinner());
+checkout.on('payment.completed', ({ sessionId }) => {
+  window.location.assign(`/checkout/complete?session_id=${sessionId}`);
+});
+checkout.on('payment.processing', () => showMessage('We are confirming your payment.'));
+checkout.on('payment.failed', ({ message }) => showError(message));
+checkout.on('error', ({ message }) => showError(message));
+
+await checkout.mount('#kalixo-checkout');
+```
+
+If you do not listen to `payment.completed`, Kalixo.js redirects the shopper to the
+session's `return_url` with `?session_id=cs_...`.
+
+<Warning>
+  Browser events are for the shopper experience only. Never fulfil from `payment.completed`,
+  a `return_url` redirect, or `checkout_session.status`. Confirm on your server with
+  `GET /v1/payments/{id}` or the `payment.captured` webhook, and refuse the order if
+  `amount_mismatch` is `true`.
+</Warning>
+
+## Events
+
+| Event | When |
+| --- | --- |
+| `ready` | The payment form is shown |
+| `payment.completed` | The payment was authorised |
+| `payment.processing` | The outcome is pending (for example a bank transfer); you get a webhook later |
+| `payment.failed` | The payment was declined. `message` is safe to show to the shopper |
+| `error` | The checkout could not load or the session is no longer open (`code: session_complete`, `session_expired`) |
+
+## Styling
+
+Pass theme tokens; do not style the inner form with your own CSS selectors.
+
+```javascript
+kalixo.checkout({
+  sessionId,
+  clientSecret,
+  theme: { colors: { primary: '#0a7cff', text: '#1d2433' }, radius: '8px', font_family: 'Inter, sans-serif' },
+});
+```
+
+Kalixo can also set default theme tokens for your account.
+
+## Redirect payment methods
+
+Some payment methods send the shopper to their bank. The bank returns the shopper to
+Kalixo, and Kalixo forwards them to your `return_url` with `?session_id=cs_...`. Read
+the payment on your server to show the result.
+
+## Content Security Policy
+
+If your checkout page uses a CSP, allow:
+
+```text
+script-src https://js.kalixo.io https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+connect-src https://checkout.kalixo.io https://sandbox.checkout.kalixo.io https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+frame-src https:;
+style-src 'unsafe-inline' https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+img-src data: https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+```
+
+Kalixo publishes CSP changes in the changelog before they are needed.
+
+## PCI DSS
+
+Card details are entered in secure fields that Kalixo.js loads from the payment
+provider. Card data never touches your page or Kalixo's servers, which keeps your PCI
+scope at SAQ A, provided you load Kalixo.js from `js.kalixo.io`.
