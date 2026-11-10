@@ -86,17 +86,20 @@ the payment on your server to show the result.
 
 ## Content Security Policy
 
-If your checkout page uses a CSP, allow:
+If your checkout page uses a CSP, it must allow Kalixo.js, the Kalixo API and the secure
+payment fields that Kalixo.js loads:
 
 ```text
-script-src https://js.kalixo.io https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
-connect-src https://checkout.kalixo.io https://sandbox.checkout.kalixo.io https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+script-src https://js.kalixo.io;
+connect-src https://checkout.kalixo.io https://sandbox.checkout.kalixo.io;
 frame-src https:;
-style-src 'unsafe-inline' https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
-img-src data: https://checkoutshopper-live.adyen.com https://checkoutshopper-test.adyen.com;
+style-src 'unsafe-inline';
+img-src data:;
 ```
 
-Kalixo publishes CSP changes in the changelog before they are needed.
+The secure payment fields need a few more domains. Ask Kalixo integrations at
+integrations@kalixo.io for the complete policy for your account. Kalixo tells you about
+changes to it before they are needed.
 
 ## PCI DSS
 

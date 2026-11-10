@@ -5,9 +5,8 @@ info:
   summary: Payment orchestration API for Kalixo partners.
   description: |
     Kalixo Checkout lets partners collect payments from their shoppers through one
-    provider-neutral API. Kalixo is merchant of record and routes each payment
-    to a payment provider (Adyen first). Partners never integrate a provider
-    directly.
+    provider-neutral API. Kalixo is merchant of record and handles payment
+    processing, so partners never integrate a payment provider directly.
 
     - Amounts are integers in the currency's minor unit (EUR 49.99 = `4999`).
     - Server endpoints use a secret key (`kc_sk_test_...` or `kc_sk_live_...`).
@@ -1076,7 +1075,7 @@ components:
     PaymentMethodDetails:
       type: object
       properties:
-        type: { type: string, examples: [card, ideal, paypal, klarna, applepay, googlepay] }
+        type: { type: string, examples: [card, ideal, applepay, googlepay] }
         brand: { type: [string, "null"], examples: [visa] }
         last4: { type: [string, "null"] }
         exp_month: { type: [integer, "null"] }
@@ -1418,7 +1417,7 @@ components:
           type: object
           required: [type, config]
           properties:
-            type: { type: string, examples: [adyen-dropin, fake] }
+            type: { type: string, description: "Identifies the payment form Kalixo.js loads. Opaque; do not rely on specific values." }
             version: { type: string }
             config:
               type: object
@@ -1447,7 +1446,7 @@ components:
         provider_payload:
           type: object
           additionalProperties: true
-          description: Opaque data for the renderer (for example an Adyen action). Partners must not rely on it.
+          description: Opaque data for Kalixo.js only. Partners must not rely on it.
 
     ErrorResponse:
       type: object

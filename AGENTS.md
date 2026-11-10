@@ -30,8 +30,8 @@
 - "Partner", not "merchant" or "client": the company integrating Kalixo Checkout.
 - "Shopper", not "customer", for the person paying. `customer` is the API object for stored payment methods.
 - "Kalixo is merchant of record": partners never contract with a payment provider.
-- "Provider" for payment service providers (Adyen). Partners never need provider details;
-  avoid provider names in partner-facing pages except where a provider test card is needed.
+- "Payment provider" for payment service providers. Never name a payment service provider
+  anywhere in the docs or the API spec: not in text, examples, domains, test cards or code.
 - "Checkout session", "payment", "attempt" (internal only, do not document attempts as a partner object).
 - Amounts are "integers in the minor unit" (EUR 49.99 is `4999`).
 
@@ -41,7 +41,7 @@
 
 ### Content boundaries
 
-- Do not document internal endpoints (`/ops/*`, backoffice), provider webhooks
-  (`/webhooks/adyen/*`), routing rules or provider accounts.
+- Do not document internal endpoints (`/ops/*`, backoffice), incoming provider webhooks
+  (`/webhooks/*`), routing rules or provider accounts.
 - Do not document the `provider_payload` field beyond "opaque, for Kalixo.js only".
 - Do not promise payment methods per country; partners ask Kalixo integrations.
