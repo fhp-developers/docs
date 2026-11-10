@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Kalixo Distribution API",
-    "version": "2.1.3",
+    "version": "2.3.0",
     "description": "The Kalixo Distribution API lets partners browse their product catalog, place and track digital gift-card orders (single or bulk), and monitor their wallet balance. All v2 ordering is asynchronous: place an order, then poll it until the codes are delivered.",
     "contact": {
       "name": "Kalixo Integrations",
@@ -45,32 +45,44 @@
   "paths": {
     "/ping": {
       "get": {
-        "tags": ["Ping"],
+        "tags": [
+          "Ping"
+        ],
         "summary": "Ping",
-        "description": "Returns a simple success payload so you can verify that the Kalixo API is reachable from your network. Requires your `x-api-key` and a whitelisted IP address — contact your account manager to issue a key and allowlist your egress IPs before calling this endpoint.",
+        "description": "Returns a simple success payload so you can verify that the Kalixo API is reachable from your network. Requires your `x-api-key` and a whitelisted IP address \u2014 contact your account manager to issue a key and allowlist your egress IPs before calling this endpoint.",
         "operationId": "ping",
         "responses": {
           "200": {
             "description": "API is reachable.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PingResponse" },
+                "schema": {
+                  "$ref": "#/components/schemas/PingResponse"
+                },
                 "examples": {
-                  "ok": { "$ref": "#/components/examples/PingOk" }
+                  "ok": {
+                    "$ref": "#/components/examples/PingOk"
+                  }
                 }
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/catalog/products": {
       "get": {
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "summary": "List catalog products",
-        "description": "Returns the products in your catalog. Supports filtering and pagination. Filters are AND-combined across fields; within a single field you may pass multiple comma-separated values (for example `country=GB,IE`).",
+        "description": "Returns catalog products as one row per country. Regional products share the same `productCode` across rows and differ by `countryCode` / `sku`. Filter by country/language/brand/category/tag (comma-separated for multiple) and paginate with skip/take (take max 100).",
         "operationId": "listCatalogProducts",
         "parameters": [
           {
@@ -78,56 +90,82 @@
             "in": "query",
             "description": "Filter by ISO country code(s). Comma-separated for multiple.",
             "required": false,
-            "schema": { "type": "string", "example": "GB,IE" }
+            "schema": {
+              "type": "string",
+              "example": "GB,IE"
+            }
           },
           {
             "name": "language",
             "in": "query",
             "description": "Filter by language code(s). Comma-separated for multiple.",
             "required": false,
-            "schema": { "type": "string", "example": "en" }
+            "schema": {
+              "type": "string",
+              "example": "en"
+            }
           },
           {
             "name": "brand",
             "in": "query",
             "description": "Filter by brand name(s). Comma-separated for multiple.",
             "required": false,
-            "schema": { "type": "string", "example": "PlayStation" }
+            "schema": {
+              "type": "string",
+              "example": "PlayStation"
+            }
           },
           {
             "name": "category",
             "in": "query",
             "description": "Filter by category/main category. Comma-separated for multiple.",
             "required": false,
-            "schema": { "type": "string", "example": "Gaming" }
+            "schema": {
+              "type": "string",
+              "example": "Gaming"
+            }
           },
           {
             "name": "tag",
             "in": "query",
             "description": "Filter by tag(s). Comma-separated for multiple.",
             "required": false,
-            "schema": { "type": "string", "example": "bestseller" }
+            "schema": {
+              "type": "string",
+              "example": "bestseller"
+            }
           },
           {
             "name": "search",
             "in": "query",
             "description": "Free-text search across product name and productCode.",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "skip",
             "in": "query",
             "description": "Number of records to skip (offset).",
             "required": false,
-            "schema": { "type": "integer", "minimum": 0, "default": 0 }
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
           },
           {
             "name": "take",
             "in": "query",
             "description": "Number of records to return. Maximum 100.",
             "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
           }
         ],
         "responses": {
@@ -135,7 +173,9 @@
             "description": "A paginated list of catalog products.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CatalogProductList" },
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogProductList"
+                },
                 "examples": {
                   "playstationTopUp": {
                     "$ref": "#/components/examples/CatalogProductListExample"
@@ -144,14 +184,20 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/catalog/products/{productCode}": {
       "get": {
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "summary": "Get a single product",
         "description": "Returns a single catalog product by its `productCode`.",
         "operationId": "getCatalogProduct",
@@ -161,7 +207,20 @@
             "in": "path",
             "required": true,
             "description": "The product code from the catalog. Stable and identical across sandbox and production.",
-            "schema": { "type": "string", "example": "10020000213575" }
+            "schema": {
+              "type": "string",
+              "example": "10020000213575"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Select the market row for a multi-country product (ISO country code).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "DE"
+            }
           }
         ],
         "responses": {
@@ -169,7 +228,9 @@
             "description": "The requested product.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Product" },
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                },
                 "examples": {
                   "playstationTopUp": {
                     "$ref": "#/components/examples/CatalogProductExample"
@@ -178,15 +239,23 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "404": { "$ref": "#/components/responses/CatalogProductNotFound" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/CatalogProductNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/orders": {
       "post": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "summary": "Place an order",
         "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
         "operationId": "placeOrder",
@@ -194,7 +263,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/PlaceOrderRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/PlaceOrderRequest"
+              }
             }
           }
         },
@@ -202,13 +273,21 @@
           "202": {
             "description": "Order accepted and now processing.",
             "headers": {
-              "X-RateLimit-Limit": { "$ref": "#/components/headers/X-RateLimit-Limit" },
-              "X-RateLimit-Remaining": { "$ref": "#/components/headers/X-RateLimit-Remaining" },
-              "X-RateLimit-Reset": { "$ref": "#/components/headers/X-RateLimit-Reset" }
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             },
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrderAccepted" }
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAccepted"
+                }
               }
             }
           },
@@ -216,7 +295,9 @@
             "description": "Validation or order rejection. See the Errors guide for the full message catalogue.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
                 "examples": {
                   "priceMismatch": {
                     "$ref": "#/components/examples/ErrorPriceMismatch"
@@ -241,7 +322,9 @@
             "description": "API ordering disabled for your account.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
                 "examples": {
                   "apiOrderingDisabled": {
                     "$ref": "#/components/examples/ErrorApiOrderingDisabled"
@@ -254,7 +337,9 @@
             "description": "An order with the same externalOrderCode already exists.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
                 "examples": {
                   "duplicateExternalOrderCode": {
                     "$ref": "#/components/examples/ErrorDuplicateExternalOrderCode"
@@ -267,7 +352,9 @@
             "description": "Order limit exceeded, insufficient wallet funds, or product not available for purchase.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
                 "examples": {
                   "orderLimitExceeded": {
                     "$ref": "#/components/examples/ErrorOrderLimitExceeded"
@@ -282,14 +369,22 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "404": { "$ref": "#/components/responses/CatalogProductNotFound" },
-          "500": { "$ref": "#/components/responses/InternalServerError" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/CatalogProductNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
           "502": {
             "description": "Order could not be created or is temporarily unavailable.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
                 "examples": {
                   "orderUnavailable": {
                     "$ref": "#/components/examples/ErrorOrderUnavailable"
@@ -306,7 +401,9 @@
     },
     "/orders/{reference}": {
       "get": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "summary": "Retrieve an order",
         "description": "Fetches an order by the UUID `orderId` returned on placement or by your `externalOrderCode`.\n\nRedemption codes are returned when status is `completed` (all units) or `partially_completed` (delivered units only). While `processing` you receive `estimatedReadyAt` and a status message; `failed` returns a reason.\n\n**partially_completed** includes `delivered`, `total`, and `products[].codes` for every code that was delivered (see the **Partial delivery with codes** response example).",
         "operationId": "getOrder",
@@ -316,7 +413,10 @@
             "in": "path",
             "required": true,
             "description": "The UUID orderId returned on placement, or your externalOrderCode.",
-            "schema": { "type": "string", "example": "O-12345" }
+            "schema": {
+              "type": "string",
+              "example": "O-12345"
+            }
           }
         ],
         "responses": {
@@ -324,7 +424,9 @@
             "description": "The order and its current status.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrderStatus" },
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatus"
+                },
                 "examples": {
                   "processing": {
                     "summary": "Still processing",
@@ -347,10 +449,19 @@
                           "productCode": "10020000213575",
                           "price": 10000,
                           "quantity": 1,
-                          "codes": [{ "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }]
+                          "codes": [
+                            {
+                              "code": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY"
+                            }
+                          ]
                         }
                       ],
-                      "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
+                      "wallet": {
+                        "balances": {
+                          "GBP": 196.01
+                        },
+                        "lowBalance": false
+                      }
                     }
                   },
                   "partially_completed": {
@@ -369,15 +480,23 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "404": { "$ref": "#/components/responses/OrderNotFound" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/OrderNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/wallet": {
       "get": {
-        "tags": ["Wallet"],
+        "tags": [
+          "Wallet"
+        ],
         "summary": "Get wallet balances",
         "description": "Returns your current wallet balances per currency, plus a low-balance flag and the configured threshold.",
         "operationId": "getWallet",
@@ -385,11 +504,19 @@
           "200": {
             "description": "Current wallet snapshot.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Wallet" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     }
@@ -400,10 +527,16 @@
         "description": "Missing or invalid `x-api-key`.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
             "examples": {
-              "missingApiKey": { "$ref": "#/components/examples/ErrorMissingApiKey" },
-              "invalidApiKey": { "$ref": "#/components/examples/ErrorInvalidApiKey" }
+              "missingApiKey": {
+                "$ref": "#/components/examples/ErrorMissingApiKey"
+              },
+              "invalidApiKey": {
+                "$ref": "#/components/examples/ErrorInvalidApiKey"
+              }
             }
           }
         }
@@ -412,9 +545,13 @@
         "description": "Product not found in your active catalog.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
             "examples": {
-              "productNotFound": { "$ref": "#/components/examples/ErrorCatalogProductNotFound" }
+              "productNotFound": {
+                "$ref": "#/components/examples/ErrorCatalogProductNotFound"
+              }
             }
           }
         }
@@ -423,9 +560,13 @@
         "description": "Order not found for the supplied reference.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
             "examples": {
-              "orderNotFound": { "$ref": "#/components/examples/ErrorOrderNotFound" }
+              "orderNotFound": {
+                "$ref": "#/components/examples/ErrorOrderNotFound"
+              }
             }
           }
         }
@@ -434,9 +575,13 @@
         "description": "Unexpected server error.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
             "examples": {
-              "internalServerError": { "$ref": "#/components/examples/ErrorInternalServerError" }
+              "internalServerError": {
+                "$ref": "#/components/examples/ErrorInternalServerError"
+              }
             }
           }
         }
@@ -454,19 +599,31 @@
     "headers": {
       "X-RateLimit-Limit": {
         "description": "Maximum requests allowed in the current 60-second window.",
-        "schema": { "type": "integer", "example": 60 }
+        "schema": {
+          "type": "integer",
+          "example": 60
+        }
       },
       "X-RateLimit-Remaining": {
         "description": "Requests remaining in the current window.",
-        "schema": { "type": "integer", "example": 59 }
+        "schema": {
+          "type": "integer",
+          "example": 59
+        }
       },
       "X-RateLimit-Reset": {
         "description": "Unix timestamp (seconds) when the current window resets.",
-        "schema": { "type": "integer", "example": 1717315200 }
+        "schema": {
+          "type": "integer",
+          "example": 1717315200
+        }
       },
       "Retry-After": {
         "description": "Seconds to wait before retrying (429 responses only).",
-        "schema": { "type": "integer", "example": 30 }
+        "schema": {
+          "type": "integer",
+          "example": 30
+        }
       }
     },
     "schemas": {
@@ -475,7 +632,9 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["ok"],
+            "enum": [
+              "ok"
+            ],
             "description": "Always `ok` when the API is reachable.",
             "example": "ok"
           },
@@ -489,14 +648,23 @@
       },
       "DenominationType": {
         "type": "string",
-        "enum": ["fixed", "open"],
+        "enum": [
+          "fixed",
+          "open"
+        ],
         "description": "`fixed` products have a set price; `open` products accept any amount within a range."
       },
       "ProductLanguage": {
         "type": "object",
         "properties": {
-          "languageCode": { "type": "string", "example": "en" },
-          "name": { "type": "string", "example": "Sony PlayStation®Network Wallet Top-Up £100" },
+          "languageCode": {
+            "type": "string",
+            "example": "en"
+          },
+          "name": {
+            "type": "string",
+            "example": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100"
+          },
           "sku": {
             "type": "string",
             "description": "Locale SKU in the form `{CC}-{LL}-{productCode}` (e.g. GB-EN-10020000213575).",
@@ -507,9 +675,15 @@
             "format": "uri",
             "example": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
           },
-          "description": { "type": "string" },
-          "tnc": { "type": "string" },
-          "redemptionInstructions": { "type": "string" }
+          "description": {
+            "type": "string"
+          },
+          "tnc": {
+            "type": "string"
+          },
+          "redemptionInstructions": {
+            "type": "string"
+          }
         }
       },
       "Product": {
@@ -520,7 +694,10 @@
             "description": "The product code you order with - a stable 14-digit catalog identifier, identical across sandbox and production.",
             "example": "10020000213575"
           },
-          "name": { "type": "string", "example": "Sony PlayStation®Network Wallet Top-Up £100" },
+          "name": {
+            "type": "string",
+            "example": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100"
+          },
           "shortName": {
             "type": "string",
             "description": "Short display name or abbreviation for the product.",
@@ -531,41 +708,135 @@
             "format": "uri",
             "example": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
           },
-          "price": { "type": "integer", "description": "Selling price in minor units (e.g. pennies).", "example": 10000 },
-          "currencyCode": { "type": "string", "example": "GBP" },
-          "buyingPrice": { "type": "number", "description": "Your buying price in minor units.", "example": 9500 },
-          "buyingCurrencyCode": { "type": "string", "example": "GBP" },
-          "discountAmount": { "type": "number", "description": "Your discount amount in minor units (sell price minus your buying price, or the monetary equivalent of your commission rate).", "example": 500 },
-          "discountPercentage": { "type": "number", "description": "Your commission rate as a percentage of the sell price.", "example": 5 },
-          "currencyMismatch": { "type": "boolean", "description": "True when your buying currency differs from the product's selling currency.", "example": false },
-          "denominationType": { "$ref": "#/components/schemas/DenominationType" },
-          "denominationMinValue": { "type": "number", "nullable": true, "example": null },
-          "denominationMaxValue": { "type": "number", "nullable": true, "example": null },
-          "denominationStep": { "type": "number", "nullable": true, "example": null },
-          "denominationDefaultValue": { "type": "number", "nullable": true, "example": null },
-          "brand": { "type": "string", "example": "PlayStation" },
-          "publisher": { "type": "string", "example": "Sony" },
-          "countryCode": { "type": "string", "example": "GB" },
-          "mainCategory": { "type": "string", "example": "Gaming" },
-          "subCategory": { "type": "string", "example": "PlayStation" },
-          "productCategory": { "type": "string", "example": "PlayStation" },
-          "productType": { "type": "string", "example": "credit" },
-          "platform": { "type": "string", "example": "PlayStation" },
+          "price": {
+            "type": "integer",
+            "description": "Selling price in minor units (e.g. pennies).",
+            "example": 10000
+          },
+          "currencyCode": {
+            "type": "string",
+            "example": "GBP"
+          },
+          "buyingPrice": {
+            "type": "number",
+            "description": "Your buying price in minor units.",
+            "example": 9500
+          },
+          "buyingCurrencyCode": {
+            "type": "string",
+            "example": "GBP"
+          },
+          "discountAmount": {
+            "type": "number",
+            "description": "Your discount amount in minor units (sell price minus your buying price, or the monetary equivalent of your commission rate).",
+            "example": 500
+          },
+          "discountPercentage": {
+            "type": "number",
+            "description": "Your commission rate as a percentage of the sell price.",
+            "example": 5
+          },
+          "currencyMismatch": {
+            "type": "boolean",
+            "description": "True when your buying currency differs from the product's selling currency.",
+            "example": false
+          },
+          "denominationType": {
+            "$ref": "#/components/schemas/DenominationType"
+          },
+          "denominationMinValue": {
+            "type": "number",
+            "nullable": true,
+            "example": null
+          },
+          "denominationMaxValue": {
+            "type": "number",
+            "nullable": true,
+            "example": null
+          },
+          "denominationStep": {
+            "type": "number",
+            "nullable": true,
+            "example": null
+          },
+          "denominationDefaultValue": {
+            "type": "number",
+            "nullable": true,
+            "example": null
+          },
+          "brand": {
+            "type": "string",
+            "example": "PlayStation"
+          },
+          "publisher": {
+            "type": "string",
+            "example": "Sony"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "GB",
+            "description": "ISO country code for this catalog row. Regional products return one row per supported country with the same productCode."
+          },
+          "mainCategory": {
+            "type": "string",
+            "example": "Gaming"
+          },
+          "subCategory": {
+            "type": "string",
+            "example": "PlayStation"
+          },
+          "productCategory": {
+            "type": "string",
+            "example": "PlayStation"
+          },
+          "productType": {
+            "type": "string",
+            "example": "credit"
+          },
+          "platform": {
+            "type": "string",
+            "example": "PlayStation"
+          },
           "redeemable": {
             "type": "string",
             "description": "Country or market where the product can be redeemed (derived from `countryCode`).",
             "example": "United Kingdom"
           },
-          "preorder": { "type": "boolean", "example": true },
-          "preorderCode": { "type": "boolean", "example": true },
-          "firstSale": { "type": "string", "format": "date", "example": "2026-06-01" },
-          "playableOn": { "type": "string", "format": "date", "example": "2026-06-15" },
-          "expires": { "type": "boolean", "example": true },
-          "expiryPolicy": { "type": "string", "example": "3 years" },
+          "preorder": {
+            "type": "boolean",
+            "example": true
+          },
+          "preorderCode": {
+            "type": "boolean",
+            "example": true
+          },
+          "firstSale": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-01"
+          },
+          "playableOn": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-15"
+          },
+          "expires": {
+            "type": "boolean",
+            "example": true
+          },
+          "expiryPolicy": {
+            "type": "string",
+            "example": "3 years"
+          },
           "tags": {
             "type": "array",
-            "items": { "type": "string" },
-            "example": ["bestseller", "gaming"]
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "bestseller",
+              "gaming"
+            ]
           },
           "status": {
             "type": "string",
@@ -579,7 +850,11 @@
           },
           "promotionType": {
             "type": "string",
-            "enum": ["Discount", "Value Off", "Added Value"],
+            "enum": [
+              "Discount",
+              "Value Off",
+              "Added Value"
+            ],
             "description": "Kind of promotional offer.",
             "example": "Discount"
           },
@@ -607,41 +882,93 @@
           },
           "serviceFeeType": {
             "type": "string",
-            "enum": ["Percentage", "Amount"],
+            "enum": [
+              "Percentage",
+              "Amount"
+            ],
             "description": "How the service fee is calculated.",
             "example": "Amount"
           },
           "serviceFeeValue": {
             "type": "string",
-            "description": "Fee rate or amount. For `Percentage`, the percentage of sell price (e.g. `\"2.5\"` for 2.5%). For `Amount`, the fixed fee in minor units (e.g. `\"250\"` for £2.50).",
+            "description": "Fee rate or amount. For `Percentage`, the percentage of sell price (e.g. `\"2.5\"` for 2.5%). For `Amount`, the fixed fee in minor units (e.g. `\"250\"` for \u00a32.50).",
             "example": "250"
           },
-          "type": { "type": "string", "example": "digital" },
+          "type": {
+            "type": "string",
+            "example": "digital"
+          },
           "languages": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/ProductLanguage" }
+            "items": {
+              "$ref": "#/components/schemas/ProductLanguage"
+            }
+          },
+          "sku": {
+            "type": "string",
+            "description": "Market SKU for this country row: `{CC}-{LL}-{productCode}`. Same productCode can appear once per country.",
+            "example": "DE-DE-10001000227724"
+          },
+          "availableCountries": {
+            "type": "array",
+            "description": "ISO country codes this productCode can be fulfilled in (linked markets).",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "DE",
+              "FR",
+              "IT"
+            ]
           }
         }
       },
       "CatalogProductList": {
         "type": "object",
         "properties": {
-          "count": { "type": "integer", "description": "Total products matching the filters.", "example": 1320 },
-          "skip": { "type": "integer", "example": 0 },
-          "take": { "type": "integer", "example": 20 },
+          "count": {
+            "type": "integer",
+            "description": "Total products matching the filters.",
+            "example": 1320
+          },
+          "skip": {
+            "type": "integer",
+            "example": 0
+          },
+          "take": {
+            "type": "integer",
+            "example": 20
+          },
           "products": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Product" }
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
           }
         }
       },
       "OrderLine": {
         "type": "object",
-        "required": ["productCode", "quantity"],
+        "required": [
+          "productCode",
+          "quantity"
+        ],
         "properties": {
-          "productCode": { "type": "string", "description": "The catalog product code.", "example": "10020000213575" },
-          "price": { "type": "integer", "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.", "example": 10000 },
-          "quantity": { "type": "integer", "minimum": 1, "example": 1 },
+          "productCode": {
+            "type": "string",
+            "description": "The catalog product code.",
+            "example": "10020000213575"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Expected unit price in minor units. For fixed products this must match the catalog price; for open-denomination products this is the chosen amount within the allowed range.",
+            "example": 10000
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
           "currency": {
             "type": "string",
             "description": "Optional line currency. Defaults to the order-level currency.",
@@ -649,30 +976,44 @@
           },
           "sku": {
             "type": "string",
-            "description": "Optional locale SKU from the catalog (`{CC}-{LL}-{productCode}`).",
+            "description": "Optional market SKU (`{CC}-{LL}-{productCode}`). Country prefix is used when `country` is omitted.",
             "example": "GB-EN-10020000213575"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO country code for the market to fulfil. Required when the product is available in multiple countries and not encoded in sku.",
+            "example": "DE"
           }
         }
       },
       "PlaceOrderRequest": {
         "type": "object",
-        "required": ["externalOrderCode", "currency", "orderProducts"],
+        "required": [
+          "externalOrderCode",
+          "currency",
+          "orderProducts"
+        ],
         "properties": {
           "externalOrderCode": {
             "type": "string",
             "description": "Your unique reference for this order. Acts as the idempotency key.",
             "example": "O-12345"
           },
-          "currency": { "type": "string", "example": "GBP" },
+          "currency": {
+            "type": "string",
+            "example": "GBP"
+          },
           "price": {
             "type": "integer",
-            "description": "Optional expected order total in minor units. If sent, must equal the sum of (line unit price × quantity).",
+            "description": "Optional expected order total in minor units. If sent, must equal the sum of (line unit price \u00d7 quantity).",
             "example": 10000
           },
           "orderProducts": {
             "type": "array",
             "minItems": 1,
-            "items": { "$ref": "#/components/schemas/OrderLine" }
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            }
           }
         }
       },
@@ -681,67 +1022,139 @@
         "properties": {
           "balances": {
             "type": "object",
-            "additionalProperties": { "type": "number" },
-            "example": { "GBP": 196.01, "EUR": 1234.56 }
+            "additionalProperties": {
+              "type": "number"
+            },
+            "example": {
+              "GBP": 196.01,
+              "EUR": 1234.56
+            }
           },
-          "lowBalance": { "type": "boolean", "example": false }
+          "lowBalance": {
+            "type": "boolean",
+            "example": false
+          }
         }
       },
       "OrderAccepted": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "string", "format": "uuid", "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10" },
-          "externalOrderCode": { "type": "string", "example": "O-12345" },
-          "status": { "type": "string", "enum": ["processing"], "example": "processing" },
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10"
+          },
+          "externalOrderCode": {
+            "type": "string",
+            "example": "O-12345"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing"
+            ],
+            "example": "processing"
+          },
           "estimatedReadyAt": {
             "type": "string",
             "format": "date-time",
             "description": "Approximate time the codes should be ready. Poll the order after this time.",
             "example": "2026-06-02T11:05:00Z"
           },
-          "wallet": { "$ref": "#/components/schemas/WalletSnapshot" }
+          "wallet": {
+            "$ref": "#/components/schemas/WalletSnapshot"
+          }
         }
       },
       "RedemptionCode": {
         "type": "object",
         "properties": {
-          "code": { "type": "string", "example": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY" }
+          "code": {
+            "type": "string",
+            "example": "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY"
+          }
         }
       },
       "OrderProductResult": {
         "type": "object",
         "properties": {
-          "productCode": { "type": "string", "example": "10020000213575" },
-          "price": { "type": "integer", "example": 10000 },
-          "quantity": { "type": "integer", "example": 1 },
+          "productCode": {
+            "type": "string",
+            "example": "10020000213575"
+          },
+          "price": {
+            "type": "integer",
+            "example": 10000
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 1
+          },
           "codes": {
             "type": "array",
             "description": "One entry per delivered unit.",
-            "items": { "$ref": "#/components/schemas/RedemptionCode" }
+            "items": {
+              "$ref": "#/components/schemas/RedemptionCode"
+            }
           }
         }
       },
       "OrderStatus": {
         "type": "object",
         "properties": {
-          "orderId": { "type": "string", "format": "uuid", "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10" },
-          "externalOrderCode": { "type": "string", "example": "O-12345" },
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10"
+          },
+          "externalOrderCode": {
+            "type": "string",
+            "example": "O-12345"
+          },
           "status": {
             "type": "string",
-            "enum": ["processing", "completed", "partially_completed", "failed"],
+            "enum": [
+              "processing",
+              "completed",
+              "partially_completed",
+              "failed"
+            ],
             "example": "completed"
           },
-          "estimatedReadyAt": { "type": "string", "format": "date-time", "nullable": true },
-          "message": { "type": "string", "nullable": true, "example": "Order is still processing" },
-          "reason": { "type": "string", "nullable": true },
-          "delivered": { "type": "integer", "nullable": true, "description": "Codes delivered so far (partial deliveries)." },
-          "total": { "type": "integer", "nullable": true, "description": "Total codes in the order." },
+          "estimatedReadyAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true,
+            "example": "Order is still processing"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "delivered": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Codes delivered so far (partial deliveries)."
+          },
+          "total": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Total codes in the order."
+          },
           "products": {
             "type": "array",
             "description": "Present when status is `completed` or `partially_completed`. Each line includes `codes` for delivered units only.",
-            "items": { "$ref": "#/components/schemas/OrderProductResult" }
+            "items": {
+              "$ref": "#/components/schemas/OrderProductResult"
+            }
           },
-          "wallet": { "$ref": "#/components/schemas/WalletSnapshot" }
+          "wallet": {
+            "$ref": "#/components/schemas/WalletSnapshot"
+          }
         }
       },
       "Wallet": {
@@ -749,19 +1162,37 @@
         "properties": {
           "balances": {
             "type": "object",
-            "additionalProperties": { "type": "number" },
-            "example": { "EUR": 1234.56, "GBP": 196.01 }
+            "additionalProperties": {
+              "type": "number"
+            },
+            "example": {
+              "EUR": 1234.56,
+              "GBP": 196.01
+            }
           },
-          "lowBalance": { "type": "boolean", "example": false },
-          "threshold": { "type": "number", "description": "Low-balance threshold that triggers an email alert.", "example": 100 }
+          "lowBalance": {
+            "type": "boolean",
+            "example": false
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Low-balance threshold that triggers an email alert.",
+            "example": 100
+          }
         }
       },
       "Error": {
         "type": "object",
         "description": "Standard error response. See the Errors concept page for the complete message catalogue.",
-        "required": ["statusCode", "message"],
+        "required": [
+          "statusCode",
+          "message"
+        ],
         "properties": {
-          "statusCode": { "type": "integer", "example": 400 },
+          "statusCode": {
+            "type": "integer",
+            "example": 400
+          },
           "error": {
             "type": "string",
             "description": "Short label for the status (for example `Bad Request`, `Not Found`). Omitted on some `500` responses.",
@@ -787,7 +1218,7 @@
         "summary": "PlayStation wallet top-up",
         "value": {
           "productCode": "10020000213575",
-          "name": "Sony PlayStation®Network Wallet Top-Up £100",
+          "name": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100",
           "shortName": "PSN",
           "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
           "price": 10000,
@@ -817,7 +1248,10 @@
           "playableOn": "2026-06-15",
           "expires": true,
           "expiryPolicy": "3 years",
-          "tags": ["bestseller", "gaming"],
+          "tags": [
+            "bestseller",
+            "gaming"
+          ],
           "status": "active",
           "promotion": true,
           "promotionType": "Discount",
@@ -831,7 +1265,7 @@
           "languages": [
             {
               "languageCode": "en",
-              "name": "Sony PlayStation®Network Wallet Top-Up £100",
+              "name": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100",
               "sku": "GB-EN-10020000213575",
               "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
             }
@@ -847,7 +1281,7 @@
           "products": [
             {
               "productCode": "10020000213575",
-              "name": "Sony PlayStation®Network Wallet Top-Up £100",
+              "name": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100",
               "shortName": "PSN",
               "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
               "price": 10000,
@@ -873,7 +1307,10 @@
               "playableOn": "2026-06-15",
               "expires": true,
               "expiryPolicy": "3 years",
-              "tags": ["bestseller", "gaming"],
+              "tags": [
+                "bestseller",
+                "gaming"
+              ],
               "status": "active",
               "promotion": true,
               "promotionType": "Discount",
@@ -903,13 +1340,24 @@
               "price": 10000,
               "quantity": 5,
               "codes": [
-                { "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" },
-                { "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ" },
-                { "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO" }
+                {
+                  "code": "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE"
+                },
+                {
+                  "code": "FFFFF-GGGGG-HHHHH-IIIII-JJJJJ"
+                },
+                {
+                  "code": "KKKKK-LLLLL-MMMMM-NNNNN-OOOOO"
+                }
               ]
             }
           ],
-          "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
+          "wallet": {
+            "balances": {
+              "GBP": 196.01
+            },
+            "lowBalance": false
+          }
         }
       },
       "ErrorMissingApiKey": {

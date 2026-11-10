@@ -8,8 +8,12 @@ The catalog list endpoint accepts several filters. They are **AND-combined acros
 a product must match every filter you supply. Within a single field you can pass
 **multiple comma-separated values** (treated as OR for that field).
 
+Catalog products are returned as **one row per country**. A regional product with
+the same `productCode` appears once for each supported market; filtering by
+`country` matches the row's market, not only the parent's default country.
+
 <ParamField query="country" type="string">
-  ISO country code(s), e.g. `GB` or `GB,IE`.
+  ISO country code(s), e.g. `GB` or `GB,IE`. Matches each market row's `countryCode`.
 </ParamField>
 <ParamField query="language" type="string">
   Language code(s), e.g. `en` or `en,fr`.

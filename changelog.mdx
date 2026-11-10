@@ -4,6 +4,55 @@ description: "API and documentation changes by version."
 icon: "clock-rotate-left"
 ---
 
+## 2.3.0 - 2026-08-04
+
+### Catalog
+
+- Reseller **catalog optimization** (advanced setting, default **off**):
+  - **Off:** distribution catalog surfaces **LOCAL** (`KX`) parents.
+  - **On:** surfaces **REGIONAL** (`KXP`) parents expanded by `regionScope`
+    (`global` / `europe` / `eur_zone` / `latam` / `mana`) intersected with the
+    reseller's configured shop countries.
+- Regional market rows may include countries with no linked concrete in that
+  ISO (e.g. EUROPE parent linked FR/DE/NL still appears for LT when the
+  reseller has LT). Fulfilment picks among linked concretes (priority or
+  cheapest per **price optimization**).
+
+### Orders
+
+- Parent type accepted on place-order follows the reseller's catalog
+  optimization flag (LOCAL vs REGIONAL).
+- Multi-country regional lines still require `country` (or market `sku`) when
+  more than one catalog market is available.
+
+## 2.2.0 - 2026-08-03
+
+### Catalog
+
+- `GET /catalog/products` now returns **one row per country** for multi-country
+  (regional) products. Rows share the same `productCode` and differ by
+  `countryCode`, `sku`, and localized `name` / `image` (English fallback when a
+  translation is missing).
+- New fields on each product row: `sku` (`{CC}-{LL}-{productCode}`) and
+  `availableCountries`.
+- `GET /catalog/products/{productCode}` accepts optional `?country=` to select a
+  market row.
+- Market rows are limited to countries the reseller can actually order (catalog
+  intersection). Only **regional** (`KXP`) parents appear in the distribution
+  catalog.
+
+### Orders
+
+- Order lines accept optional `country` (ISO code). For multi-country products,
+  pass `country` or a market `sku` so fulfilment resolves the correct market.
+
+### Breaking API changes
+
+| Change | Before | After |
+| --- | --- | --- |
+| Catalog list shape | One row per `productCode` | One row per `productCode` + `countryCode` (same `productCode` may repeat) |
+| Catalog parent type | Any parent in catalog | Regional parents only |
+
 ## 2.1.3 - 2026-06-06
 
 ### Ping
