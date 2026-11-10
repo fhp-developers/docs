@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Kalixo API",
-  "description": "Developer documentation for the Kalixo Distribution API v2 - catalog, ordering, and wallet.",
+  "name": "Kalixo Developers",
+  "description": "Developer documentation for Kalixo: the Distribution API (catalog, ordering and wallet) and Kalixo Checkout (payments with Kalixo as merchant of record).",
   "colors": {
     "primary": "#a1c62e",
     "light": "#c9f73a",
@@ -41,53 +41,127 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Get an API key",
+      "label": "Get API keys",
       "href": "mailto:integrations@kalixo.io"
     }
   },
   "navigation": {
-    "tabs": [
+    "products": [
       {
-        "tab": "Guides",
-        "groups": [
+        "product": "Distribution API",
+        "description": "Catalog, ordering and wallet",
+        "icon": "gift",
+        "tabs": [
           {
-            "group": "Get started",
-            "pages": ["index", "quickstart", "authentication", "concepts/sandbox", "changelog"]
-          },
-          {
-            "group": "Core concepts",
-            "pages": [
-              "concepts/pagination",
-              "concepts/filtering",
-              "concepts/open-denomination",
-              "concepts/promotions",
-              "concepts/service-fee",
-              "concepts/order-lifecycle",
-              "concepts/order-cancellation",
-              "concepts/idempotency",
-              "concepts/rate-limits",
-              "concepts/errors",
-              "concepts/notifications",
-              "concepts/webhooks",
-              "examples/kalixo-node"
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Get started",
+                "pages": ["index", "quickstart", "authentication", "concepts/sandbox", "changelog"]
+              },
+              {
+                "group": "Core concepts",
+                "pages": [
+                  "concepts/pagination",
+                  "concepts/filtering",
+                  "concepts/open-denomination",
+                  "concepts/promotions",
+                  "concepts/service-fee",
+                  "concepts/order-lifecycle",
+                  "concepts/order-cancellation",
+                  "concepts/idempotency",
+                  "concepts/rate-limits",
+                  "concepts/errors",
+                  "concepts/notifications",
+                  "concepts/webhooks",
+                  "examples/kalixo-node"
+                ]
+              },
+              {
+                "group": "Migrate",
+                "pages": ["migrating-from-v1"]
+              }
             ]
           },
           {
-            "group": "Migrate",
-            "pages": ["migrating-from-v1"]
+            "tab": "API reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": ["api-reference/introduction"]
+              },
+              {
+                "group": "Endpoints",
+                "openapi": "openapi.json"
+              }
+            ]
           }
         ]
       },
       {
-        "tab": "API reference",
-        "groups": [
+        "product": "Checkout",
+        "description": "Accept payments with Kalixo as merchant of record",
+        "icon": "credit-card",
+        "tabs": [
           {
-            "group": "Overview",
-            "pages": ["api-reference/introduction"]
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Get started",
+                "pages": [
+                  "checkout/index",
+                  "checkout/quickstart",
+                  "checkout/authentication",
+                  "checkout/concepts/testing",
+                  "checkout/changelog"
+                ]
+              },
+              {
+                "group": "Accept payments",
+                "pages": [
+                  "checkout/guides/kalixo-js",
+                  "checkout/guides/hosted-checkout",
+                  "checkout/guides/payment-links",
+                  "checkout/guides/captures-and-refunds",
+                  "checkout/guides/stored-payment-methods"
+                ]
+              },
+              {
+                "group": "After the payment",
+                "pages": [
+                  "checkout/concepts/webhooks",
+                  "checkout/concepts/events",
+                  "checkout/guides/disputes",
+                  "checkout/guides/reports"
+                ]
+              },
+              {
+                "group": "Core concepts",
+                "pages": [
+                  "checkout/concepts/payment-lifecycle",
+                  "checkout/concepts/amount-integrity",
+                  "checkout/concepts/idempotency",
+                  "checkout/concepts/errors",
+                  "checkout/concepts/versioning"
+                ]
+              }
+            ]
           },
           {
-            "group": "Endpoints",
-            "openapi": "openapi.json"
+            "tab": "API reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": ["checkout/api-reference/introduction"]
+              },
+              {
+                "group": "Endpoints",
+                "openapi": {
+                  "source": "checkout/openapi.yaml",
+                  "directory": "checkout/api-reference"
+                }
+              }
+            ]
           }
         ]
       }
@@ -105,7 +179,7 @@
     "options": ["copy", "view", "chatgpt", "claude", "download-spec"]
   },
   "search": {
-    "prompt": "Search the Kalixo API docs"
+    "prompt": "Search the Kalixo developer docs"
   },
   "footer": {
     "socials": {

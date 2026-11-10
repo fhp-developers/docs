@@ -1,0 +1,76 @@
+---
+title: "Webhooks"
+description: "Receive signed events when payments, refunds and disputes change."
+icon: "webhook"
+---
+
+Kalixo sends an HTTP `POST` with an [event](/checkout/concepts/events) to your endpoint whenever
+something happens. Events have the same shape regardless of the payment provider.
+
+## Register an endpoint
+
+```javascript
+const endpoint = await kalixo.webhookEndpoints.create({ url: 'https://shop.example.com/webhooks/kalixo-checkout' });
+// Store endpoint.secret (whsec_...). It is shown only once.
+```
+
+Subscribe to specific types with `enabled_events`, or all events with `["*"]` (default).
+
+## Verify the signature
+
+Each delivery has a `Kalixo-Signature` header:
+
+```text
+Kalixo-Signature: t=1792000000,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
+```
+
+`v1` is the hex HMAC-SHA256 of `"<t>.<raw request body>"` with your endpoint secret.
+Reject the request if no `v1` matches or if `t` is more than 5 minutes old.
+
+<CodeGroup>
+```javascript Node.js (SDK)
+import express from 'express';
+import { constructEvent } from '@kalixo/checkout-node';
+
+app.post('/webhooks/kalixo-checkout', express.raw({ type: 'application/json' }), (req, res) => {
+  let event;
+  try {
+    event = constructEvent(req.body, req.header('Kalixo-Signature'), process.env.KALIXO_CHECKOUT_WEBHOOK_SECRET);
+  } catch {
+    return res.status(400).end();
+  }
+  res.status(200).end();
+  queue.add(event); // process asynchronously
+});
+```
+
+```python Python
+import hmac, hashlib, time
+
+def verify(raw_body: bytes, header: str, secret: str) -> bool:
+    parts = dict(p.split("=", 1) for p in header.split(",") if "=" in p)
+    t = int(parts.get("t", 0))
+    if abs(time.time() - t) > 300:
+        return False
+    expected = hmac.new(secret.encode(), f"{t}.".encode() + raw_body, hashlib.sha256).hexdigest()
+    candidates = [v for k, v in (p.split("=", 1) for p in header.split(",")) if k.strip() == "v1"]
+    return any(hmac.compare_digest(expected, c) for c in candidates)
+```
+</CodeGroup>
+
+Verify against the **raw** body. Parsing and re-serializing JSON changes the bytes.
+
+## Delivery rules
+
+- Answer with any `2xx` within 10 seconds, then process asynchronously.
+- Delivery is **at least once**. Deduplicate on the event `id`.
+- Order is not guaranteed. Every event contains the full object with a `version` that
+  increases with every change; ignore events with a lower `version` than you already stored.
+- Failed deliveries are retried with exponential backoff for about 3 days
+  (1 minute, 5 minutes, 30 minutes, 2 hours, ... 24 hours). Redirects are not followed.
+- Missed something? List events with `GET /v1/events` (kept for 30 days) or read the object directly.
+
+## Secret rotation
+
+`POST /v1/webhook-endpoints/{id}/rotate-secret` returns a new secret. For 24 hours Kalixo
+signs every delivery with both secrets (two `v1` values), so you can deploy the new secret without downtime.

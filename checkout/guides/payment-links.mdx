@@ -1,0 +1,22 @@
+---
+title: "Payment links"
+description: "Share a link that opens a Kalixo checkout, for invoices, chat or email."
+icon: "link"
+---
+
+```bash
+curl https://sandbox.checkout.kalixo.io/v1/payment-links \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: invoice-77-link" \
+  -H "Content-Type: application/json" \
+  -d '{ "amount": 1500, "currency": "EUR", "country": "NL", "reference": "invoice-77", "expires_at": "2026-11-30T23:59:59Z" }'
+```
+
+The response has a `url` such as `https://checkout.kalixo.io/l/Hk3s9...`. Share it with the shopper.
+
+- **Single-use links** (default) close after one successful payment (`status: completed`).
+- **Reusable links** (`reusable: true`) accept many payments, for example a donation or a fixed-price product.
+- Links expire at `expires_at` (at most 90 days) or when you call `POST /v1/payment-links/{id}/deactivate`.
+- Each payment through a link is a normal checkout session and payment. Use webhooks
+  and `reference` to match them to your invoice; the session's metadata contains `payment_link`.
+- Without a `return_url`, the shopper sees a Kalixo confirmation page after paying.

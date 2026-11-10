@@ -1,0 +1,35 @@
+---
+title: "Stored payment methods"
+description: "Let returning shoppers pay with one click."
+icon: "wallet"
+---
+
+<Steps>
+  <Step title="Create a customer">
+    ```javascript
+    const customer = await kalixo.customers.create({ reference: 'user-42', email: 'shopper@example.com' });
+    ```
+    Store `customer.id` on your user. Kalixo encrypts email and name at rest.
+  </Step>
+  <Step title="Offer to save the card">
+    ```javascript
+    await kalixo.checkoutSessions.create({ ...order, customer: customer.id, store_payment_method: true });
+    ```
+    The checkout shows a **Save for next time** checkbox. The card is saved only if the shopper ticks it.
+    You receive `payment_method.attached`.
+  </Step>
+  <Step title="Pay with one click next time">
+    Create the next session with the same `customer`. Kalixo.js shows the saved cards automatically.
+  </Step>
+</Steps>
+
+## Manage saved cards
+
+```javascript
+const methods = await kalixo.customers.listPaymentMethods(customer.id);
+await kalixo.customers.detachPaymentMethod(customer.id, methods.data[0].id);
+```
+
+`available: false` means the card cannot be used for new payments right now (for example
+after a change on Kalixo's side). Kalixo.js hides unavailable cards; the shopper enters
+the card again once.

@@ -1,0 +1,1467 @@
+openapi: 3.1.0
+info:
+  title: Kalixo Checkout API
+  version: "2026-10-01"
+  summary: Payment orchestration API for Kalixo partners.
+  description: |
+    Kalixo Checkout lets partners collect payments from their shoppers through one
+    provider-neutral API. Kalixo is merchant of record and routes each payment
+    to a payment provider (Adyen first). Partners never integrate a provider
+    directly.
+
+    - Amounts are integers in the currency's minor unit (EUR 49.99 = `4999`).
+    - Server endpoints use a secret key (`kc_sk_test_...` or `kc_sk_live_...`).
+    - Client endpoints are called by `Kalixo.js` with a publishable key and the
+      checkout session's `client_secret`.
+    - Every `POST` with a secret key requires an `Idempotency-Key` header.
+  contact:
+    name: Kalixo Checkout integrations
+    email: integrations@kalixo.io
+  license:
+    name: Proprietary
+    url: https://kalixo.io/legal
+servers:
+  - url: https://checkout.kalixo.io
+    description: Live
+  - url: https://sandbox.checkout.kalixo.io
+    description: Sandbox (test keys only, connected to the provider test environment)
+security:
+  - secretKey: []
+tags:
+  - name: Checkout sessions
+    description: Create a session with the amount to charge, then show it with Kalixo.js or the hosted checkout.
+  - name: Payments
+    description: Read payments and capture or cancel authorized payments.
+  - name: Refunds
+    description: Full and partial refunds of captured payments.
+  - name: Payment links
+    description: Kalixo-hosted payment links that survive provider switches.
+  - name: Customers
+    description: Customers and their stored payment methods for one-click checkout.
+  - name: Disputes
+    description: Chargebacks and information requests, plus evidence upload.
+  - name: Events
+    description: The event log behind webhooks.
+  - name: Webhook endpoints
+    description: Where Kalixo delivers signed events.
+  - name: Reports
+    description: CSV exports of transactions for reconciliation and partner invoicing.
+  - name: Client
+    description: Called by Kalixo.js and the hosted checkout. Not for partner servers.
+
+paths:
+  /v1/checkout-sessions:
+    post:
+      tags: [Checkout sessions]
+      operationId: createCheckoutSession
+      summary: Create a checkout session
+      description: |
+        Creates a checkout session and its payment. The amount and currency set
+        here are the only amount Kalixo will ever charge for this session.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateCheckoutSessionRequest" }
+      responses:
+        "200":
+          description: Checkout session created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Checkout sessions]
+      operationId: listCheckoutSessions
+      summary: List checkout sessions
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/CheckoutSessionStatus" }
+        - name: reference
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: A page of checkout sessions.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/CheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/checkout-sessions/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Checkout sessions]
+      operationId: retrieveCheckoutSession
+      summary: Retrieve a checkout session
+      responses:
+        "200":
+          description: The checkout session.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Checkout sessions]
+      operationId: updateCheckoutSession
+      summary: Update a checkout session
+      description: |
+        `amount`, `currency` and `line_items` can only change before the first
+        payment attempt. After that the amount is locked and the request fails
+        with `amount_locked`. `description` and `metadata` can always change.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateCheckoutSessionRequest" }
+      responses:
+        "200":
+          description: The updated checkout session.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/checkout-sessions/{id}/expire:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Checkout sessions]
+      operationId: expireCheckoutSession
+      summary: Expire a checkout session
+      description: Fails with `payment_in_progress` if an attempt is still being processed.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: The expired checkout session.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payments:
+    get:
+      tags: [Payments]
+      operationId: listPayments
+      summary: List payments
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/PaymentStatus" }
+        - name: reference
+          in: query
+          schema: { type: string }
+        - name: created_gte
+          in: query
+          schema: { type: string, format: date-time }
+        - name: created_lt
+          in: query
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: A page of payments.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Payment" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payments/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Payments]
+      operationId: retrievePayment
+      summary: Retrieve a payment
+      responses:
+        "200":
+          description: The payment.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payments/{id}/capture:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Payments]
+      operationId: capturePayment
+      summary: Capture an authorized payment
+      description: |
+        Captures a payment created with `capture_method: manual`. Omit `amount`
+        to capture the full remaining authorized amount. Partial captures are
+        allowed where the payment method supports them. Captures are
+        asynchronous: the result arrives as `payment.captured`,
+        `payment.partially_captured` or `capture.failed`.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  format: int64
+                  minimum: 1
+                  description: Amount to capture. Cannot exceed the capturable amount.
+      responses:
+        "200":
+          description: Capture requested.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Capture" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payments/{id}/cancel:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Payments]
+      operationId: cancelPayment
+      summary: Cancel an authorized payment
+      description: |
+        Cancels an authorized, not yet captured payment. The result arrives as
+        `payment.canceled`.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Cancellation requested.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cancellation" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/refunds:
+    post:
+      tags: [Refunds]
+      operationId: createRefund
+      summary: Refund a captured payment
+      description: |
+        Omit `amount` for a full refund of the remaining captured amount.
+        Multiple partial refunds are allowed. The total refunded can never
+        exceed the captured amount. The result arrives as `refund.succeeded` or
+        `refund.failed`.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateRefundRequest" }
+      responses:
+        "200":
+          description: Refund requested.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Refund" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Refunds]
+      operationId: listRefunds
+      summary: List refunds
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: payment
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: A page of refunds.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Refund" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/refunds/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Refunds]
+      operationId: retrieveRefund
+      summary: Retrieve a refund
+      responses:
+        "200":
+          description: The refund.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Refund" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payment-links:
+    post:
+      tags: [Payment links]
+      operationId: createPaymentLink
+      summary: Create a payment link
+      description: |
+        Creates a Kalixo payment link (`https://checkout.kalixo.io/l/:code`). Links
+        are independent of the payment provider and keep working after a
+        provider switch.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePaymentLinkRequest" }
+      responses:
+        "200":
+          description: Payment link created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentLink" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Payment links]
+      operationId: listPaymentLinks
+      summary: List payment links
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+      responses:
+        "200":
+          description: A page of payment links.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/PaymentLink" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payment-links/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Payment links]
+      operationId: retrievePaymentLink
+      summary: Retrieve a payment link
+      responses:
+        "200":
+          description: The payment link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentLink" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/payment-links/{id}/deactivate:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Payment links]
+      operationId: deactivatePaymentLink
+      summary: Deactivate a payment link
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: The deactivated payment link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentLink" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/customers:
+    post:
+      tags: [Customers]
+      operationId: createCustomer
+      summary: Create a customer
+      description: Customers are needed to store payment methods for one-click checkout.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateCustomerRequest" }
+      responses:
+        "200":
+          description: Customer created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Customers]
+      operationId: listCustomers
+      summary: List customers
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: reference
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: A page of customers.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Customer" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/customers/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Customers]
+      operationId: retrieveCustomer
+      summary: Retrieve a customer
+      responses:
+        "200":
+          description: The customer.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/customers/{id}/payment-methods:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Customers]
+      operationId: listCustomerPaymentMethods
+      summary: List a customer's stored payment methods
+      responses:
+        "200":
+          description: The customer's stored payment methods.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/PaymentMethod" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/customers/{id}/payment-methods/{payment_method_id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+      - name: payment_method_id
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Customers]
+      operationId: detachCustomerPaymentMethod
+      summary: Detach a stored payment method
+      description: Deletes the token at the provider and marks the payment method `detached`.
+      responses:
+        "200":
+          description: The detached payment method.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentMethod" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/disputes:
+    get:
+      tags: [Disputes]
+      operationId: listDisputes
+      summary: List disputes
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/DisputeStatus" }
+      responses:
+        "200":
+          description: A page of disputes.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Dispute" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/disputes/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Disputes]
+      operationId: retrieveDispute
+      summary: Retrieve a dispute
+      responses:
+        "200":
+          description: The dispute.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Dispute" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/disputes/{id}/evidence:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Disputes]
+      operationId: uploadDisputeEvidence
+      summary: Upload dispute evidence
+      description: |
+        Uploads one evidence document. Kalixo ops review the evidence and decide
+        whether to defend the dispute. Allowed types: `application/pdf` (max 2 MB),
+        `image/jpeg` and `image/tiff` (max 10 MB). Documents must not contain card
+        numbers or identity documents.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadDisputeEvidenceRequest" }
+      responses:
+        "200":
+          description: The dispute with the new evidence document.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Dispute" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/events:
+    get:
+      tags: [Events]
+      operationId: listEvents
+      summary: List events
+      description: Fallback for missed webhooks. Events are kept for 30 days.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+        - name: type
+          in: query
+          schema: { $ref: "#/components/schemas/EventType" }
+        - name: object_id
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: A page of events, newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Event" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/events/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Events]
+      operationId: retrieveEvent
+      summary: Retrieve an event
+      responses:
+        "200":
+          description: The event.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Event" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/webhook-endpoints:
+    post:
+      tags: [Webhook endpoints]
+      operationId: createWebhookEndpoint
+      summary: Create a webhook endpoint
+      description: The signing `secret` is returned only in this response.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateWebhookEndpointRequest" }
+      responses:
+        "200":
+          description: Webhook endpoint created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Webhook endpoints]
+      operationId: listWebhookEndpoints
+      summary: List webhook endpoints
+      responses:
+        "200":
+          description: All webhook endpoints.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/webhook-endpoints/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Webhook endpoints]
+      operationId: retrieveWebhookEndpoint
+      summary: Retrieve a webhook endpoint
+      responses:
+        "200":
+          description: The webhook endpoint.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Webhook endpoints]
+      operationId: updateWebhookEndpoint
+      summary: Update a webhook endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateWebhookEndpointRequest" }
+      responses:
+        "200":
+          description: The updated webhook endpoint.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [Webhook endpoints]
+      operationId: deleteWebhookEndpoint
+      summary: Delete a webhook endpoint
+      responses:
+        "200":
+          description: The deleted webhook endpoint.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/webhook-endpoints/{id}/rotate-secret:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Webhook endpoints]
+      operationId: rotateWebhookEndpointSecret
+      summary: Rotate the signing secret
+      description: |
+        Returns a new secret. The previous secret keeps signing deliveries for
+        24 hours (both signatures are sent in `Kalixo-Signature`).
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Webhook endpoint with the new `secret`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/reports:
+    post:
+      tags: [Reports]
+      operationId: createReport
+      summary: Create a transaction report
+      description: |
+        Starts an asynchronous CSV export of financial transactions, payments,
+        refunds or disputes for a period. Partners use the `financial_transactions`
+        report as the basis for invoicing their share to Kalixo.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateReportRequest" }
+      responses:
+        "200":
+          description: Report export started.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportExport" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      tags: [Reports]
+      operationId: listReports
+      summary: List report exports
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/StartingAfter"
+      responses:
+        "200":
+          description: A page of report exports.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ListEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/ReportExport" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/reports/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Reports]
+      operationId: retrieveReport
+      summary: Retrieve a report export
+      responses:
+        "200":
+          description: The report export.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportExport" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/reports/{id}/download:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    get:
+      tags: [Reports]
+      operationId: downloadReport
+      summary: Download a ready report as CSV
+      responses:
+        "200":
+          description: CSV file.
+          content:
+            text/csv:
+              schema: { type: string }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/client/checkout-sessions/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+      - $ref: "#/components/parameters/ClientSecret"
+    get:
+      tags: [Client]
+      operationId: clientBootstrapCheckoutSession
+      summary: Bootstrap a checkout (Kalixo.js)
+      description: |
+        Returns what Kalixo.js needs to render the checkout, including the
+        renderer chosen by Kalixo's routing. Pins the session to a provider
+        account on first call.
+      security:
+        - publishableKey: []
+        - {}
+      responses:
+        "200":
+          description: Client view of the checkout session.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClientCheckoutSession" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/client/checkout-sessions/{id}/attempts:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+      - $ref: "#/components/parameters/ClientSecret"
+    post:
+      tags: [Client]
+      operationId: clientCreatePaymentAttempt
+      summary: Submit a payment attempt (Kalixo.js)
+      security:
+        - publishableKey: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClientCreateAttemptRequest" }
+      responses:
+        "200":
+          description: Attempt result.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClientAttemptResult" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /v1/client/attempts/{id}/details:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+      - $ref: "#/components/parameters/ClientSecret"
+    post:
+      tags: [Client]
+      operationId: clientSubmitAttemptDetails
+      summary: Submit additional details for an attempt (Kalixo.js)
+      security:
+        - publishableKey: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [details]
+              properties:
+                details:
+                  type: object
+                  additionalProperties: true
+                  description: Opaque renderer payload (for example 3DS2 results).
+      responses:
+        "200":
+          description: Attempt result.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClientAttemptResult" }
+        default: { $ref: "#/components/responses/Error" }
+
+webhooks:
+  event:
+    post:
+      operationId: receiveEvent
+      summary: Kalixo event delivery
+      description: |
+        Kalixo POSTs an `Event` to every enabled webhook endpoint subscribed to its
+        type. Verify the `Kalixo-Signature` header, answer with any 2xx within
+        10 seconds, then process asynchronously. Deliveries are retried with
+        exponential backoff for about 3 days. Deduplicate on `id`; ignore events
+        whose `data.object.version` is lower than what you already have.
+      parameters:
+        - name: Kalixo-Signature
+          in: header
+          required: true
+          description: "`t=<unix seconds>,v1=<hex HMAC-SHA256 of '<t>.<raw body>'>`"
+          schema: { type: string }
+        - name: Kalixo-Event-Id
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Event" }
+      responses:
+        "200":
+          description: Accepted.
+
+components:
+  securitySchemes:
+    secretKey:
+      type: http
+      scheme: bearer
+      description: Secret key, `kc_sk_test_...` or `kc_sk_live_...`. Server-side only.
+    publishableKey:
+      type: http
+      scheme: bearer
+      description: Publishable key, `kc_pk_test_...` or `kc_pk_live_...`. Safe for browsers.
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Unique key per logical request, reused on retries. 1 to 255 characters.
+      schema: { type: string, minLength: 1, maxLength: 255 }
+    ClientSecret:
+      name: Kalixo-Client-Secret
+      in: header
+      required: true
+      description: The checkout session's `client_secret`.
+      schema: { type: string }
+    PathId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    StartingAfter:
+      name: starting_after
+      in: query
+      description: Cursor from a previous page's `next_cursor`.
+      schema: { type: string }
+
+  responses:
+    Error:
+      description: Error.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    Amount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: Amount in the currency's minor unit.
+    Currency:
+      type: string
+      pattern: "^[A-Z]{3}$"
+      description: ISO 4217 currency code, uppercase.
+      examples: [EUR]
+    Country:
+      type: string
+      pattern: "^[A-Z]{2}$"
+      description: ISO 3166-1 alpha-2 country code of the shopper.
+      examples: [NL]
+    Metadata:
+      type: object
+      description: Up to 50 keys. Keys up to 40 characters, values up to 500 characters. Echoed back unchanged.
+      additionalProperties: { type: string, maxLength: 500 }
+      maxProperties: 50
+    CaptureMethod:
+      type: string
+      enum: [automatic, manual]
+    LineItem:
+      type: object
+      required: [name, quantity, unit_amount]
+      properties:
+        name: { type: string, maxLength: 200 }
+        quantity: { type: integer, minimum: 1 }
+        unit_amount: { $ref: "#/components/schemas/Amount" }
+        tax_amount: { $ref: "#/components/schemas/Amount" }
+        tax_percentage:
+          type: integer
+          description: Tax percentage in basis points (21% = 2100).
+        sku: { type: string, maxLength: 100 }
+        product_url: { type: string, format: uri }
+        image_url: { type: string, format: uri }
+
+    ListEnvelope:
+      type: object
+      required: [object, data, has_more]
+      properties:
+        object: { type: string, const: list }
+        data: { type: array, items: {} }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, "null"] }
+
+    CheckoutSessionStatus:
+      type: string
+      enum: [open, complete, expired]
+    CheckoutSession:
+      type: object
+      required: [id, object, status, payment, amount, currency, country, reference, capture_method, return_url, url, expires_at, created_at, livemode, metadata]
+      properties:
+        id: { type: string, examples: [cs_01JABCDEF] }
+        object: { type: string, const: checkout_session }
+        status: { $ref: "#/components/schemas/CheckoutSessionStatus" }
+        payment: { type: string, description: ID of the payment created with this session. }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        country: { $ref: "#/components/schemas/Country" }
+        reference: { type: string, description: The partner's order reference. }
+        description: { type: [string, "null"] }
+        capture_method: { $ref: "#/components/schemas/CaptureMethod" }
+        customer: { type: [string, "null"] }
+        customer_email: { type: [string, "null"] }
+        line_items:
+          type: array
+          items: { $ref: "#/components/schemas/LineItem" }
+        store_payment_method: { type: boolean }
+        locale: { type: string, examples: [en-GB] }
+        return_url: { type: string, format: uri }
+        url:
+          type: string
+          format: uri
+          description: Hosted checkout URL. Contains the client secret in the URL fragment.
+        client_secret: { type: string, description: Pass to Kalixo.js. Do not log or store it in analytics. }
+        amount_locked: { type: boolean, description: True once the first payment attempt has started. }
+        payment_link: { type: [string, "null"] }
+        expires_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
+        livemode: { type: boolean }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+    CreateCheckoutSessionRequest:
+      type: object
+      required: [amount, currency, country, reference, return_url]
+      properties:
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+        currency: { $ref: "#/components/schemas/Currency" }
+        country: { $ref: "#/components/schemas/Country" }
+        reference: { type: string, minLength: 1, maxLength: 80 }
+        return_url: { type: string, format: uri, description: "HTTPS URL. The shopper returns here with `?session_id=cs_...`." }
+        description: { type: string, maxLength: 500 }
+        capture_method: { $ref: "#/components/schemas/CaptureMethod" }
+        customer: { type: string, description: "Existing customer ID. Required to store payment methods." }
+        customer_email: { type: string, format: email }
+        line_items:
+          type: array
+          maxItems: 100
+          items: { $ref: "#/components/schemas/LineItem" }
+        store_payment_method:
+          type: boolean
+          description: Offer the shopper to save their card for one-click checkout. Requires `customer`.
+        locale: { type: string, examples: [nl-NL] }
+        expires_in:
+          type: integer
+          minimum: 900
+          maximum: 86400
+          default: 3600
+          description: Seconds until the session expires.
+        metadata: { $ref: "#/components/schemas/Metadata" }
+    UpdateCheckoutSessionRequest:
+      type: object
+      properties:
+        amount: { type: integer, format: int64, minimum: 1 }
+        currency: { $ref: "#/components/schemas/Currency" }
+        line_items:
+          type: array
+          items: { $ref: "#/components/schemas/LineItem" }
+        description: { type: string, maxLength: 500 }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+
+    PaymentStatus:
+      type: string
+      enum: [requires_payment_method, processing, requires_action, authorized, partially_captured, captured, partially_refunded, refunded, canceled, expired, disputed, charged_back]
+    PaymentMethodDetails:
+      type: object
+      properties:
+        type: { type: string, examples: [card, ideal, paypal, klarna, applepay, googlepay] }
+        brand: { type: [string, "null"], examples: [visa] }
+        last4: { type: [string, "null"] }
+        exp_month: { type: [integer, "null"] }
+        exp_year: { type: [integer, "null"] }
+        stored_payment_method: { type: [string, "null"], description: "`pm_...` if this payment used or saved a stored method." }
+    PaymentError:
+      type: object
+      properties:
+        code: { type: string, examples: [payment_declined] }
+        decline_code: { type: [string, "null"], examples: [insufficient_funds] }
+        message: { type: string }
+    Payment:
+      type: object
+      required: [id, object, status, amount, currency, amount_authorized, amount_captured, amount_refunded, amount_disputed, amount_capturable, capture_method, reference, metadata, version, created_at, livemode]
+      properties:
+        id: { type: string, examples: [pay_01JABCDEF] }
+        object: { type: string, const: payment }
+        status: { $ref: "#/components/schemas/PaymentStatus" }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        amount_authorized: { $ref: "#/components/schemas/Amount" }
+        amount_captured: { $ref: "#/components/schemas/Amount" }
+        amount_refunded: { $ref: "#/components/schemas/Amount" }
+        amount_disputed: { $ref: "#/components/schemas/Amount" }
+        amount_capturable: { $ref: "#/components/schemas/Amount" }
+        amount_mismatch: { type: boolean, description: True if the provider reported an amount different from the expected one. }
+        capture_method: { $ref: "#/components/schemas/CaptureMethod" }
+        checkout_session: { type: string }
+        customer: { type: [string, "null"] }
+        reference: { type: string }
+        description: { type: [string, "null"] }
+        payment_method: { $ref: "#/components/schemas/PaymentMethodDetails" }
+        last_payment_error:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentError"
+            - type: "null"
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        version: { type: integer, description: Increases with every change. }
+        authorized_at: { type: [string, "null"], format: date-time }
+        captured_at: { type: [string, "null"], format: date-time }
+        canceled_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        livemode: { type: boolean }
+
+    Capture:
+      type: object
+      required: [id, object, payment, amount, currency, status, created_at]
+      properties:
+        id: { type: string, examples: [cap_01JABCDEF] }
+        object: { type: string, const: capture }
+        payment: { type: string }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        status: { type: string, enum: [pending, succeeded, failed] }
+        failure_reason: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Cancellation:
+      type: object
+      required: [id, object, payment, status, created_at]
+      properties:
+        id: { type: string, examples: [cnl_01JABCDEF] }
+        object: { type: string, const: cancellation }
+        payment: { type: string }
+        status: { type: string, enum: [pending, succeeded, failed] }
+        failure_reason: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+
+    Refund:
+      type: object
+      required: [id, object, payment, amount, currency, status, reason, metadata, created_at]
+      properties:
+        id: { type: string, examples: [re_01JABCDEF] }
+        object: { type: string, const: refund }
+        payment: { type: string }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        status: { type: string, enum: [pending, succeeded, failed] }
+        reason: { type: string, enum: [requested_by_customer, duplicate, fraudulent, amount_mismatch, other] }
+        failure_reason: { type: [string, "null"] }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CreateRefundRequest:
+      type: object
+      required: [payment]
+      properties:
+        payment: { type: string }
+        amount: { type: integer, format: int64, minimum: 1 }
+        reason: { type: string, enum: [requested_by_customer, duplicate, fraudulent, other], default: requested_by_customer }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+
+    PaymentLink:
+      type: object
+      required: [id, object, url, status, amount, currency, country, reference, reusable, capture_method, created_at, metadata]
+      properties:
+        id: { type: string, examples: [plink_01JABCDEF] }
+        object: { type: string, const: payment_link }
+        url: { type: string, format: uri }
+        status: { type: string, enum: [active, inactive, completed, expired] }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        country: { $ref: "#/components/schemas/Country" }
+        reference: { type: string }
+        description: { type: [string, "null"] }
+        reusable: { type: boolean, description: If true the link can be paid more than once. }
+        capture_method: { $ref: "#/components/schemas/CaptureMethod" }
+        return_url: { type: [string, "null"], format: uri }
+        expires_at: { type: [string, "null"], format: date-time }
+        payments_count: { type: integer }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        created_at: { type: string, format: date-time }
+    CreatePaymentLinkRequest:
+      type: object
+      required: [amount, currency, country, reference]
+      properties:
+        amount: { type: integer, format: int64, minimum: 1 }
+        currency: { $ref: "#/components/schemas/Currency" }
+        country: { $ref: "#/components/schemas/Country" }
+        reference: { type: string, minLength: 1, maxLength: 80 }
+        description: { type: string, maxLength: 500 }
+        reusable: { type: boolean, default: false }
+        capture_method: { $ref: "#/components/schemas/CaptureMethod" }
+        return_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time, description: At most 90 days in the future. }
+        locale: { type: string }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+
+    Customer:
+      type: object
+      required: [id, object, created_at, metadata]
+      properties:
+        id: { type: string, examples: [cus_01JABCDEF] }
+        object: { type: string, const: customer }
+        reference: { type: [string, "null"], description: The partner's own customer ID. }
+        email: { type: [string, "null"] }
+        name: { type: [string, "null"] }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        created_at: { type: string, format: date-time }
+    CreateCustomerRequest:
+      type: object
+      properties:
+        reference: { type: string, maxLength: 100 }
+        email: { type: string, format: email }
+        name: { type: string, maxLength: 200 }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+
+    PaymentMethod:
+      type: object
+      required: [id, object, customer, type, status, available, created_at]
+      properties:
+        id: { type: string, examples: [pm_01JABCDEF] }
+        object: { type: string, const: payment_method }
+        customer: { type: string }
+        type: { type: string, examples: [card] }
+        card:
+          type: [object, "null"]
+          properties:
+            brand: { type: string }
+            last4: { type: string }
+            exp_month: { type: integer }
+            exp_year: { type: integer }
+        status: { type: string, enum: [active, detached] }
+        available:
+          type: boolean
+          description: False when the partner is routed to a provider that cannot use this stored method.
+        created_at: { type: string, format: date-time }
+
+    DisputeStatus:
+      type: string
+      enum: [needs_response, under_review, funds_withdrawn, won, lost, accepted]
+    Dispute:
+      type: object
+      required: [id, object, payment, status, amount, currency, created_at]
+      properties:
+        id: { type: string, examples: [dp_01JABCDEF] }
+        object: { type: string, const: dispute }
+        payment: { type: string }
+        status: { $ref: "#/components/schemas/DisputeStatus" }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        reason_code: { type: [string, "null"] }
+        reason: { type: [string, "null"] }
+        evidence_due_by: { type: [string, "null"], format: date-time }
+        evidence:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              document_type: { type: string }
+              file_name: { type: string }
+              created_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    UploadDisputeEvidenceRequest:
+      type: object
+      required: [document_type, file_name, content_type, content_base64]
+      properties:
+        document_type:
+          type: string
+          examples: [proof_of_delivery, customer_communication, invoice, terms_and_conditions, other]
+        file_name: { type: string, maxLength: 200 }
+        content_type: { type: string, enum: [application/pdf, image/jpeg, image/tiff] }
+        content_base64: { type: string }
+        description: { type: string, maxLength: 1000 }
+
+    EventType:
+      type: string
+      enum:
+        - checkout_session.completed
+        - checkout_session.expired
+        - payment.authorized
+        - payment.captured
+        - payment.partially_captured
+        - payment.failed
+        - payment.canceled
+        - payment.expired
+        - payment.amount_updated
+        - payment.amount_mismatch
+        - payment.fraud_reported
+        - capture.failed
+        - refund.succeeded
+        - refund.failed
+        - dispute.created
+        - dispute.updated
+        - dispute.funds_withdrawn
+        - dispute.won
+        - dispute.lost
+        - payment_method.attached
+        - payment_method.updated
+        - payment_method.detached
+    Event:
+      type: object
+      required: [id, type, api_version, created_at, livemode, partner_id, data]
+      properties:
+        id: { type: string, examples: [evt_01JABCDEF] }
+        type: { $ref: "#/components/schemas/EventType" }
+        api_version: { type: string, examples: ["2026-10-01"] }
+        created_at: { type: string, format: date-time }
+        livemode: { type: boolean }
+        partner_id: { type: string }
+        data:
+          type: object
+          required: [object]
+          properties:
+            object:
+              description: Full snapshot of the object after the change.
+              oneOf:
+                - $ref: "#/components/schemas/Payment"
+                - $ref: "#/components/schemas/CheckoutSession"
+                - $ref: "#/components/schemas/Refund"
+                - $ref: "#/components/schemas/Capture"
+                - $ref: "#/components/schemas/Dispute"
+                - $ref: "#/components/schemas/PaymentMethod"
+            related:
+              type: object
+              description: Related objects, for example the payment of a refund event.
+              additionalProperties: true
+
+    WebhookEndpoint:
+      type: object
+      required: [id, object, url, enabled_events, status, created_at]
+      properties:
+        id: { type: string, examples: [we_01JABCDEF] }
+        object: { type: string, const: webhook_endpoint }
+        url: { type: string, format: uri }
+        description: { type: [string, "null"] }
+        enabled_events:
+          type: array
+          items: { type: string }
+          description: Event types, or `["*"]` for all.
+        status: { type: string, enum: [enabled, disabled] }
+        secret: { type: string, description: Only returned on create and rotate. Starts with `whsec_`. }
+        created_at: { type: string, format: date-time }
+    CreateWebhookEndpointRequest:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, format: uri, description: Must be HTTPS in live mode. }
+        description: { type: string, maxLength: 200 }
+        enabled_events:
+          type: array
+          items: { type: string }
+          default: ["*"]
+    UpdateWebhookEndpointRequest:
+      type: object
+      properties:
+        url: { type: string, format: uri }
+        description: { type: string, maxLength: 200 }
+        enabled_events:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [enabled, disabled] }
+
+    ReportExport:
+      type: object
+      required: [id, object, type, period_start, period_end, status, created_at]
+      properties:
+        id: { type: string, examples: [rex_01JABCDEF] }
+        object: { type: string, const: report_export }
+        type: { type: string, enum: [financial_transactions, payments, refunds, disputes] }
+        period_start: { type: string, format: date-time }
+        period_end: { type: string, format: date-time }
+        status: { type: string, enum: [pending, ready, failed] }
+        row_count: { type: [integer, "null"] }
+        failure_reason: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        completed_at: { type: [string, "null"], format: date-time }
+    CreateReportRequest:
+      type: object
+      required: [type, period_start, period_end]
+      properties:
+        type: { type: string, enum: [financial_transactions, payments, refunds, disputes] }
+        period_start: { type: string, format: date-time }
+        period_end: { type: string, format: date-time, description: Exclusive. At most 92 days after `period_start`. }
+
+    ClientCheckoutSession:
+      type: object
+      required: [id, status, amount, currency, country, locale, renderer, payment_status]
+      properties:
+        id: { type: string }
+        status: { $ref: "#/components/schemas/CheckoutSessionStatus" }
+        payment_status: { $ref: "#/components/schemas/PaymentStatus" }
+        amount: { $ref: "#/components/schemas/Amount" }
+        currency: { $ref: "#/components/schemas/Currency" }
+        country: { $ref: "#/components/schemas/Country" }
+        locale: { type: string }
+        description: { type: [string, "null"] }
+        partner_name: { type: string }
+        store_payment_method: { type: boolean }
+        return_url: { type: string, format: uri }
+        terms_url: { type: string, format: uri }
+        theme:
+          type: object
+          additionalProperties: true
+        renderer:
+          type: object
+          required: [type, config]
+          properties:
+            type: { type: string, examples: [adyen-dropin, fake] }
+            version: { type: string }
+            config:
+              type: object
+              additionalProperties: true
+              description: Opaque, renderer-specific configuration.
+    ClientCreateAttemptRequest:
+      type: object
+      required: [payment_method_data]
+      properties:
+        payment_method_data:
+          type: object
+          additionalProperties: true
+          description: Opaque renderer payload (encrypted card fields, browser info, risk data, SDK data). Amount fields are ignored.
+        store_payment_method: { type: boolean }
+        origin: { type: string, format: uri }
+    ClientAttemptResult:
+      type: object
+      required: [attempt_id, status]
+      properties:
+        attempt_id: { type: string }
+        status: { type: string, enum: [authorized, processing, requires_action, refused, error] }
+        error:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentError"
+            - type: "null"
+        provider_payload:
+          type: object
+          additionalProperties: true
+          description: Opaque data for the renderer (for example an Adyen action). Partners must not rely on it.
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [type, code, message, request_id]
+          properties:
+            type:
+              type: string
+              enum: [invalid_request_error, authentication_error, permission_error, not_found_error, idempotency_error, payment_error, rate_limit_error, api_error]
+            code: { type: string, examples: [amount_locked] }
+            decline_code: { type: [string, "null"] }
+            message: { type: string }
+            param: { type: [string, "null"] }
+            request_id: { type: string }

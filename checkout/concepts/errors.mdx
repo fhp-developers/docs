@@ -1,0 +1,44 @@
+---
+title: "Errors"
+description: "Error format, types and common codes."
+icon: "triangle-exclamation"
+---
+
+```json
+{
+  "error": {
+    "type": "invalid_request_error",
+    "code": "amount_locked",
+    "decline_code": null,
+    "message": "The amount cannot change after the shopper started paying. Expire this session and create a new one.",
+    "param": null,
+    "request_id": "req_6f1c..."
+  }
+}
+```
+
+Include `request_id` when you contact support.
+
+| Type | HTTP | Meaning |
+| --- | --- | --- |
+| `invalid_request_error` | 400, 409 | The request is invalid or conflicts with the object's state |
+| `authentication_error` | 401 | Missing, invalid or wrong-mode API key |
+| `permission_error` | 403 | Not allowed (for example an unregistered origin) |
+| `not_found_error` | 404 | The object does not exist for your account |
+| `idempotency_error` | 409 | Idempotency key conflict |
+| `payment_error` | 402 | The payment cannot be processed (limits) |
+| `rate_limit_error` | 429 | Too many requests; retry with backoff |
+| `api_error` | 500, 503 | Kalixo-side error; retry with the same `Idempotency-Key` |
+
+## Decline codes
+
+Declined payments appear in `payment.last_payment_error.decline_code` and in the
+`payment.failed` event: `generic_decline`, `insufficient_funds`, `expired_card`,
+`incorrect_cvc`, `incorrect_number`, `card_not_supported`, `currency_not_supported`,
+`do_not_honor`, `fraudulent`, `lost_or_stolen_card`, `restricted_card`,
+`authentication_failed`, `authentication_required`, `withdrawal_limit_exceeded`,
+`pin_required`, `shopper_canceled`, `issuer_unavailable`, `processing_error`,
+`transaction_not_permitted`, `amount_limit_exceeded`.
+
+The `message` of a decline is safe to show to shoppers. Do not show more detail:
+issuers' raw responses can help fraudsters.

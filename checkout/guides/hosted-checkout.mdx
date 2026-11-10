@@ -1,0 +1,35 @@
+---
+title: "Hosted checkout"
+description: "Redirect the shopper to a Kalixo-hosted payment page."
+icon: "window-maximize"
+---
+
+Every checkout session has a `url` on `checkout.kalixo.io`. Redirect the shopper there
+when you do not want to build a payment page.
+
+```javascript
+const session = await kalixo.checkoutSessions.create({
+  amount: 2500,
+  currency: 'GBP',
+  country: 'GB',
+  reference: 'order-2002',
+  return_url: 'https://shop.example.com/checkout/complete',
+});
+res.redirect(303, session.url);
+```
+
+- The URL contains the session's client secret after `#`. Browsers never send that part
+  to servers. Treat the URL as private to the shopper.
+- After the payment, the shopper returns to your `return_url` with `?session_id=cs_...`.
+  Confirm the outcome on your server.
+- If the payment is declined, the shopper can retry on the hosted page until the session expires.
+- The page shows your account name, the amount and Kalixo's terms, because Kalixo is the
+  merchant of record.
+
+## When to choose the hosted checkout
+
+| Hosted checkout | Kalixo.js |
+| --- | --- |
+| No frontend work | Checkout inside your own page |
+| Shopper leaves your site briefly | Shopper stays on your site |
+| Same payment methods and security | Same payment methods and security |

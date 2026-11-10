@@ -1,0 +1,20 @@
+---
+title: "API reference"
+description: "Base URLs, authentication, pagination and conventions."
+icon: "book"
+---
+
+| Environment | Base URL |
+| --- | --- |
+| Sandbox | `https://sandbox.checkout.kalixo.io` |
+| Live | `https://checkout.kalixo.io` |
+
+- **Authentication:** `Authorization: Bearer kc_sk_...` on every server request. See [Authentication](/checkout/authentication).
+- **Idempotency:** `Idempotency-Key` on every `POST`. See [Idempotency](/checkout/concepts/idempotency).
+- **Amounts:** integers in the minor unit; `currency` is ISO 4217 uppercase.
+- **Pagination:** list endpoints return `{ "object": "list", "data": [...], "has_more": true, "next_cursor": "pay_..." }`.
+  Pass `starting_after=<next_cursor>` for the next page, `limit` up to 100 (default 20). Newest first.
+- **IDs** are prefixed: `cs_` sessions, `pay_` payments, `re_` refunds, `cap_` captures,
+  `cus_` customers, `pm_` payment methods, `plink_` payment links, `dp_` disputes, `evt_` events.
+- **Metadata:** up to 50 string keys, echoed back on objects and events.
+- **Client endpoints** (`/v1/client/...`) are used by Kalixo.js. Do not call them from your server.

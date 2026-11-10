@@ -1,0 +1,18 @@
+---
+title: "Versioning"
+description: "How the API and event payloads evolve."
+icon: "code-branch"
+---
+
+The current API version is `2026-10-01`. Every event carries it in `api_version`.
+
+Kalixo makes **additive** changes without a new version: new endpoints, new optional
+request fields, new response fields, new event types, new enum values (for example a
+new `decline_code` or payment method `type`). Build your integration to ignore unknown
+fields and event types.
+
+Breaking changes (removing or renaming fields, changing meanings) ship only with a new
+API version, announced in the [changelog](/checkout/changelog) at least six months ahead.
+
+Kalixo.js follows semantic versioning on `https://js.kalixo.io/v1/`. The `v1` path always
+serves the latest compatible release.

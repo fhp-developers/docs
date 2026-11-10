@@ -1,0 +1,68 @@
+---
+title: "Quickstart"
+description: "Create a checkout session, take a test payment and receive the webhook."
+icon: "rocket"
+---
+
+<Steps>
+  <Step title="Get sandbox keys">
+    Ask [integrations@kalixo.io](mailto:integrations@kalixo.io) for a sandbox account. You receive a
+    secret key (`kc_sk_test_...`) for your server and a publishable key (`kc_pk_test_...`) for the browser.
+    Tell us the domains that will show the checkout, for example `https://shop.example.com`.
+  </Step>
+  <Step title="Create a checkout session on your server">
+    Set the amount in the currency's minor unit. `4999` is EUR 49.99.
+
+    <CodeGroup>
+    ```bash cURL
+    curl https://sandbox.checkout.kalixo.io/v1/checkout-sessions \
+      -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+      -H "Idempotency-Key: order-1001-checkout" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "amount": 4999,
+        "currency": "EUR",
+        "country": "NL",
+        "reference": "order-1001",
+        "return_url": "https://shop.example.com/checkout/complete"
+      }'
+    ```
+
+    ```javascript Node.js
+    import { KalixoCheckout } from '@kalixo/checkout-node';
+
+    const kalixo = new KalixoCheckout(process.env.KALIXO_CHECKOUT_SECRET_KEY);
+    const session = await kalixo.checkoutSessions.create({
+      amount: 4999,
+      currency: 'EUR',
+      country: 'NL',
+      reference: 'order-1001',
+      return_url: 'https://shop.example.com/checkout/complete',
+    });
+    // Send session.id and session.client_secret to your checkout page.
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="Show the checkout">
+    ```html
+    <div id="kalixo-checkout"></div>
+    <script src="https://js.kalixo.io/v1/kalixo.js"></script>
+    <script type="module">
+      const kalixo = await KalixoCheckout.init({ publishableKey: 'kc_pk_test_...' });
+      const checkout = kalixo.checkout({ sessionId: 'cs_...', clientSecret: 'cs_..._secret_...' });
+      await checkout.mount('#kalixo-checkout');
+    </script>
+    ```
+
+    Pay with the test card `4111 1111 1111 1111`. See [Testing](/checkout/concepts/testing) for cards that decline.
+  </Step>
+  <Step title="Receive the webhook">
+    Register a webhook endpoint, verify the `Kalixo-Signature` header and fulfil the order on
+    `payment.captured`. See [Webhooks](/checkout/concepts/webhooks).
+  </Step>
+</Steps>
+
+<Note>
+  Prefer not to build a checkout page? Redirect the shopper to `session.url`, the
+  [hosted checkout](/checkout/guides/hosted-checkout).
+</Note>

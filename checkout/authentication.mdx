@@ -1,0 +1,36 @@
+---
+title: "Authentication"
+description: "Secret keys for your server, publishable keys for the browser."
+icon: "key"
+---
+
+Kalixo Checkout uses two kinds of API keys per environment.
+
+| Key | Prefix | Where | Can |
+| --- | --- | --- | --- |
+| Secret key | `kc_sk_test_`, `kc_sk_live_` | Your server only | Create sessions, read payments, capture, refund, manage webhooks |
+| Publishable key | `kc_pk_test_`, `kc_pk_live_` | Kalixo.js in the browser | Show the checkout for a session you created |
+
+Send the key as a bearer token:
+
+```bash
+curl https://sandbox.checkout.kalixo.io/v1/payments \
+  -H "Authorization: Bearer kc_sk_test_..."
+```
+
+- The sandbox accepts only test keys and the live API accepts only live keys.
+  A mismatch fails with `api_key_mode_mismatch`.
+- Never put a secret key in browser code or a mobile app. Kalixo.js refuses secret keys.
+- Kalixo stores only a hash of your keys. Kalixo shows each key once, when it is issued.
+- Publishable keys work only from the domains registered for your account
+  (`origin_not_allowed` otherwise). Ask Kalixo to add new domains.
+
+## Client secret
+
+Every checkout session has a `client_secret`. Kalixo.js sends it with the publishable
+key to prove the browser may pay that session. Do not log it or store it in analytics.
+
+## Rotating keys
+
+Ask Kalixo for a new key, deploy it, then ask Kalixo to revoke the old key. Revocation
+takes effect within 30 seconds.

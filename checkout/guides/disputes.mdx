@@ -1,0 +1,38 @@
+---
+title: "Disputes"
+description: "Chargebacks and information requests, and how to send evidence."
+icon: "scale-balanced"
+---
+
+When a shopper disputes a payment with their bank, you receive `dispute.created`.
+Kalixo is merchant of record and handles the dispute with the card scheme; you
+provide the evidence.
+
+| Event | Meaning |
+| --- | --- |
+| `dispute.created` | A dispute or information request was opened (`status: needs_response`) |
+| `dispute.funds_withdrawn` | The disputed amount was debited |
+| `dispute.updated` | Kalixo submitted a defense or the dispute changed |
+| `dispute.won` | The dispute was decided in Kalixo's favour; funds are returned |
+| `dispute.lost` | The dispute was lost or accepted |
+
+## Upload evidence
+
+Upload evidence before `evidence_due_by`.
+
+```javascript
+await kalixo.disputes.uploadEvidence('dp_...', {
+  document_type: 'proof_of_delivery',
+  file_name: 'delivery-order-1001.pdf',
+  content_type: 'application/pdf',
+  content_base64: fs.readFileSync('delivery.pdf').toString('base64'),
+  description: 'Code delivered to the shopper account on 12 October',
+});
+```
+
+- Formats: PDF (max 2 MB), JPEG or TIFF (max 10 MB).
+- Never upload card numbers or identity documents.
+- Useful evidence for digital goods: delivery logs, account activity after delivery,
+  shopper communication and your terms accepted at checkout.
+
+While a dispute is open the payment status is `disputed`; refunds are blocked.

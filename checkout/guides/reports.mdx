@@ -1,0 +1,28 @@
+---
+title: "Reports"
+description: "CSV exports for reconciliation and for invoicing your share to Kalixo."
+icon: "file-csv"
+---
+
+Kalixo collects the payments as merchant of record. Use the `financial_transactions`
+report as the basis for invoicing your share to Kalixo.
+
+```javascript
+const report = await kalixo.reports.create({ type: 'financial_transactions', period_start: '2026-10-01T00:00:00Z', period_end: '2026-11-01T00:00:00Z' });
+// Poll until ready (usually seconds), then download.
+const ready = await kalixo.reports.retrieve(report.id);
+if (ready.status === 'ready') {
+  const csv = await kalixo.reports.download(report.id);
+}
+```
+
+| Type | Rows |
+| --- | --- |
+| `financial_transactions` | Every capture, refund, chargeback and chargeback reversal in the period |
+| `payments` | Payments created in the period with their amounts and status |
+| `refunds` | Refunds created in the period |
+| `disputes` | Disputes opened in the period |
+
+- `period_end` is exclusive; a report covers at most 92 days.
+- Amounts appear twice: `amount_minor` (integer) and `amount` (decimal string).
+- Reports are kept for 30 days.
