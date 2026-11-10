@@ -10,104 +10,71 @@
   --kalixo-800: #506317;
   --kalixo-900: #28310c;
   --kalixo-950: #0a0c03;
-  --kalixo-accent-light: #a1c62e;
-  --kalixo-accent-soft: #e9fcb0;
+  --kalixo-border-light: color-mix(in srgb, var(--kalixo-500) 25%, #e5e7eb);
 }
 
-/* Light theme - white canvas, lighter brand green for accents */
+/* Buttons are brand lime (colors.dark) in both themes. Mintlify renders their
+   labels white, which is unreadable on lime, so force the brand ink. */
+#topbar-cta-button a,
+#topbar-cta-button a *,
+a:has(> .bg-primary-dark) .text-white,
+button:has(> .bg-primary-dark) .text-white,
+.bg-primary-dark.text-white {
+  color: var(--kalixo-950) !important;
+}
+
+/* The API playground colours its buttons by HTTP method; keep them on brand too */
+.tryit-button {
+  background-color: var(--kalixo-500) !important;
+  color: var(--kalixo-950) !important;
+}
+
+.tryit-button svg.bg-white {
+  background-color: var(--kalixo-950) !important;
+}
+
+/* Light theme: lime for fills, underlines and highlights; ink for text and icons,
+   because lime on white has a contrast ratio of about 1.2:1. */
 html:not(.dark) #navbar {
   background-color: #ffffff;
-  border-bottom: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 18%, #e5e7eb);
+  border-bottom: 1px solid var(--kalixo-border-light);
 }
 
 html:not(.dark) #sidebar {
   background-color: #ffffff;
-  border-right: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 14%, #e5e7eb);
+  border-right: 1px solid var(--kalixo-border-light);
+}
+
+html:not(.dark) .text-primary,
+html:not(.dark) .group:hover .group-hover\:text-primary {
+  color: var(--kalixo-950);
+}
+
+html:not(.dark) svg.bg-primary:not(.bg-codeblock *) {
+  background-color: var(--kalixo-950);
 }
 
 /* Only highlight the current page, not every parent in the sidebar tree */
 html:not(.dark) #sidebar-content li[data-active] > a {
   background-color: transparent;
   color: inherit;
-  font-weight: inherit;
 }
 
 html:not(.dark) #sidebar-content li[data-active]:not(:has(li[data-active])) > a {
-  background-color: var(--kalixo-50);
-  color: var(--kalixo-800);
-  font-weight: 500;
+  background-color: var(--kalixo-500);
+  color: var(--kalixo-950);
 }
 
-html:not(.dark) sidebar-group[data-active] sidebar-group-header {
+html:not(.dark) .sidebar-group[data-active] .sidebar-group-header {
   background-color: transparent;
 }
 
 html:not(.dark) #sidebar-content a:hover {
-  color: var(--kalixo-accent-light);
+  color: var(--kalixo-950);
 }
 
-html:not(.dark) card {
-  border-color: color-mix(in srgb, var(--kalixo-accent-light) 24%, #e5e7eb);
-  background-color: #ffffff;
-}
-
-html:not(.dark) callout {
-  border-color: color-mix(in srgb, var(--kalixo-accent-light) 28%, #e5e7eb);
-  background-color: color-mix(in srgb, var(--kalixo-50) 45%, #ffffff);
-}
-
-/* Get an API key — Mintlify uses an inner overlay + text-white span */
-#topbar-cta-button {
-  background-color: transparent;
-}
-
-#topbar-cta-button span.absolute.inset-0 {
-  display: none !important;
-}
-
-#topbar-cta-button a {
-  background-color: var(--kalixo-600);
-  color: var(--kalixo-950) !important;
-  border-radius: 0.375rem;
-  font-weight: 500;
-}
-
-#topbar-cta-button a span.z-10,
-#topbar-cta-button a svg {
-  color: inherit !important;
-}
-
-#topbar-cta-button a:hover {
-  background-color: var(--kalixo-700);
-  color: #ffffff !important;
-  opacity: 1;
-}
-
-.dark #topbar-cta-button a {
-  background-color: var(--kalixo-500);
-  color: var(--kalixo-950) !important;
-}
-
-.dark #topbar-cta-button a:hover {
-  background-color: var(--kalixo-400);
-  color: var(--kalixo-950) !important;
-}
-
-html:not(.dark) #table-of-contents {
-  border-left: 1px solid color-mix(in srgb, var(--kalixo-accent-light) 14%, #e5e7eb);
-  padding-left: 1.25rem;
-}
-
-html:not(.dark) toc-item[data-active] {
-  color: var(--kalixo-800);
-}
-
-html:not(.dark) link {
-  color: var(--kalixo-accent-light);
-}
-
-html:not(.dark) eyebrow {
-  color: var(--kalixo-accent-light);
+html:not(.dark) .nav-tabs-item > .bg-primary {
+  height: 2px;
 }
 
 /* Code language dropdown (cURL, JavaScript, Python, PHP) in dark code blocks */
@@ -139,24 +106,6 @@ html:not(.dark) .bg-codeblock [role="menuitem"][data-active="true"] * {
   background-color: color-mix(in srgb, var(--kalixo-500) 14%, transparent);
 }
 
-.dark sidebar-group[data-active] sidebar-group-header {
+.dark .sidebar-group[data-active] .sidebar-group-header {
   background-color: transparent;
-}
-
-.dark card {
-  border-color: color-mix(in srgb, var(--kalixo-500) 20%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--kalixo-950) 88%,
-    var(--kalixo-900)
-  );
-}
-
-.dark callout {
-  border-color: color-mix(in srgb, var(--kalixo-500) 24%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--kalixo-950) 80%,
-    var(--kalixo-900)
-  );
 }

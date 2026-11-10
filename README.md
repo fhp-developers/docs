@@ -38,7 +38,11 @@ mint validate        # validate docs.json + OpenAPI
 ## Branding
 
 - Palette: lime greens from `#f4fdd8` (50) through `#0a0c03` (950); primary accent `#c9f73a` (500).
-- Light mode: white background with Kalixo green accents; dark mode background: `#0a0c03`. Dark mode is the default.
+  All three `colors` in `docs.json` use `#c9f73a`, the same lime as kalixo.io.
+- Buttons are lime with `#0a0c03` text in both modes (`custom.css` overrides Mintlify's white labels).
+- Light mode: white background; lime for highlights, underlines and the current page, with
+  `#0a0c03` for accent text and icons, because lime text on white is unreadable.
+- Dark mode background: `#0a0c03`. Dark mode is the default.
 - Logo: `logo/kalixo-white.svg` (dark mode) and `logo/kalixo-black.svg` (light mode).
 - Favicon: `favicon.ico` (from [kalixo.io](https://kalixo.io/favicon.ico)).
 

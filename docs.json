@@ -4,9 +4,9 @@
   "name": "Kalixo Developers",
   "description": "Developer documentation for Kalixo: the Distribution API (catalog, ordering and wallet) and Kalixo Checkout (payments with Kalixo as merchant of record).",
   "colors": {
-    "primary": "#a1c62e",
+    "primary": "#c9f73a",
     "light": "#c9f73a",
-    "dark": "#799423"
+    "dark": "#c9f73a"
   },
   "appearance": {
     "default": "dark",
