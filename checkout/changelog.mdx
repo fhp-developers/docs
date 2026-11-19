@@ -4,7 +4,7 @@ description: "Changes to the Kalixo Checkout API, Kalixo.js and the Node SDK."
 icon: "clock-rotate-left"
 ---
 
-<Update label="2026-11-19" description="API version 2026-10-01 (security hardening)">
+<Update label="2026-11-19" description="API version 2026-10-01 (security upgrade)">
   - **Registered return domains.** A checkout session or payment link `return_url` must be on
     a domain registered for your account, the same list Kalixo.js checks. Other domains fail
     with `return_url_not_allowed`. Ask Kalixo to add your domains.
@@ -61,9 +61,15 @@ icon: "clock-rotate-left"
     verification examples for PHP, Java and .NET.
 </Update>
 
-<Update label="2026-10-13" description="API version 2026-10-01">
-  - First release of the Kalixo Checkout API: checkout sessions, payments, captures, refunds,
-    payment links, customers and stored payment methods, disputes, events, webhook endpoints and reports.
+<Update label="2026-10-13" description="API version 2026-10-01 (platform upgrade)">
+  - **Kalixo Checkout API, version `2026-10-01`.** Checkout sessions, payments, captures,
+    refunds, payment links, customers and stored payment methods, disputes, events, webhook
+    endpoints and reports.
   - Kalixo.js `v1` and the hosted checkout.
   - `@kalixo/checkout-node` 1.0.0.
+  - Developer documentation on `developer.kalixo.io`.
+</Update>
+
+<Update label="2025-10" description="Initial release">
+  - Kalixo Checkout goes live: partners accept payments with Kalixo as merchant of record.
 </Update>
