@@ -1,6 +1,6 @@
 ---
 title: "Testing"
-description: "Sandbox environment and test cards."
+description: "Sandbox environment, test cards, captures, disputes and test webhooks."
 icon: "flask"
 ---
 
@@ -21,19 +21,117 @@ Enter any future expiry date and any CVC.
 | `4000 0000 0000 0119` | Processing error |
 | `4000 0000 0000 0101` | The provider reports a different amount: triggers `payment.amount_mismatch` and an automatic reversal |
 
-Refunds of exactly `666` minor units fail (`refund.failed`).
+Refunds of exactly `666` minor units (for example EUR 6.66) fail (`refund.failed`).
 
 <Note>
-  Kalixo may route your sandbox account to a provider's test environment instead.
-  The checkout then shows that provider's test form and test cards; your integration
-  does not change.
+  These cards and the `666` refund work when your sandbox account uses Kalixo's sandbox test
+  processor. Kalixo can instead route a sandbox account to a payment provider's test
+  environment, to test more payment methods. The checkout then shows that provider's test
+  form, and these cards are declined: Kalixo integrations sends you the provider's test cards
+  instead. Your integration does not change. Ask Kalixo integrations which setup your account
+  has. [Simulated payments](#simulate-a-payment) and dispute simulation work with either setup.
 </Note>
+
+## Simulate a payment
+
+Pay an open checkout session without a browser or 3D Secure, for example in automated tests
+of your order flow. The payment always goes through Kalixo's sandbox test processor, and
+everything after it is the normal flow: `payment.authorized`, then `payment.captured` (or
+`payment.failed`), and `checkout_session.completed`. You can refund it and simulate a dispute
+on it.
+
+<CodeGroup>
+```bash cURL
+curl https://sandbox.checkout.kalixo.io/v1/test-helpers/checkout-sessions/cs_.../simulate \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d '{ "outcome": "succeeded" }'
+```
+
+```javascript Node.js
+const simulation = await kalixo.testHelpers.simulateSession('cs_...', { outcome: 'succeeded' });
+console.log(simulation.payment, simulation.attempt.status); // pay_... authorized
+```
+</CodeGroup>
+
+| `outcome` | Result |
+| --- | --- |
+| `succeeded` (default) | Authorised, then captured with automatic capture |
+| `declined` | `payment.failed` with `generic_decline`; the session stays open |
+| `insufficient_funds` | `payment.failed` with `insufficient_funds` |
+| `processing` | Pending; the outcome arrives by webhook only |
+| `amount_mismatch` | `payment.amount_mismatch` and an automatic reversal |
+
+Simulate on a session the shopper has not paid on yet. A session that already has an attempt
+at a payment provider returns `session_has_attempts`: create a new session.
+
+## Manual capture
+
+Create the session with `capture_method: "manual"` and pay it with `4111 1111 1111 1111`.
+The payment stops at `authorized`. Then capture part of it, for example EUR 20.00 (`2000`
+in minor units) of a EUR 49.99 payment:
+
+```javascript
+await kalixo.payments.capture('pay_...', { amount: 2000 }); // partial: payment.partially_captured
+await kalixo.payments.capture('pay_...');                   // the rest: payment.captured
+// or, instead of capturing:
+await kalixo.payments.cancel('pay_...');                    // payment.canceled
+```
+
+## Disputes
+
+Simulate a dispute on a captured sandbox payment made with a test card or
+[simulated](#simulate-a-payment). Each call moves the dispute to the next stage, and the
+matching events follow within seconds:
+
+<CodeGroup>
+```bash cURL
+curl https://sandbox.checkout.kalixo.io/v1/test-helpers/payments/pay_.../dispute \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d '{ "stage": "opened" }'
+```
+
+```javascript Node.js
+await kalixo.testHelpers.simulateDispute('pay_...', { stage: 'opened' });          // dispute.created
+await kalixo.testHelpers.simulateDispute('pay_...', { stage: 'funds_withdrawn' }); // dispute.funds_withdrawn
+await kalixo.testHelpers.simulateDispute('pay_...', { stage: 'won' });             // dispute.won (or 'lost')
+```
+</CodeGroup>
+
+| `stage` | Dispute status | Payment status | Event |
+| --- | --- | --- | --- |
+| `opened` | `needs_response` | `disputed` | `dispute.created` |
+| `funds_withdrawn` | `funds_withdrawn` | `disputed` | `dispute.funds_withdrawn` |
+| `won` | `won` | `captured` | `dispute.won` |
+| `lost` | `lost` | `charged_back` | `dispute.lost` |
+
+Upload evidence while the dispute is open to test your
+[evidence flow](/checkout/guides/disputes). Test helpers return `test_mode_only` on the live
+API.
+
+## Test webhooks
+
+Send a signed sample of any event type to one of your webhook endpoints, without making a
+payment. See [Test your endpoint](/checkout/concepts/webhooks#test-your-endpoint).
+
+```javascript
+const result = await kalixo.testHelpers.sendTestEvent('we_...', { type: 'payment.captured' });
+console.log(result.delivered, result.status_code); // true 200
+```
 
 ## What to test before going live
 
 - Successful payment and fulfilment on `payment.captured`.
 - Declined payment and retry on the same session.
+- A [3D Secure](/checkout/concepts/3d-secure) challenge, approved and declined.
 - Pending payment that completes by webhook only.
 - Webhook signature verification and duplicate deliveries (deduplicate on `id`).
 - Amount mismatch handling (do not fulfil when `amount_mismatch` is `true`).
-- Full and partial refunds.
+- Full and partial refunds, and a failed refund (`666`).
+- Manual capture and cancellation, if you use `capture_method: "manual"`.
+- A dispute from `opened` to `won` and to `lost`.
+
+When everything passes, follow [Go live](/checkout/go-live).

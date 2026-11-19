@@ -9,12 +9,26 @@ something happens. Events have the same shape regardless of the payment provider
 
 ## Register an endpoint
 
-```javascript
+The URL must be public and use HTTPS, in the sandbox too. You can register up to 16 endpoints.
+
+<CodeGroup>
+```bash cURL
+curl https://sandbox.checkout.kalixo.io/v1/webhook-endpoints \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: webhook-endpoint-orders" \
+  -H "Content-Type: application/json" \
+  -d '{ "url": "https://shop.example.com/webhooks/kalixo-checkout", "enabled_events": ["*"] }'
+```
+
+```javascript Node.js
 const endpoint = await kalixo.webhookEndpoints.create({ url: 'https://shop.example.com/webhooks/kalixo-checkout' });
 // Store endpoint.secret (whsec_...). It is shown only once.
 ```
+</CodeGroup>
 
 Subscribe to specific types with `enabled_events`, or all events with `["*"]` (default).
+The response contains the signing `secret` (`whsec_...`). Kalixo shows it only once: store it
+in your secret manager.
 
 ## Verify the signature
 
@@ -25,7 +39,11 @@ Kalixo-Signature: t=1792000000,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56
 ```
 
 `v1` is the hex HMAC-SHA256 of `"<t>.<raw request body>"` with your endpoint secret.
-Reject the request if no `v1` matches or if `t` is more than 5 minutes old.
+Reject the request if no `v1` matches or if `t` is more than 5 minutes away from your clock.
+During a [secret rotation](#secret-rotation) the header has two `v1` values; accept either.
+
+Deliveries also carry `Kalixo-Event-Id` and `Kalixo-Event-Type` headers, equal to the event's
+`id` and `type`.
 
 <CodeGroup>
 ```javascript Node.js (SDK)
@@ -45,30 +63,215 @@ app.post('/webhooks/kalixo-checkout', express.raw({ type: 'application/json' }),
 ```
 
 ```python Python
-import hmac, hashlib, time
+import hashlib
+import hmac
+import time
 
-def verify(raw_body: bytes, header: str, secret: str) -> bool:
-    parts = dict(p.split("=", 1) for p in header.split(",") if "=" in p)
-    t = int(parts.get("t", 0))
-    if abs(time.time() - t) > 300:
+
+def verify(raw_body: bytes, header: str | None, secret: str, tolerance: int = 300) -> bool:
+    """Returns True only for a well-formed, fresh header with a matching v1 signature."""
+    if not header:
         return False
-    expected = hmac.new(secret.encode(), f"{t}.".encode() + raw_body, hashlib.sha256).hexdigest()
-    candidates = [v for k, v in (p.split("=", 1) for p in header.split(",")) if k.strip() == "v1"]
-    return any(hmac.compare_digest(expected, c) for c in candidates)
+    timestamp = None
+    signatures = []
+    for part in header.split(","):
+        key, sep, value = part.strip().partition("=")
+        if not sep:
+            continue
+        if key == "t":
+            timestamp = value
+        elif key == "v1":
+            signatures.append(value)
+    if not timestamp or not timestamp.isdigit() or not signatures:
+        return False
+    if abs(time.time() - int(timestamp)) > tolerance:
+        return False
+    expected = hmac.new(secret.encode(), timestamp.encode() + b"." + raw_body, hashlib.sha256).hexdigest()
+    return any(hmac.compare_digest(expected, signature) for signature in signatures)
+```
+
+```php PHP
+<?php
+function kalixo_verify(string $rawBody, ?string $header, string $secret, int $tolerance = 300): bool
+{
+    if (!$header) {
+        return false;
+    }
+    $timestamp = null;
+    $signatures = [];
+    foreach (explode(',', $header) as $part) {
+        $pair = explode('=', trim($part), 2);
+        if (count($pair) !== 2) {
+            continue;
+        }
+        if ($pair[0] === 't') {
+            $timestamp = $pair[1];
+        } elseif ($pair[0] === 'v1') {
+            $signatures[] = $pair[1];
+        }
+    }
+    if ($timestamp === null || !ctype_digit($timestamp) || !$signatures) {
+        return false;
+    }
+    if (abs(time() - (int) $timestamp) > $tolerance) {
+        return false;
+    }
+    $expected = hash_hmac('sha256', $timestamp . '.' . $rawBody, $secret);
+    foreach ($signatures as $signature) {
+        if (hash_equals($expected, $signature)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// $rawBody = file_get_contents('php://input');
+// $ok = kalixo_verify($rawBody, $_SERVER['HTTP_KALIXO_SIGNATURE'] ?? null, getenv('KALIXO_CHECKOUT_WEBHOOK_SECRET'));
+```
+
+```java Java
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HexFormat;
+import java.util.List;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+public final class KalixoSignature {
+    public static boolean verify(byte[] rawBody, String header, String secret, long toleranceSeconds) throws Exception {
+        if (header == null) return false;
+        String timestamp = null;
+        List<String> signatures = new ArrayList<>();
+        for (String part : header.split(",")) {
+            String[] pair = part.trim().split("=", 2);
+            if (pair.length != 2) continue;
+            if (pair[0].equals("t")) timestamp = pair[1];
+            else if (pair[0].equals("v1")) signatures.add(pair[1]);
+        }
+        if (timestamp == null || !timestamp.matches("\\d{1,12}") || signatures.isEmpty()) return false;
+        if (Math.abs(System.currentTimeMillis() / 1000 - Long.parseLong(timestamp)) > toleranceSeconds) return false;
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+        mac.update((timestamp + ".").getBytes(StandardCharsets.UTF_8));
+        byte[] expected = HexFormat.of().formatHex(mac.doFinal(rawBody)).getBytes(StandardCharsets.UTF_8);
+        for (String signature : signatures) {
+            if (MessageDigest.isEqual(expected, signature.getBytes(StandardCharsets.UTF_8))) return true;
+        }
+        return false;
+    }
+}
+```
+
+```csharp C# (.NET)
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+
+public static class KalixoSignature
+{
+    public static bool Verify(byte[] rawBody, string? header, string secret, int toleranceSeconds = 300)
+    {
+        if (string.IsNullOrEmpty(header)) return false;
+        string? timestamp = null;
+        var signatures = new List<string>();
+        foreach (var part in header.Split(','))
+        {
+            var pair = part.Trim().Split('=', 2);
+            if (pair.Length != 2) continue;
+            if (pair[0] == "t") timestamp = pair[1];
+            else if (pair[0] == "v1") signatures.Add(pair[1]);
+        }
+        if (timestamp is null || !long.TryParse(timestamp, out var t) || signatures.Count == 0) return false;
+        if (Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - t) > toleranceSeconds) return false;
+
+        var signed = new byte[timestamp.Length + 1 + rawBody.Length];
+        Encoding.UTF8.GetBytes(timestamp + ".").CopyTo(signed, 0);
+        rawBody.CopyTo(signed, timestamp.Length + 1);
+        var expected = Encoding.UTF8.GetBytes(Convert.ToHexString(HMACSHA256.HashData(Encoding.UTF8.GetBytes(secret), signed)).ToLowerInvariant());
+        foreach (var signature in signatures)
+        {
+            if (CryptographicOperations.FixedTimeEquals(expected, Encoding.UTF8.GetBytes(signature))) return true;
+        }
+        return false;
+    }
+}
 ```
 </CodeGroup>
 
-Verify against the **raw** body. Parsing and re-serializing JSON changes the bytes.
+Verify against the **raw** body. Parsing and re-serializing JSON changes the bytes. In
+frameworks that parse JSON automatically, read the raw body for this route (for example
+`express.raw()` in Express, `request.get_data()` in Flask, `php://input` in PHP).
 
 ## Delivery rules
 
 - Answer with any `2xx` within 10 seconds, then process asynchronously.
 - Delivery is **at least once**. Deduplicate on the event `id`.
-- Order is not guaranteed. Every event contains the full object with a `version` that
-  increases with every change; ignore events with a lower `version` than you already stored.
+- Order is not guaranteed. Every event contains the full object. Payments, checkout sessions
+  and disputes have a `version` that increases with every change: ignore an event whose object
+  has a lower `version` than the one you stored. Refunds only move forward (`pending` to
+  `succeeded` or `failed`), so never move one back to an earlier status.
 - Failed deliveries are retried with exponential backoff for about 3 days
   (1 minute, 5 minutes, 30 minutes, 2 hours, ... 24 hours). Redirects are not followed.
 - Missed something? List events with `GET /v1/events` (kept for 30 days) or read the object directly.
+
+## Test your endpoint
+
+<Steps>
+  <Step title="Expose your local server">
+    Kalixo only delivers to public HTTPS URLs. While you develop, run a tunnel (for example
+    `ngrok http 3000` or `cloudflared tunnel --url http://localhost:3000`) and register the
+    tunnel URL as a sandbox webhook endpoint.
+  </Step>
+  <Step title="Send a test event">
+    Ask the sandbox to sign and send a sample event to your endpoint. The response tells you
+    whether your endpoint answered with a `2xx`, so you can iterate without making payments.
+
+    <CodeGroup>
+    ```bash cURL
+    curl https://sandbox.checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
+      -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+      -H "Idempotency-Key: $(uuidgen)" \
+      -H "Content-Type: application/json" \
+      -d '{ "type": "payment.captured" }'
+    ```
+
+    ```javascript Node.js
+    const result = await kalixo.testHelpers.sendTestEvent('we_...', { type: 'refund.failed' });
+    console.log(result.delivered, result.status_code, result.error);
+    ```
+    </CodeGroup>
+
+    Any [event type](/checkout/concepts/events) works. Test events are not retried, are not
+    listed in `GET /v1/events`, and refer to objects that do not exist: they carry
+    `reference: "kalixo_test_event"` so your handler can recognise them.
+  </Step>
+  <Step title="Run the real flow">
+    Pay a sandbox session with a [test card](/checkout/concepts/testing#test-cards) to receive
+    real `payment.*` events, refund it for `refund.*` events, and
+    [simulate a dispute](/checkout/concepts/testing#disputes) for `dispute.*` events.
+  </Step>
+  <Step title="Unit-test your verifier">
+    Sign a fixture yourself with a test secret: compute the HMAC-SHA256 of
+    `"<t>.<body>"`, build `t=<t>,v1=<hex>`, and check each case:
+
+    | Case | Expected result |
+    | --- | --- |
+    | Valid signature | Accepted |
+    | Changed body, wrong secret or malformed header | `400`, not processed |
+    | `t` older than 5 minutes | `400` |
+    | Two `v1` values, one matching (during rotation) | Accepted |
+    | The same event `id` twice | Processed once |
+    | An object with a lower `version` than you stored | Ignored |
+  </Step>
+  <Step title="Test recovery">
+    Stop your endpoint, pay a sandbox session, then start the endpoint again. Kalixo retries
+    the delivery (after 1 minute, then 5 minutes, and so on), and your handler processes the
+    event once. To catch up without waiting, list the events with `GET /v1/events`.
+  </Step>
+</Steps>
 
 ## Secret rotation
 

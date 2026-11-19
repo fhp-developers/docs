@@ -24,7 +24,8 @@ const KalixoCheckout = await loadKalixoCheckout();
 ```
 </CodeGroup>
 
-To pin a release, load `https://js.kalixo.io/v1/<version>/kalixo.js` with the
+The script tag defines `window.KalixoCheckout`; `loadKalixoCheckout()` resolves to the same
+object. To pin a release, load `https://js.kalixo.io/v1/<version>/kalixo.js` with the
 `integrity` hash from the release notes.
 
 ## Mount the checkout
@@ -58,8 +59,8 @@ session's `return_url` with `?session_id=cs_...`.
 
 | Event | When |
 | --- | --- |
-| `ready` | The payment form is shown |
-| `payment.completed` | The payment was authorised |
+| `ready` | The payment form is shown. Includes `partnerName`, `amount` (minor units), `currency` and `description` for your order summary |
+| `payment.completed` | The payment was authorised. With automatic capture, the `payment.captured` webhook follows shortly after |
 | `payment.processing` | The outcome is pending (for example a bank transfer); you get a webhook later |
 | `payment.failed` | The payment was declined. `message` is safe to show to the shopper |
 | `error` | The checkout could not load or the session is no longer open (`code: session_complete`, `session_expired`) |
@@ -97,9 +98,11 @@ style-src 'unsafe-inline';
 img-src data:;
 ```
 
-The secure payment fields need a few more domains. Ask Kalixo integrations at
-integrations@kalixo.io for the complete policy for your account. Kalixo tells you about
-changes to it before they are needed.
+`frame-src https:` and the open `img-src` and `style-src` entries are a permissive starting
+point. The secure payment fields come from the payment provider that Kalixo routes your
+account to, so their domains depend on your account. To lock the policy down, ask Kalixo
+integrations at integrations@kalixo.io for the exact domains for your account and replace
+`https:` with them. Kalixo tells you about changes to the list before they are needed.
 
 ## PCI DSS
 

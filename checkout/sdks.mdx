@@ -1,0 +1,113 @@
+---
+title: "SDKs and libraries"
+description: "Official libraries, and how to call the API from any language."
+icon: "code"
+---
+
+## Official libraries
+
+| Library | Use | Install |
+| --- | --- | --- |
+| `@kalixo/checkout-node` | Your server: checkout sessions, payments, captures, refunds, webhooks | `npm install @kalixo/checkout-node` |
+| `@kalixo/checkout-js` | The browser: loads [Kalixo.js](/checkout/guides/kalixo-js) from `js.kalixo.io` | `npm install @kalixo/checkout-js`, or the script tag |
+
+The Node SDK picks the sandbox or live API from your key, sends an `Idempotency-Key` on
+every `POST` and reuses it when it retries `429` and `5xx` responses, and verifies webhook
+signatures with `constructEvent`.
+
+<Note>
+  Need a server library for another language, or a mobile SDK? Tell
+  [integrations@kalixo.io](mailto:integrations@kalixo.io) what you need. Until then, call the
+  REST API directly: it is small and consistent.
+</Note>
+
+## Call the API from any language
+
+Every endpoint is REST with a bearer key and JSON bodies. Amounts are integers in the minor
+unit, and every `POST` needs an `Idempotency-Key`. This creates a checkout session for EUR
+49.99 (`4999` in minor units):
+
+<CodeGroup>
+```bash cURL
+curl https://sandbox.checkout.kalixo.io/v1/checkout-sessions \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: order-1001-checkout" \
+  -H "Content-Type: application/json" \
+  -d '{ "amount": 4999, "currency": "EUR", "country": "NL", "reference": "order-1001",
+        "return_url": "https://shop.example.com/checkout/complete" }'
+```
+
+```python Python
+import os
+
+import requests
+
+response = requests.post(
+    "https://sandbox.checkout.kalixo.io/v1/checkout-sessions",
+    headers={
+        "Authorization": f"Bearer {os.environ['KALIXO_CHECKOUT_SECRET_KEY']}",
+        "Idempotency-Key": "order-1001-checkout",
+    },
+    json={
+        "amount": 4999,
+        "currency": "EUR",
+        "country": "NL",
+        "reference": "order-1001",
+        "return_url": "https://shop.example.com/checkout/complete",
+    },
+    timeout=30,
+)
+session = response.json()
+```
+
+```php PHP
+<?php
+$ch = curl_init('https://sandbox.checkout.kalixo.io/v1/checkout-sessions');
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Bearer ' . getenv('KALIXO_CHECKOUT_SECRET_KEY'),
+        'Idempotency-Key: order-1001-checkout',
+        'Content-Type: application/json',
+    ],
+    CURLOPT_POSTFIELDS => json_encode([
+        'amount' => 4999,
+        'currency' => 'EUR',
+        'country' => 'NL',
+        'reference' => 'order-1001',
+        'return_url' => 'https://shop.example.com/checkout/complete',
+    ]),
+]);
+$session = json_decode(curl_exec($ch), true);
+```
+
+```go Go
+body, _ := json.Marshal(map[string]any{
+	"amount":     4999,
+	"currency":   "EUR",
+	"country":    "NL",
+	"reference":  "order-1001",
+	"return_url": "https://shop.example.com/checkout/complete",
+})
+req, _ := http.NewRequest("POST", "https://sandbox.checkout.kalixo.io/v1/checkout-sessions", bytes.NewReader(body))
+req.Header.Set("Authorization", "Bearer "+os.Getenv("KALIXO_CHECKOUT_SECRET_KEY"))
+req.Header.Set("Idempotency-Key", "order-1001-checkout")
+req.Header.Set("Content-Type", "application/json")
+resp, err := http.DefaultClient.Do(req)
+```
+</CodeGroup>
+
+Without the Node SDK, you handle three things yourself:
+
+- Send a stable `Idempotency-Key` on every `POST`, and reuse it when you retry. See
+  [Idempotency](/checkout/concepts/idempotency).
+- Wait for `Retry-After` on a `429`. See [Rate limits](/checkout/concepts/rate-limits).
+- Verify `Kalixo-Signature` on webhooks against the raw body. The
+  [Webhooks](/checkout/concepts/webhooks#verify-the-signature) page has examples in Python,
+  PHP, Java and .NET.
+
+## OpenAPI specification
+
+The [API reference](/checkout/api-reference/introduction) is generated from the Kalixo
+Checkout OpenAPI specification. Use it to generate a client in your language.

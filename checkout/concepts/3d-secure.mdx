@@ -1,0 +1,66 @@
+---
+title: "3D Secure"
+description: "How shopper authentication works, what you handle, and how to test it."
+icon: "shield-check"
+---
+
+Many card payments need the shopper to confirm the payment with their bank: 3D Secure, which
+Strong Customer Authentication (SCA) requires in Europe. The card issuer decides when a
+challenge is needed. Kalixo.js and the hosted checkout run the challenge for you, so you do
+not integrate 3D Secure yourself.
+
+## How it works
+
+- When a payment needs authentication, its status becomes `requires_action` and the
+  checkout shows the challenge: a passcode, an approval in the banking app, or a biometric
+  check.
+- When the shopper passes, the payment moves to `authorized`. When they fail, it returns to
+  `requires_payment_method` and the shopper can try again on the same session.
+- Authentication is per attempt. Each attempt counts towards the
+  [attempt limit](/checkout/concepts/rate-limits) of the session.
+
+## What you handle
+
+Nothing specific to 3D Secure. Handle the normal outcomes:
+
+- In Kalixo.js, `payment.processing` means the outcome is still pending and
+  `payment.failed` carries a `message` that is safe to show to the shopper.
+- Confirm every order on your server before you deliver it. See
+  [Fulfilment](/checkout/guides/fulfilment).
+
+<Warning>
+  A passed challenge is not a captured payment. It only allows the authorisation. Fulfil
+  after `payment.captured` (or `payment.authorized` with manual capture) and
+  `amount_mismatch: false`.
+</Warning>
+
+## Abandoned challenges
+
+If the shopper closes the page during a challenge, the attempt stays open while the bank may
+still answer. A new attempt on the same session fails with `payment_in_progress` until the
+open attempt ends, after at most 30 minutes. To let the shopper pay sooner, create a new
+checkout session.
+
+## Decline codes
+
+A failed authentication sets `decline_code` on `last_payment_error` and in `payment.failed`:
+
+| `decline_code` | Meaning |
+| --- | --- |
+| `authentication_failed` | The shopper did not pass the challenge |
+| `authentication_required` | The issuer requires authentication and it was not completed |
+
+See [Errors](/checkout/concepts/errors#decline-codes) for every decline code.
+
+## Testing
+
+Pay with `4000 0000 0000 3220` to get a test challenge, then approve or decline it in the
+test dialog. See [Testing](/checkout/concepts/testing#test-cards).
+
+| Test | Expected result |
+| --- | --- |
+| Approve the challenge | `payment.authorized`, then `payment.captured`; the order is fulfilled once |
+| Decline the challenge | `payment.failed` with `authentication_failed`; the session stays open; nothing is fulfilled |
+
+[Simulated payments](/checkout/concepts/testing#simulate-a-payment) skip 3D Secure. Use the
+test card to test the challenge.

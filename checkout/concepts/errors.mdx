@@ -1,6 +1,6 @@
 ---
 title: "Errors"
-description: "Error format, types and common codes."
+description: "Error format, types and the full catalogue of error codes."
 icon: "triangle-exclamation"
 ---
 
@@ -12,28 +12,152 @@ icon: "triangle-exclamation"
     "decline_code": null,
     "message": "The amount cannot change after the shopper started paying. Expire this session and create a new one.",
     "param": null,
-    "request_id": "req_6f1c..."
+    "request_id": "req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e"
   }
 }
 ```
 
-Include `request_id` when you contact support.
+| Field | Meaning |
+| --- | --- |
+| `type` | The category of error, see [types](#types) |
+| `code` | A stable, machine-readable code. Branch on `code`, never on `message` |
+| `decline_code` | Why a payment was declined. Set on declined payments only |
+| `message` | Human-readable explanation. It can change; do not parse it |
+| `param` | The request field or header that caused the error, when there is one |
+| `request_id` | Same as the `Request-Id` response header. Include it when you contact support |
 
-| Type | HTTP | Meaning |
+Every response, successful or not, has a `Request-Id` header. You can send your own
+`X-Request-Id` (8 to 64 letters, digits, `-` or `_`) and Kalixo uses it instead of
+generating one.
+
+## Types
+
+| Type | HTTP | Meaning | Retry? |
+| --- | --- | --- | --- |
+| `invalid_request_error` | 400, 409, 413 | The request is invalid or conflicts with the object's state | No, fix the request |
+| `authentication_error` | 401 | Missing, invalid or wrong-mode API key | No |
+| `permission_error` | 403 | Not allowed (for example an unregistered origin) | No |
+| `not_found_error` | 404 | The object does not exist for your account | No |
+| `idempotency_error` | 409 | Idempotency key conflict | Only `idempotency_request_in_progress`, after a short wait |
+| `payment_error` | 402 | The payment cannot be processed (limits) | No |
+| `rate_limit_error` | 429 | Too many requests | Yes, with exponential backoff. See [Rate limits](/checkout/concepts/rate-limits) |
+| `api_error` | 500, 503 | Kalixo-side error | Yes, with the same `Idempotency-Key` |
+
+## Error codes
+
+### Authentication and permissions
+
+| Code | HTTP | When |
 | --- | --- | --- |
-| `invalid_request_error` | 400, 409 | The request is invalid or conflicts with the object's state |
-| `authentication_error` | 401 | Missing, invalid or wrong-mode API key |
-| `permission_error` | 403 | Not allowed (for example an unregistered origin) |
-| `not_found_error` | 404 | The object does not exist for your account |
-| `idempotency_error` | 409 | Idempotency key conflict |
-| `payment_error` | 402 | The payment cannot be processed (limits) |
-| `rate_limit_error` | 429 | Too many requests; retry with backoff |
-| `api_error` | 500, 503 | Kalixo-side error; retry with the same `Idempotency-Key` |
+| `api_key_missing` | 401 | No `Authorization: Bearer` header |
+| `api_key_invalid` | 401 | The key is malformed, unknown or revoked |
+| `api_key_mode_mismatch` | 401 | A live key on the sandbox, or a test key on the live API |
+| `secret_key_required` | 401 | A publishable key on a server endpoint |
+| `publishable_key_required` | 401 | Kalixo.js was called without a publishable key, or with a secret key |
+| `origin_not_allowed` | 403 | Kalixo.js ran on a domain that is not registered for your account. Ask Kalixo to add it |
+| `partner_suspended` | 403 | Your account is suspended. Contact Kalixo |
 
-## Decline codes
+### Request validation
 
-Declined payments appear in `payment.last_payment_error.decline_code` and in the
-`payment.failed` event: `generic_decline`, `insufficient_funds`, `expired_card`,
+| Code | HTTP | When |
+| --- | --- | --- |
+| `parameter_invalid` | 400 | A field has the wrong type or format, or the body has a field the endpoint does not accept. `message` names the field |
+| `parameter_missing` | 400 | A required field is missing |
+| `invalid_json` | 400 | The body is not valid JSON |
+| `payload_too_large` | 413 | The body is larger than the endpoint accepts |
+| `idempotency_key_missing` | 400 | A `POST` without an `Idempotency-Key` header |
+| `amount_invalid` | 400 | `amount` is not a positive integer in the minor unit |
+| `currency_unsupported` | 400 | Kalixo Checkout does not support the currency. See [supported currencies](/checkout/concepts/amount-integrity#supported-currencies) |
+| `currency_not_enabled` | 400 | The currency is supported but not enabled for your account |
+| `country_invalid` | 400 | `country` is not an assigned, uppercase ISO 3166-1 alpha-2 code (for example `XX` or `UK`; use `GB`) |
+| `reference_invalid` | 400 | `reference` is empty or longer than 80 characters |
+| `url_invalid` | 400 | A URL is not absolute, not HTTPS, or contains credentials |
+| `return_url_not_allowed` | 400 | The `return_url` is not on a domain registered for your account. Ask Kalixo to add the domain |
+| `url_not_public` | 400 | A webhook endpoint `url` points at a private, local or internal address |
+| `metadata_invalid` | 400 | More than 50 keys, keys over 40 characters, or values that are not strings up to 500 characters |
+| `expires_in_invalid` | 400 | `expires_in` is outside 900 to 86400 seconds |
+| `expires_at_invalid` | 400 | A payment link `expires_at` is in the past or more than 90 days away |
+| `customer_required` | 400 | `store_payment_method: true` without a `customer` |
+| `line_items_invalid` | 400 | A line item has no name, a quantity below 1, a non-integer amount, a negative amount on a non-discount line, or tax on the wrong side of zero |
+| `line_items_mismatch` | 400 | `quantity * unit_amount` over all lines does not equal `amount` |
+| `amount_too_large` | 400 | A capture above the capturable amount, or a refund above the refundable amount |
+| `period_invalid` | 400 | A report `period_end` is not after `period_start` |
+| `period_too_long` | 400 | A report covers more than 92 days |
+| `limit_reached` | 400 | You already have 16 webhook endpoints |
+| `content_type_invalid` | 400 | Dispute evidence is not PDF, JPEG or TIFF |
+| `content_missing` | 400 | Dispute evidence `content_base64` is empty |
+| `file_too_large` | 400 | Dispute evidence is over 2 MB (PDF) or 10 MB (JPEG, TIFF) |
+| `file_name_invalid` | 400 | Dispute evidence `file_name` has characters other than letters, digits, spaces, dots, dashes and underscores |
+
+### Object state
+
+| Code | HTTP | When | What to do |
+| --- | --- | --- | --- |
+| `amount_locked` | 409 | You changed `amount`, `currency` or `line_items` after the shopper started paying | Expire the session and create a new one |
+| `session_not_open` | 409 | The session is `complete` or `expired`, for example when you expire it a second time | Create a new session |
+| `session_expired` | 409 | Kalixo.js tried to pay an expired session | Create a new session |
+| `payment_in_progress` | 409 | You tried to expire a session while an attempt is being processed, or the shopper submitted twice | Wait for the outcome |
+| `capture_not_allowed` | 409 | You tried to capture a payment with `capture_method: automatic` | Nothing: Kalixo captures it for you |
+| `payment_not_capturable` | 409 | The payment is not authorised or has nothing left to capture | Check `status` and `amount_capturable` |
+| `payment_amount_mismatch` | 409 | You tried to capture a payment with `amount_mismatch: true` | Do not fulfil. Kalixo reverses it |
+| `payment_not_cancelable` | 409 | The payment is not `authorized`, or part of it was captured | Refund instead |
+| `payment_not_refundable` | 409 | Nothing is left to refund | Check `amount_captured` and `amount_refunded` |
+| `payment_disputed` | 409 | The payment has an open dispute | Wait: the dispute decides the outcome |
+| `dispute_not_open` | 409 | The dispute is closed and no longer accepts evidence | None |
+| `report_not_ready` | 409 | You downloaded a report that is still `pending` or `failed` | Poll `GET /v1/reports/{id}` until `ready` |
+| `payment_not_disputable` | 409 | Sandbox only: you simulated a dispute on a payment that was never captured | Capture first |
+| `dispute_already_open` | 409 | Sandbox only: you opened a second dispute on the same payment | Move the open dispute to another stage |
+| `resource_missing` | 404 | The ID does not exist for your account (or for this environment) | Check the ID and the key mode |
+| `route_not_found` | 404 | The URL does not exist | Check the path |
+
+### Idempotency
+
+| Code | HTTP | When |
+| --- | --- | --- |
+| `idempotency_key_reused` | 409 | The key was used before with a different request body or path |
+| `idempotency_request_in_progress` | 409 | The first request with this key is still running. Retry after a moment |
+
+See [Idempotency](/checkout/concepts/idempotency).
+
+### Limits and availability
+
+| Code | HTTP | When |
+| --- | --- | --- |
+| `amount_limit_exceeded` | 402 | The amount is above a per-payment or daily limit on your account |
+| `rate_limited` | 429 | Too many requests, or too many payment attempts per minute. Wait for `Retry-After` seconds. See [Rate limits](/checkout/concepts/rate-limits) |
+| `too_many_attempts` | 429 | The shopper reached the maximum number of payment attempts for this session (5 by default). Create a new session |
+| `internal_error` | 500 | Unexpected error at Kalixo. Retry with the same `Idempotency-Key` |
+| `payment_route_unavailable` | 503 | Kalixo cannot process this currency or country for your account right now. Contact Kalixo if it persists |
+
+### Sandbox test helpers
+
+| Code | HTTP | When |
+| --- | --- | --- |
+| `test_mode_only` | 400 | You called a test helper on the live API |
+| `test_helper_unavailable` | 400 | You simulated a dispute on a payment that did not use a sandbox test card |
+
+## Payment errors
+
+A declined or expired attempt does not return an HTTP error. It sets
+`payment.last_payment_error` and sends `payment.failed` (or `payment.expired`):
+
+```json
+"last_payment_error": {
+  "code": "payment_declined",
+  "decline_code": "insufficient_funds",
+  "message": "The card has insufficient funds."
+}
+```
+
+| `code` | Meaning |
+| --- | --- |
+| `payment_declined` | The attempt was declined. See `decline_code`. The shopper can retry while the session is open |
+| `payment_expired` | The attempt expired before it completed, for example an abandoned bank redirect |
+| `amount_mismatch` | The payment provider reported a different amount. Kalixo reverses the payment; do not fulfil |
+
+### Decline codes
+
+`generic_decline`, `insufficient_funds`, `expired_card`,
 `incorrect_cvc`, `incorrect_number`, `card_not_supported`, `currency_not_supported`,
 `do_not_honor`, `fraudulent`, `lost_or_stolen_card`, `restricted_card`,
 `authentication_failed`, `authentication_required`, `withdrawal_limit_exceeded`,
@@ -42,3 +166,5 @@ Declined payments appear in `payment.last_payment_error.decline_code` and in the
 
 The `message` of a decline is safe to show to shoppers. Do not show more detail:
 issuers' raw responses can help fraudsters.
+
+New codes can be added at any time. Treat an unknown `code` like others of its `type`.

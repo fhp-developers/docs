@@ -23,7 +23,8 @@ curl https://sandbox.checkout.kalixo.io/v1/payments \
 - Never put a secret key in browser code or a mobile app. Kalixo.js refuses secret keys.
 - Kalixo stores only a hash of your keys. Kalixo shows each key once, when it is issued.
 - Publishable keys work only from the domains registered for your account
-  (`origin_not_allowed` otherwise). Ask Kalixo to add new domains.
+  (`origin_not_allowed` otherwise). A checkout session's `return_url` must be on one of
+  these domains too (`return_url_not_allowed` otherwise). Ask Kalixo to add new domains.
 
 ## Client secret
 

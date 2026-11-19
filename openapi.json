@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Kalixo Distribution API",
-    "version": "2.3.0",
-    "description": "The Kalixo Distribution API lets partners browse their product catalog, place and track digital gift-card orders (single or bulk), and monitor their wallet balance. All v2 ordering is asynchronous: place an order, then poll it until the codes are delivered.",
+    "version": "2.4.0",
+    "description": "The Kalixo Distribution API lets partners browse their product catalog, place and track digital gift-card orders (single or bulk), and monitor their wallet balance. All v2 ordering is asynchronous: place an order, then poll it until the codes are delivered.\n\nEvery response carries an `X-Request-Id` header; include it when you contact support. Responses after authentication also carry `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset`.",
     "contact": {
       "name": "Kalixo Integrations",
       "email": "integrations@kalixo.io"
@@ -12,7 +12,7 @@
   "servers": [
     {
       "url": "https://api.kalixo.io/v2",
-      "description": "Production (pre-release placeholder)"
+      "description": "Production"
     },
     {
       "url": "https://sandbox.kalixo.io/v2",
@@ -40,6 +40,10 @@
     {
       "name": "Wallet",
       "description": "Check your current wallet balances per currency."
+    },
+    {
+      "name": "Sandbox",
+      "description": "Sandbox-only helpers: the Kalixo Test products and their expected outcomes."
     }
   ],
   "paths": {
@@ -65,10 +69,27 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -182,10 +203,27 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -237,6 +275,20 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
           "401": {
@@ -244,6 +296,9 @@
           },
           "404": {
             "$ref": "#/components/responses/CatalogProductNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -257,7 +312,7 @@
           "Orders"
         ],
         "summary": "Place an order",
-        "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+        "description": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nSend `country` on each line: the `countryCode` of the catalog row. It is required when the product's `availableCountries` has more than one entry.\n\n`externalOrderCode` is your idempotency key. Repeating a code you already used returns `202` with the existing order and its current status; no second order is created. If two requests with the same new code arrive at the same moment, one of them can get `409`: fetch the order with `GET /orders/{externalOrderCode}`.",
         "operationId": "placeOrder",
         "requestBody": {
           "required": true,
@@ -265,14 +320,31 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PlaceOrderRequest"
+              },
+              "examples": {
+                "single": {
+                  "$ref": "#/components/examples/OrderRequestSingle"
+                },
+                "regional": {
+                  "$ref": "#/components/examples/OrderRequestRegional"
+                },
+                "openDenomination": {
+                  "$ref": "#/components/examples/OrderRequestOpen"
+                },
+                "multiLine": {
+                  "$ref": "#/components/examples/OrderRequestMultiLine"
+                }
               }
             }
           }
         },
         "responses": {
           "202": {
-            "description": "Order accepted and now processing.",
+            "description": "Order accepted. Also returned, with the existing order, when you repeat an `externalOrderCode`.",
             "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
               "X-RateLimit-Limit": {
                 "$ref": "#/components/headers/X-RateLimit-Limit"
               },
@@ -287,6 +359,14 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrderAccepted"
+                },
+                "examples": {
+                  "new": {
+                    "$ref": "#/components/examples/OrderAcceptedNew"
+                  },
+                  "replay": {
+                    "$ref": "#/components/examples/OrderAcceptedReplay"
+                  }
                 }
               }
             }
@@ -299,6 +379,12 @@
                   "$ref": "#/components/schemas/Error"
                 },
                 "examples": {
+                  "countryRequired": {
+                    "$ref": "#/components/examples/ErrorCountryRequired"
+                  },
+                  "countryUnavailable": {
+                    "$ref": "#/components/examples/ErrorCountryUnavailable"
+                  },
                   "priceMismatch": {
                     "$ref": "#/components/examples/ErrorPriceMismatch"
                   },
@@ -313,10 +399,30 @@
                   },
                   "orderCouldNotBePlaced": {
                     "$ref": "#/components/examples/ErrorOrderCouldNotBePlaced"
+                  },
+                  "currencyMismatch": {
+                    "$ref": "#/components/examples/ErrorCurrencyMismatch"
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "description": "API ordering disabled for your account.",
@@ -331,10 +437,27 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
+          "404": {
+            "$ref": "#/components/responses/CatalogProductNotFound"
+          },
           "409": {
-            "description": "An order with the same externalOrderCode already exists.",
+            "description": "Another request with the same `externalOrderCode` was being placed at the same moment. The order exists: fetch it with `GET /orders/{externalOrderCode}` instead of retrying.",
             "content": {
               "application/json": {
                 "schema": {
@@ -345,6 +468,20 @@
                     "$ref": "#/components/examples/ErrorDuplicateExternalOrderCode"
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
               }
             }
           },
@@ -367,13 +504,24 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/CatalogProductNotFound"
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -393,6 +541,20 @@
                     "$ref": "#/components/examples/ErrorOrderNotCreated"
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
               }
             }
           }
@@ -435,7 +597,13 @@
                       "externalOrderCode": "O-12345",
                       "status": "processing",
                       "estimatedReadyAt": "2026-06-02T11:05:00Z",
-                      "message": "Order is still processing"
+                      "message": "Order is still processing",
+                      "wallet": {
+                        "balances": {
+                          "GBP": 196.01
+                        },
+                        "lowBalance": false
+                      }
                     }
                   },
                   "completed": {
@@ -473,10 +641,30 @@
                       "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
                       "externalOrderCode": "O-12345",
                       "status": "failed",
-                      "reason": "The order could not be completed."
+                      "reason": "Order could not be fulfilled",
+                      "wallet": {
+                        "balances": {
+                          "GBP": 196.01
+                        },
+                        "lowBalance": false
+                      }
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
               }
             }
           },
@@ -485,6 +673,9 @@
           },
           "404": {
             "$ref": "#/components/responses/OrderNotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -509,10 +700,86 @@
                   "$ref": "#/components/schemas/Wallet"
                 }
               }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
             }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/sandbox/scenarios": {
+      "get": {
+        "tags": [
+          "Sandbox"
+        ],
+        "summary": "List sandbox test products",
+        "description": "Sandbox only. Returns the Kalixo Test products with their expected outcome and a `sampleOrderLine` you can send to `POST /orders` as-is. The same products appear in `GET /catalog/products` with brand **Kalixo Test** and `isSandboxProduct: true`. On the production API this endpoint returns `404`.",
+        "operationId": "listSandboxScenarios",
+        "servers": [
+          {
+            "url": "https://sandbox.kalixo.io/v2",
+            "description": "Sandbox"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kalixo Test products and expected outcomes.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/X-Request-Id"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/X-RateLimit-Limit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/X-RateLimit-Remaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/X-RateLimit-Reset"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SandboxScenarioList"
+                },
+                "examples": {
+                  "scenarios": {
+                    "$ref": "#/components/examples/SandboxScenarios"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/SandboxOnly"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -539,6 +806,11 @@
               }
             }
           }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          }
         }
       },
       "CatalogProductNotFound": {
@@ -553,6 +825,20 @@
                 "$ref": "#/components/examples/ErrorCatalogProductNotFound"
               }
             }
+          }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/X-RateLimit-Reset"
           }
         }
       },
@@ -569,6 +855,20 @@
               }
             }
           }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/X-RateLimit-Reset"
+          }
         }
       },
       "InternalServerError": {
@@ -581,6 +881,81 @@
             "examples": {
               "internalServerError": {
                 "$ref": "#/components/examples/ErrorInternalServerError"
+              }
+            }
+          }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/X-RateLimit-Reset"
+          },
+          "Retry-After": {
+            "$ref": "#/components/headers/Retry-After"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "rateLimit": {
+                "$ref": "#/components/examples/ErrorRateLimit"
+              }
+            }
+          }
+        }
+      },
+      "SandboxOnly": {
+        "description": "Called on the production API. Sandbox helpers exist on the sandbox only.",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/X-Request-Id"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/X-RateLimit-Reset"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "sandboxOnly": {
+                "$ref": "#/components/examples/ErrorSandboxOnly"
               }
             }
           }
@@ -597,6 +972,13 @@
       }
     },
     "headers": {
+      "X-Request-Id": {
+        "description": "Unique ID of the request. Include it when you contact support. If you send your own `X-Request-Id` (8 to 64 letters, digits, `-` or `_`), Kalixo echoes it back.",
+        "schema": {
+          "type": "string",
+          "example": "3f2c1b9e-8d7a-4c6b-9e5f-1a2b3c4d5e6f"
+        }
+      },
       "X-RateLimit-Limit": {
         "description": "Maximum requests allowed in the current 60-second window.",
         "schema": {
@@ -676,13 +1058,28 @@
             "example": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Product description as plain text."
+          },
+          "descriptionHtml": {
+            "type": "string",
+            "description": "Same as `description`, with the original HTML markup."
           },
           "tnc": {
-            "type": "string"
+            "type": "string",
+            "description": "Terms and conditions as plain text."
+          },
+          "tncHtml": {
+            "type": "string",
+            "description": "Same as `tnc`, with the original HTML markup."
           },
           "redemptionInstructions": {
-            "type": "string"
+            "type": "string",
+            "description": "Redemption instructions as plain text."
+          },
+          "redemptionInstructionsHtml": {
+            "type": "string",
+            "description": "Same as `redemptionInstructions`, with the original HTML markup."
           }
         }
       },
@@ -741,27 +1138,40 @@
             "description": "True when your buying currency differs from the product's selling currency.",
             "example": false
           },
+          "isSandboxProduct": {
+            "type": "boolean",
+            "description": "`true` for Kalixo Test products, which exist in the sandbox only. Always `false` in production.",
+            "example": false
+          },
           "denominationType": {
             "$ref": "#/components/schemas/DenominationType"
           },
           "denominationMinValue": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "example": null
           },
           "denominationMaxValue": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "example": null
           },
           "denominationStep": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "example": null
           },
           "denominationDefaultValue": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "example": null
           },
           "brand": {
@@ -775,7 +1185,7 @@
           "countryCode": {
             "type": "string",
             "example": "GB",
-            "description": "ISO country code for this catalog row. Regional products return one row per supported country with the same productCode."
+            "description": "ISO country code of this catalog row (the market). Regional products return one row per available country with the same productCode. Send it as `country` on the order line."
           },
           "mainCategory": {
             "type": "string",
@@ -845,7 +1255,7 @@
           },
           "promotion": {
             "type": "boolean",
-            "description": "True when a promotion applies to this product.",
+            "description": "**Planned, not returned yet.** True when a promotion applies to this product.",
             "example": true
           },
           "promotionType": {
@@ -855,29 +1265,29 @@
               "Value Off",
               "Added Value"
             ],
-            "description": "Kind of promotional offer.",
+            "description": "**Planned, not returned yet.** Kind of promotional offer.",
             "example": "Discount"
           },
           "promotionDetails": {
             "type": "string",
-            "description": "Offer detail (e.g. percentage, amount off, or bonus item description).",
+            "description": "**Planned, not returned yet.** Offer detail (e.g. percentage, amount off, or bonus item description).",
             "example": "5"
           },
           "promotionStartDate": {
             "type": "string",
             "format": "date",
-            "description": "First day the promotion applies.",
+            "description": "**Planned, not returned yet.** First day the promotion applies.",
             "example": "2026-07-20"
           },
           "promotionEndDate": {
             "type": "string",
             "format": "date",
-            "description": "Last day the promotion applies.",
+            "description": "**Planned, not returned yet.** Last day the promotion applies.",
             "example": "2026-07-30"
           },
           "serviceFee": {
             "type": "boolean",
-            "description": "True when a service fee applies to this product.",
+            "description": "**Planned, not returned yet.** True when a service fee applies to this product.",
             "example": true
           },
           "serviceFeeType": {
@@ -886,12 +1296,12 @@
               "Percentage",
               "Amount"
             ],
-            "description": "How the service fee is calculated.",
+            "description": "**Planned, not returned yet.** How the service fee is calculated.",
             "example": "Amount"
           },
           "serviceFeeValue": {
             "type": "string",
-            "description": "Fee rate or amount. For `Percentage`, the percentage of sell price (e.g. `\"2.5\"` for 2.5%). For `Amount`, the fixed fee in minor units (e.g. `\"250\"` for \u00a32.50).",
+            "description": "**Planned, not returned yet.** Fee rate or amount. For `Percentage`, the percentage of sell price (e.g. `\"2.5\"` for 2.5%). For `Amount`, the fixed fee in minor units (e.g. `\"250\"` for \u00a32.50).",
             "example": "250"
           },
           "type": {
@@ -911,7 +1321,7 @@
           },
           "availableCountries": {
             "type": "array",
-            "description": "ISO country codes this productCode can be fulfilled in (linked markets).",
+            "description": "Every country this productCode can be ordered for. When it has more than one entry, each order line must say which one with `country` (or a market `sku`).",
             "items": {
               "type": "string"
             },
@@ -976,12 +1386,12 @@
           },
           "sku": {
             "type": "string",
-            "description": "Optional market SKU (`{CC}-{LL}-{productCode}`). Country prefix is used when `country` is omitted.",
+            "description": "Optional market SKU (`{CC}-{LL}-{productCode}`) from the catalog row. Its country prefix is used when `country` is omitted.",
             "example": "GB-EN-10020000213575"
           },
           "country": {
             "type": "string",
-            "description": "ISO country code for the market to fulfil. Required when the product is available in multiple countries and not encoded in sku.",
+            "description": "ISO country code of the market to fulfil: the `countryCode` of the catalog row you are selling. Required when the product's `availableCountries` has more than one entry and `sku` does not carry the country. Must be one of `availableCountries`. Safe to send for every line.",
             "example": "DE"
           }
         }
@@ -1028,11 +1438,13 @@
             "example": {
               "GBP": 196.01,
               "EUR": 1234.56
-            }
+            },
+            "description": "Balance per currency as a decimal amount in major units (`196.01` is GBP 196.01), unlike prices, which are in minor units."
           },
           "lowBalance": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "description": "True when any balance is below the low-balance threshold, or when you have no balance."
           }
         }
       },
@@ -1051,8 +1463,12 @@
           "status": {
             "type": "string",
             "enum": [
-              "processing"
+              "processing",
+              "completed",
+              "partially_completed",
+              "failed"
             ],
+            "description": "Always `processing` for a new order. When you repeat an `externalOrderCode` you already used, this is the existing order's current status. Codes are never included here: fetch them with `GET /orders/{reference}`.",
             "example": "processing"
           },
           "estimatedReadyAt": {
@@ -1122,27 +1538,37 @@
             "example": "completed"
           },
           "estimatedReadyAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           },
           "message": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "example": "Order is still processing"
           },
           "reason": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "delivered": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Codes delivered so far (partial deliveries)."
           },
           "total": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Total codes in the order."
           },
           "products": {
@@ -1168,15 +1594,17 @@
             "example": {
               "EUR": 1234.56,
               "GBP": 196.01
-            }
+            },
+            "description": "Balance per currency as a decimal amount in major units (`196.01` is GBP 196.01), unlike prices, which are in minor units."
           },
           "lowBalance": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "description": "True when any balance is below `threshold`, or when you have no balance."
           },
           "threshold": {
             "type": "number",
-            "description": "Low-balance threshold that triggers an email alert.",
+            "description": "Low-balance threshold in major units. Crossing below it triggers an email alert.",
             "example": 100
           }
         }
@@ -1204,6 +1632,59 @@
             "example": "Product 10020000213575 price mismatch: expected 10000"
           }
         }
+      },
+      "SandboxScenario": {
+        "type": "object",
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "description": "Order with this productCode in the sandbox.",
+            "example": "10999000412573"
+          },
+          "name": {
+            "type": "string",
+            "example": "Kalixo Test - Success (Fixed)"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price in minor units.",
+            "example": 499
+          },
+          "currencyCode": {
+            "type": "string",
+            "example": "GBP"
+          },
+          "denominationType": {
+            "$ref": "#/components/schemas/DenominationType"
+          },
+          "isSandboxProduct": {
+            "type": "boolean",
+            "example": true
+          },
+          "expectedOutcome": {
+            "type": "string",
+            "description": "What the order does in the sandbox.",
+            "example": "completed with SANDBOX-* test code(s)"
+          },
+          "sampleOrderLine": {
+            "$ref": "#/components/schemas/OrderLine"
+          }
+        }
+      },
+      "SandboxScenarioList": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SandboxScenario"
+            }
+          },
+          "note": {
+            "type": "string",
+            "example": "Kalixo Test products appear in GET /v2/catalog/products alongside your assigned catalog. All sandbox orders return SANDBOX-* test codes only."
+          }
+        }
       }
     },
     "examples": {
@@ -1218,6 +1699,7 @@
         "summary": "PlayStation wallet top-up",
         "value": {
           "productCode": "10020000213575",
+          "sku": "GB-EN-10020000213575",
           "name": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100",
           "shortName": "PSN",
           "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
@@ -1228,6 +1710,7 @@
           "discountAmount": 500,
           "discountPercentage": 5,
           "currencyMismatch": false,
+          "isSandboxProduct": false,
           "denominationType": "fixed",
           "denominationMinValue": null,
           "denominationMaxValue": null,
@@ -1236,6 +1719,9 @@
           "brand": "PlayStation",
           "publisher": "Sony",
           "countryCode": "GB",
+          "availableCountries": [
+            "GB"
+          ],
           "mainCategory": "Gaming",
           "subCategory": "PlayStation",
           "productCategory": "PlayStation",
@@ -1253,14 +1739,6 @@
             "gaming"
           ],
           "status": "active",
-          "promotion": true,
-          "promotionType": "Discount",
-          "promotionDetails": "5",
-          "promotionStartDate": "2026-07-20",
-          "promotionEndDate": "2026-07-30",
-          "serviceFee": true,
-          "serviceFeeType": "Amount",
-          "serviceFeeValue": "250",
           "type": "digital",
           "languages": [
             {
@@ -1273,53 +1751,86 @@
         }
       },
       "CatalogProductListExample": {
-        "summary": "Paginated list with one product",
+        "summary": "A regional product returned once per country",
         "value": {
-          "count": 1,
+          "count": 2,
           "skip": 0,
           "take": 20,
           "products": [
             {
-              "productCode": "10020000213575",
-              "name": "Sony PlayStation\u00aeNetwork Wallet Top-Up \u00a3100",
+              "productCode": "10001000227724",
+              "sku": "DE-DE-10001000227724",
+              "name": "PlayStation Store Guthaben 50 EUR",
               "shortName": "PSN",
-              "image": "https://cdn.kalixo.io/static-images/GB-EN-10020000213575.png",
-              "price": 10000,
-              "currencyCode": "GBP",
-              "buyingPrice": 9500,
-              "buyingCurrencyCode": "GBP",
-              "discountAmount": 500,
+              "image": "https://cdn.kalixo.io/static-images/DE-DE-10001000227724.png",
+              "price": 5000,
+              "currencyCode": "EUR",
+              "buyingPrice": 4750,
+              "buyingCurrencyCode": "EUR",
+              "discountAmount": 250,
               "discountPercentage": 5,
               "currencyMismatch": false,
+              "isSandboxProduct": false,
               "denominationType": "fixed",
               "brand": "PlayStation",
               "publisher": "Sony",
-              "countryCode": "GB",
+              "countryCode": "DE",
+              "availableCountries": [
+                "DE",
+                "FR",
+                "IT"
+              ],
               "mainCategory": "Gaming",
               "subCategory": "PlayStation",
               "productCategory": "PlayStation",
               "productType": "credit",
               "platform": "PlayStation",
-              "redeemable": "United Kingdom",
-              "preorder": true,
-              "preorderCode": true,
-              "firstSale": "2026-06-01",
-              "playableOn": "2026-06-15",
-              "expires": true,
-              "expiryPolicy": "3 years",
+              "redeemable": "Germany",
+              "preorder": false,
+              "preorderCode": false,
+              "expires": false,
               "tags": [
-                "bestseller",
                 "gaming"
               ],
               "status": "active",
-              "promotion": true,
-              "promotionType": "Discount",
-              "promotionDetails": "5",
-              "promotionStartDate": "2026-07-20",
-              "promotionEndDate": "2026-07-30",
-              "serviceFee": true,
-              "serviceFeeType": "Amount",
-              "serviceFeeValue": "250",
+              "type": "digital"
+            },
+            {
+              "productCode": "10001000227724",
+              "sku": "FR-FR-10001000227724",
+              "name": "Carte PlayStation Store 50 EUR",
+              "shortName": "PSN",
+              "image": "https://cdn.kalixo.io/static-images/FR-FR-10001000227724.png",
+              "price": 5000,
+              "currencyCode": "EUR",
+              "buyingPrice": 4750,
+              "buyingCurrencyCode": "EUR",
+              "discountAmount": 250,
+              "discountPercentage": 5,
+              "currencyMismatch": false,
+              "isSandboxProduct": false,
+              "denominationType": "fixed",
+              "brand": "PlayStation",
+              "publisher": "Sony",
+              "countryCode": "FR",
+              "availableCountries": [
+                "DE",
+                "FR",
+                "IT"
+              ],
+              "mainCategory": "Gaming",
+              "subCategory": "PlayStation",
+              "productCategory": "PlayStation",
+              "productType": "credit",
+              "platform": "PlayStation",
+              "redeemable": "France",
+              "preorder": false,
+              "preorderCode": false,
+              "expires": false,
+              "tags": [
+                "gaming"
+              ],
+              "status": "active",
               "type": "digital"
             }
           ]
@@ -1509,6 +2020,210 @@
         "value": {
           "statusCode": 500,
           "message": "Internal server error"
+        }
+      },
+      "OrderRequestSingle": {
+        "summary": "One fixed-price product (GBP 100.00)",
+        "description": "Prices are in minor units: `10000` is GBP 100.00.",
+        "value": {
+          "externalOrderCode": "O-12345",
+          "currency": "GBP",
+          "price": 10000,
+          "orderProducts": [
+            {
+              "productCode": "10020000213575",
+              "country": "GB",
+              "price": 10000,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "OrderRequestRegional": {
+        "summary": "Regional product: pick the market with country (EUR 50.00)",
+        "description": "The product is available in DE, FR and IT, so the line must say which market to fulfil.",
+        "value": {
+          "externalOrderCode": "O-12346",
+          "currency": "EUR",
+          "orderProducts": [
+            {
+              "productCode": "10001000227724",
+              "country": "DE",
+              "price": 5000,
+              "quantity": 2
+            }
+          ]
+        }
+      },
+      "OrderRequestOpen": {
+        "summary": "Open-denomination product (GBP 32.99)",
+        "value": {
+          "externalOrderCode": "O-12347",
+          "currency": "GBP",
+          "orderProducts": [
+            {
+              "productCode": "10001000000814",
+              "country": "GB",
+              "price": 3299,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "OrderRequestMultiLine": {
+        "summary": "Two lines with an order total (GBP 150.00)",
+        "value": {
+          "externalOrderCode": "O-67890",
+          "currency": "GBP",
+          "price": 15000,
+          "orderProducts": [
+            {
+              "productCode": "10020000213575",
+              "country": "GB",
+              "price": 10000,
+              "quantity": 1
+            },
+            {
+              "productCode": "10001000000421",
+              "country": "GB",
+              "price": 5000,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "OrderAcceptedNew": {
+        "summary": "New order",
+        "value": {
+          "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
+          "externalOrderCode": "O-12345",
+          "status": "processing",
+          "estimatedReadyAt": "2026-06-02T11:05:00Z",
+          "wallet": {
+            "balances": {
+              "GBP": 196.01
+            },
+            "lowBalance": false
+          }
+        }
+      },
+      "OrderAcceptedReplay": {
+        "summary": "Repeated externalOrderCode (existing order returned)",
+        "description": "No new order is created. Fetch the codes with `GET /orders/O-12345`.",
+        "value": {
+          "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
+          "externalOrderCode": "O-12345",
+          "status": "completed",
+          "estimatedReadyAt": "2026-06-02T11:05:00Z",
+          "wallet": {
+            "balances": {
+              "GBP": 96.01
+            },
+            "lowBalance": true
+          }
+        }
+      },
+      "ErrorCountryRequired": {
+        "summary": "Country required for a regional product",
+        "value": {
+          "statusCode": 400,
+          "error": "Bad Request",
+          "message": "Product 10001000227724 is available in multiple countries (DE, FR, IT); pass country (or a market sku) on the line"
+        }
+      },
+      "ErrorCountryUnavailable": {
+        "summary": "Country not available for the product",
+        "value": {
+          "statusCode": 400,
+          "error": "Bad Request",
+          "message": "Product 10001000227724 is not available in ES (available: DE, FR, IT)"
+        }
+      },
+      "ErrorSandboxOnly": {
+        "summary": "Sandbox only",
+        "value": {
+          "statusCode": 404,
+          "error": "Not Found",
+          "message": "Sandbox scenarios are not available on the production API"
+        }
+      },
+      "SandboxScenarios": {
+        "summary": "Kalixo Test products (example values)",
+        "description": "productCodes differ per environment; call the endpoint for yours. Each scenario also exists in USD (US) and in EUR for every euro-area country.",
+        "value": {
+          "products": [
+            {
+              "productCode": "10999000412573",
+              "name": "Kalixo Test - Success (Fixed)",
+              "price": 499,
+              "currencyCode": "GBP",
+              "denominationType": "fixed",
+              "isSandboxProduct": true,
+              "expectedOutcome": "completed with SANDBOX-* test code(s)",
+              "sampleOrderLine": {
+                "productCode": "10999000412573",
+                "quantity": 1,
+                "price": 499
+              }
+            },
+            {
+              "productCode": "10999000412581",
+              "name": "Kalixo Test - Success (Open)",
+              "price": 1000,
+              "currencyCode": "GBP",
+              "denominationType": "open",
+              "isSandboxProduct": true,
+              "expectedOutcome": "completed - send line price for open denomination",
+              "sampleOrderLine": {
+                "productCode": "10999000412581",
+                "quantity": 1,
+                "price": 1000
+              }
+            },
+            {
+              "productCode": "10999000412599",
+              "name": "Kalixo Test - Async Failure",
+              "price": 499,
+              "currencyCode": "GBP",
+              "denominationType": "fixed",
+              "isSandboxProduct": true,
+              "expectedOutcome": "failed (no codes)",
+              "sampleOrderLine": {
+                "productCode": "10999000412599",
+                "quantity": 1,
+                "price": 499
+              }
+            },
+            {
+              "productCode": "10999000412607",
+              "name": "Kalixo Test - Partial Completion",
+              "price": 499,
+              "currencyCode": "GBP",
+              "denominationType": "fixed",
+              "isSandboxProduct": true,
+              "expectedOutcome": "partially_completed when qty \u2265 2 (odd units succeed)",
+              "sampleOrderLine": {
+                "productCode": "10999000412607",
+                "quantity": 1,
+                "price": 499
+              }
+            },
+            {
+              "productCode": "10999000412615",
+              "name": "Kalixo Test - Slow Processing",
+              "price": 499,
+              "currencyCode": "GBP",
+              "denominationType": "fixed",
+              "isSandboxProduct": true,
+              "expectedOutcome": "processing ~10s then completed",
+              "sampleOrderLine": {
+                "productCode": "10999000412615",
+                "quantity": 1,
+                "price": 499
+              }
+            }
+          ],
+          "note": "Kalixo Test products appear in GET /v2/catalog/products alongside your assigned catalog. All sandbox orders return SANDBOX-* test codes only."
         }
       }
     }

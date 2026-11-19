@@ -4,26 +4,64 @@ description: "API and documentation changes by version."
 icon: "clock-rotate-left"
 ---
 
+## 2.4.0 - 2026-11-11
+
+### Responses
+
+- Every response now carries an `X-Request-Id` header, errors included. Send your own
+  `X-Request-Id` to have it echoed back. Include it when you contact support. See
+  [Errors](/concepts/errors#request-id).
+
+### API reference
+
+- Documented `GET /sandbox/scenarios`, which lists the Kalixo Test products, their expected
+  outcomes and a sample order line. Sandbox only.
+- Documented `isSandboxProduct` on catalog products, and `descriptionHtml`, `tncHtml` and
+  `redemptionInstructionsHtml` on `languages[]`. The API already returned them.
+- Documented the rate-limit headers and `429 Too Many Requests` on every endpoint.
+- `POST /orders`: request examples with `country`, and the exact idempotency behaviour.
+  Repeating an `externalOrderCode` returns `202` with the existing order and its current
+  `status`. `409` happens only when two requests with the same new code arrive at the same
+  moment.
+- `promotion*` and `serviceFee*` product fields are marked as planned. The API does not
+  return them yet.
+- Fixed examples: a `failed` order's `reason` is `Order could not be fulfilled`, and
+  `processing` and `failed` orders include `wallet`.
+- Wallet `balances` and `threshold` are documented as decimal amounts in major units
+  (`196.01` is GBP 196.01).
+- The production base URL `https://api.kalixo.io/v2` is final.
+
+### Documentation
+
+- [Regional products](/concepts/order-lifecycle#regional-products): when and how to send
+  `country`. The quickstart and the Node client now send it.
+- [Idempotency](/concepts/idempotency) rewritten. Polling example with a maximum wait and
+  retries for `5xx` and network errors.
+- [Sandbox](/concepts/sandbox) lists every test product, price and currency.
+- The [Node reference client](/examples/kalixo-node) is plain JavaScript again (it contained
+  TypeScript syntax) and retries `5xx` responses.
+- New guide: [Checkout and Distribution](/checkout/guides/checkout-and-distribution), to take
+  the shopper's payment with Kalixo Checkout and deliver the codes with this API.
+
 ## 2.3.0 - 2026-08-04
 
 ### Catalog
 
-- Reseller **catalog optimization** (advanced setting, default **off**):
-  - **Off:** distribution catalog surfaces **LOCAL** (`KX`) parents.
-  - **On:** surfaces **REGIONAL** (`KXP`) parents expanded by `regionScope`
-    (`global` / `europe` / `eur_zone` / `latam` / `mana`) intersected with the
-    reseller's configured shop countries.
-- Regional market rows may include countries with no linked concrete in that
-  ISO (e.g. EUROPE parent linked FR/DE/NL still appears for LT when the
-  reseller has LT). Fulfilment picks among linked concretes (priority or
-  cheapest per **price optimization**).
+- Which products your catalog lists now depends on your account's catalog setting, which
+  Kalixo configures (default: local):
+  - **Local:** each product is sold in one country, with its own productCode.
+  - **Regional:** one productCode covers a region, for example Europe or the euro area. It
+    is listed once for every country in the region that your account sells to.
+- A regional product lists every country in its region that your account sells to, even
+  when Kalixo fulfils that country from another market's stock in the same region. Kalixo
+  picks the fulfilment source for each order.
 
 ### Orders
 
-- Parent type accepted on place-order follows the reseller's catalog
-  optimization flag (LOCAL vs REGIONAL).
-- Multi-country regional lines still require `country` (or market `sku`) when
-  more than one catalog market is available.
+- `POST /orders` accepts the productCodes your catalog lists, local or regional, according to
+  your account's catalog setting.
+- Lines for a product with more than one country in `availableCountries` still need
+  `country` (or a market `sku`).
 
 ## 2.2.0 - 2026-08-03
 
@@ -37,9 +75,8 @@ icon: "clock-rotate-left"
   `availableCountries`.
 - `GET /catalog/products/{productCode}` accepts optional `?country=` to select a
   market row.
-- Market rows are limited to countries the reseller can actually order (catalog
-  intersection). Only **regional** (`KXP`) parents appear in the distribution
-  catalog.
+- Rows are limited to countries your account can order.
+- The catalog listed regional products only. Since 2.3.0 this is an account setting.
 
 ### Orders
 
@@ -51,7 +88,27 @@ icon: "clock-rotate-left"
 | Change | Before | After |
 | --- | --- | --- |
 | Catalog list shape | One row per `productCode` | One row per `productCode` + `countryCode` (same `productCode` may repeat) |
-| Catalog parent type | Any parent in catalog | Regional parents only |
+| Order lines for multi-country products | No country needed | `country` or a market `sku` required (`400` otherwise) |
+| Products listed | Every product | Regional products only (an account setting since 2.3.0) |
+
+## 2.1.4 - 2026-07-16
+
+### Products and orders
+
+- Products are identified only by `productCode`, in the catalog, on order lines and in
+  order responses.
+- `orderId` is a UUID. `GET /orders/{reference}` accepts the UUID or your
+  `externalOrderCode`.
+
+### Breaking API changes
+
+| Change | Before | After |
+| --- | --- | --- |
+| Order line product | `orderProducts[].productId` (number) | `orderProducts[].productCode` (string) |
+| Product id | Numeric `id` on catalog products | Removed - use `productCode` |
+| Order line in responses | `products[].productId` | `products[].productCode` |
+| Order id | `orderId` integer (for example `59400`) | `orderId` UUID string (for example `b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10`) |
+| `GET /orders/{reference}` | Numeric order id or `externalOrderCode` | UUID `orderId` or `externalOrderCode`; numeric order ids are not accepted |
 
 ## 2.1.3 - 2026-06-06
 
@@ -90,8 +147,8 @@ icon: "clock-rotate-left"
 ### Catalog
 
 - `redeemable` is derived from `countryCode` (e.g. `GB` → `United Kingdom`), not the internal region field.
-- Documented optional `promotion*` fields on catalog products (see [Promotions](/concepts/promotions)).
-- Documented optional `serviceFee*` fields on catalog products (see [Service fee](/concepts/service-fee)).
+- Documented planned `promotion*` fields on catalog products (see [Promotions](/concepts/promotions)). Not returned yet.
+- Documented planned `serviceFee*` fields on catalog products (see [Service fee](/concepts/service-fee)). Not returned yet.
 
 ### Breaking API changes
 

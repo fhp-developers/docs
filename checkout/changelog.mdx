@@ -4,6 +4,63 @@ description: "Changes to the Kalixo Checkout API, Kalixo.js and the Node SDK."
 icon: "clock-rotate-left"
 ---
 
+<Update label="2026-11-19" description="API version 2026-10-01 (security hardening)">
+  - **Registered return domains.** A checkout session or payment link `return_url` must be on
+    a domain registered for your account, the same list Kalixo.js checks. Other domains fail
+    with `return_url_not_allowed`. Ask Kalixo to add your domains.
+  - **Session versions.** Checkout sessions carry a `version`, like payments and disputes. See
+    [Delivery rules](/checkout/concepts/webhooks#delivery-rules).
+  - **Session expiry.** Sessions now expire within seconds of `expires_at`. Expiring a session
+    that is no longer open fails with `409 session_not_open`.
+  - **Payment links.** Links expire after 7 days unless you set `expires_at`. Deactivating a
+    link also expires the checkout a shopper already opened from it.
+  - **Rate limits.** `429` responses include `Retry-After`. New limits per checkout-session
+    creation and per shopper IP address, and 5 payment attempts per session (was 10). See
+    [Rate limits](/checkout/concepts/rate-limits).
+  - **Validation.** `country` must be an assigned ISO 3166-1 alpha-2 code (`XX` and `UK` fail
+    with `country_invalid`). Webhook endpoint URLs that point at private or internal addresses
+    fail with `url_not_public`.
+  - **Hosted checkout.** The page shows the order details only with the client secret.
+  - Kalixo.js: the `ready` event includes the order summary (`partnerName`, `amount`,
+    `currency`, `description`).
+</Update>
+
+<Update label="2026-11-16" description="API version 2026-10-01 (additive)">
+  - **Simulate a payment.** `POST /v1/test-helpers/checkout-sessions/{id}/simulate` pays an
+    open sandbox session without a browser, with the `outcome` you choose. See
+    [Simulate a payment](/checkout/concepts/testing#simulate-a-payment).
+    `@kalixo/checkout-node`: `kalixo.testHelpers.simulateSession()`.
+  - **Automatic capture.** `payment.captured` is sent once the capture is confirmed, usually
+    seconds after `payment.authorized`. Until then the payment is `authorized` and cannot be
+    refunded.
+  - **Session expiry.** Reading an open session after its `expires_at` returns it as `expired`.
+    A payment attempt that started before `expires_at` keeps the session open for at most 5
+    more minutes; after that it is refused.
+  - Docs: only payments and disputes carry a `version`. See
+    [Delivery rules](/checkout/concepts/webhooks#delivery-rules).
+</Update>
+
+<Update label="2026-11-11" description="API version 2026-10-01 (additive)">
+  - **Discount and shipping line items.** Line items accept `type` (`item`, `shipping` or
+    `discount`). Discount lines carry a zero or negative `unit_amount`. See
+    [Line items](/checkout/concepts/amount-integrity#line-items).
+  - **Sandbox test helpers.** `POST /v1/test-helpers/webhook-endpoints/{id}/send-event` sends a
+    signed sample event to your endpoint; `POST /v1/test-helpers/payments/{id}/dispute`
+    simulates a dispute. See [Testing](/checkout/concepts/testing).
+  - `@kalixo/checkout-node`: `kalixo.testHelpers.sendTestEvent()` and
+    `kalixo.testHelpers.simulateDispute()`.
+  - API reference: request and response examples, and the error responses each endpoint can
+    return, with examples.
+  - API reference fixes: `payment.payment_method` is `null` until an attempt is authorised;
+    disputes have a `version`; a session's `url` is `null` in lists and events; webhook
+    deliveries carry a `Kalixo-Event-Type` header; a deleted webhook endpoint has
+    `status: deleted`.
+  - New pages: the full [error code catalogue](/checkout/concepts/errors),
+    [Rate limits](/checkout/concepts/rate-limits) and
+    [Checkout and Distribution](/checkout/guides/checkout-and-distribution). Webhook
+    verification examples for PHP, Java and .NET.
+</Update>
+
 <Update label="2026-10-13" description="API version 2026-10-01">
   - First release of the Kalixo Checkout API: checkout sessions, payments, captures, refunds,
     payment links, customers and stored payment methods, disputes, events, webhook endpoints and reports.

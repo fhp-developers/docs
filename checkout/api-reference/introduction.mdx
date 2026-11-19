@@ -17,4 +17,12 @@ icon: "book"
 - **IDs** are prefixed: `cs_` sessions, `pay_` payments, `re_` refunds, `cap_` captures,
   `cus_` customers, `pm_` payment methods, `plink_` payment links, `dp_` disputes, `evt_` events.
 - **Metadata:** up to 50 string keys, echoed back on objects and events.
+- **Errors:** `{ "error": { "type", "code", "message", "param", "request_id" } }`. Every
+  endpoint lists the errors it can return. See the [error catalogue](/checkout/concepts/errors).
+- **Request IDs:** every response has a `Request-Id` header. Include it when you contact support.
+- **Rate limits:** more than about 600 requests per minute per key return `429` with a
+  `Retry-After` header. See [Rate limits](/checkout/concepts/rate-limits).
+- **Unknown fields:** request bodies with unknown fields are rejected (`parameter_invalid`).
+  Responses and events can gain fields; ignore the ones you do not know.
+- **Test helpers** (`/v1/test-helpers/...`) work in the sandbox only. See [Testing](/checkout/concepts/testing).
 - **Client endpoints** (`/v1/client/...`) are used by Kalixo.js. Do not call them from your server.

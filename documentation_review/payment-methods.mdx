@@ -1,0 +1,76 @@
+---
+title: "Payment methods"
+description: "Which methods Kalixo offers, where they work, and how they behave."
+---
+
+Kalixo is the merchant of record and routes each payment to a provider for you, so **you integrate once** — with [Kalixo.js](/checkout/guides/kalixo-js) or the [hosted checkout](/checkout/guides/hosted-checkout) — and Kalixo shows the right methods for the shopper. You never add a method-specific SDK.
+
+Kalixo decides which methods to display from the session's `country` and `currency` and from what is enabled on your account. A method that is not eligible for a session is never shown and never payable.
+
+<Note>
+Which methods are enabled for your account, and in which markets, is configured by Kalixo. Ask [integrations@kalixo.io](mailto:integrations@kalixo.io) to enable a method or market.
+</Note>
+
+## How methods reach the shopper
+
+- **Cards and wallets** are entered in Kalixo's secure fields and usually **authorise in place** (with a 3D Secure step where required — see [3D Secure](/checkout/concepts/3d-secure)).
+- **Redirect methods** (iDEAL, Wero, Klarna, PayPal, Bancontact, EPS, BLIK) send the shopper to their bank or wallet and then back to your `return_url` with `?session_id=cs_...`. Read the payment on your server to show the result — see [Fulfilment](/checkout/guides/fulfilment).
+- **Asynchronous methods** (bank debits such as SEPA, and some redirects) may settle **after** the shopper returns. Treat these as pending until `payment.captured` arrives — never from the redirect alone.
+
+## Availability matrix
+
+Capture and refund behaviour below is the common case; exact support per method and market is confirmed by Kalixo for your account.
+
+| Method | Markets | Currency | Flow | Capture | Refunds |
+| - | - | - | - | - | - |
+| Cards (Visa, Mastercard, Amex, and more) | Global | Shopper currency | Inline + 3DS | Automatic or manual | Full & partial |
+| Apple Pay | Global (Apple devices) | Shopper currency | Inline wallet | Automatic | Full & partial |
+| Google Pay | Global (Google accounts) | Shopper currency | Inline wallet | Automatic | Full & partial |
+| iDEAL / Wero | NL | EUR | Redirect | Immediate | Full & partial |
+| Bancontact | BE | EUR | Redirect | Immediate | Full & partial |
+| BLIK | PL | PLN | Redirect / code | Immediate | Full & partial |
+| EPS | AT | EUR | Redirect | Immediate | Full & partial |
+| Klarna | Per Klarna market | Local | Redirect | Automatic or on capture | Full & partial |
+| PayPal | Global | Shopper currency | Redirect | Automatic | Full & partial |
+| SEPA Direct Debit | SEPA zone | EUR | Bank debit (async) | On settlement | Full & partial |
+
+<Note>
+Most redirect and bank methods capture at authorisation and do not support separate or delayed (manual) capture. Set `capture_method: "manual"` only for methods that support it (typically cards); see [Captures, cancellations and refunds](/checkout/guides/captures-and-refunds).
+</Note>
+
+## Eligibility rules
+
+- A method appears only for a session whose `country` / `currency` it supports. You cannot force a method by changing those values — an ineligible combination is simply not offered.
+- Create the session with the shopper's real `country` and the correct `currency` for the goods. For local methods, use the method's home market (for example `country: "NL"`, `currency: "EUR"` for iDEAL; `country: "PL"`, `currency: "PLN"` for BLIK).
+- The amount shown at the provider always equals the session `amount`. If a provider ever reports a different amount, Kalixo sets `amount_mismatch: true` and reverses the payment — never fulfil it. See [Amount integrity](/checkout/concepts/amount-integrity).
+
+## Per-method notes
+
+<AccordionGroup>
+<Accordion title="Cards & wallets">
+Entered in Kalixo's secure fields (PCI SAQ A). 3D Secure is applied when the issuer or regulation requires it; the shopper completes the challenge inline. Cards support manual capture and partial captures where the issuer allows. Apple Pay needs your checkout domain verified for Apple Pay (the drop-in domain for Kalixo.js, `checkout.kalixo.io` for the hosted page).
+</Accordion>
+<Accordion title="iDEAL / Wero, Bancontact, EPS">
+Single-use redirect methods for a specific market. The shopper picks their bank, approves, and returns to your `return_url`. Capture is immediate; there is no separate capture step. Confirm the outcome on your server — the shopper may close the tab before returning.
+</Accordion>
+<Accordion title="BLIK">
+Poland / PLN. The shopper confirms a short-lived 6-digit code in their banking app. Because codes are short and guessable, velocity limits matter — do not expose a retry loop without limits.
+</Accordion>
+<Accordion title="Klarna">
+Buy-now-pay-later; availability and sub-methods depend on the Klarna market and the shopper's address, which must match the session `country`. Outcomes can be asynchronous — settle on the webhook.
+</Accordion>
+<Accordion title="PayPal">
+Global redirect to the PayPal wallet. Captures automatically unless configured otherwise. Refunds are full or partial.
+</Accordion>
+<Accordion title="SEPA Direct Debit">
+EUR bank debit. The result is **asynchronous** and can arrive minutes to days later, only by webhook. Do not fulfil on the shopper's return — wait for `payment.captured`.
+</Accordion>
+</AccordionGroup>
+
+## Testing
+
+Each method has sandbox test data (test cards, bank selections, BLIK codes, wallet accounts). See [Testing](/checkout/concepts/testing). The sandbox may route to a provider's test environment, in which case the checkout shows that provider's test form — your integration does not change.
+
+<Card title="Fulfil safely across every method" href="/checkout/guides/fulfilment">
+Redirects and async methods make server-side confirmation essential. Always verify on your server before fulfilling.
+</Card>

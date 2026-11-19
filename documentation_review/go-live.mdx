@@ -1,0 +1,42 @@
+---
+title: "Go live"
+description: "What to switch, register and verify before you take real payments."
+---
+
+You have built against the sandbox. Going live is mostly swapping keys and registering your production details — plus a last pass over the things that must be right before real money moves.
+
+## Switch to live
+
+<Steps>
+<Step title="Get live keys">
+Ask [integrations@kalixo.io](mailto:integrations@kalixo.io) for live keys (`kc_sk_live_...`, `kc_pk_live_...`). The live API accepts only live keys; a mismatch fails with `api_key_mode_mismatch`. Keep the secret key on your server only.
+</Step>
+<Step title="Register your live domains">
+Give Kalixo the domains that will show the checkout. Publishable keys work only from registered domains (`origin_not_allowed` otherwise). For Apple Pay, verify the live checkout domain.
+</Step>
+<Step title="Create a live webhook endpoint">
+Register your production URL, store the returned `secret` (shown once), and subscribe to the events you handle. Verify the `Kalixo-Signature` on every delivery.
+</Step>
+<Step title="Point the base URL at live">
+Switch from `https://sandbox.checkout.kalixo.io` to `https://checkout.kalixo.io`, and load Kalixo.js from `https://js.kalixo.io/v1/kalixo.js`.
+</Step>
+</Steps>
+
+## Verify before launch
+
+- [ ] **Fulfil on the server only.** You confirm with `GET /v1/payments/{id}` or `payment.captured`, never from `payment.completed`, a `return_url` redirect, or `checkout_session.status`. See [Fulfilment](/checkout/guides/fulfilment).
+- [ ] **Amount-mismatch is handled.** You never fulfil when `amount_mismatch` is `true`.
+- [ ] **Webhooks are robust.** Signature verified against the raw body, `2xx` within 10 seconds, deduplicated on `id`, lower `version`s ignored, processed asynchronously.
+- [ ] **Idempotency everywhere.** Every `POST` sends an `Idempotency-Key` derived from your own records, reused on retries.
+- [ ] **All outcomes covered.** Declines and retries, pending/async methods, refunds (full and partial), disputes.
+- [ ] **Secrets are safe.** No secret key in client code; `client_secret` never logged or sent to analytics; webhook secret stored securely.
+- [ ] **Transport is hardened.** HTTPS everywhere, `Strict-Transport-Security` with a long `max-age` on your checkout and return pages, and a Content Security Policy that allows Kalixo.js (see the [Kalixo.js guide](/checkout/guides/kalixo-js)).
+- [ ] **PCI.** Card fields are Kalixo's, loaded from `js.kalixo.io` — this keeps you at SAQ A. See [Security](/checkout/concepts/security).
+- [ ] **Reconciliation.** You can pull the `financial_transactions` [report](/checkout/guides/reports) and match it to your orders.
+- [ ] **Key rotation rehearsed.** You know how to roll a secret key (deploy new, ask Kalixo to revoke old) and rotate a webhook secret (dual-signed for 24 h).
+
+## After launch
+
+- Monitor `payment.failed` rates and decline codes; a spike can signal card testing.
+- Watch webhook delivery; replay from `GET /v1/events` if your endpoint was down.
+- Subscribe to the [changelog](/checkout/changelog) — Kalixo ships additive changes without a version bump, so ignore unknown fields and event types.

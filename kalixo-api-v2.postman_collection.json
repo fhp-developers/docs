@@ -5,7 +5,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "8bc0baa5-b3b6-441b-957d-3f7df0036b39",
+                    "id": "a20048df-dfa9-4a31-81be-172d6801332e",
                     "name": "Ping",
                     "request": {
                         "name": "Ping",
@@ -35,7 +35,7 @@
                     },
                     "response": [
                         {
-                            "id": "039e6462-59b4-437a-995e-542405f99a44",
+                            "id": "5fa791d0-9ae6-494d-a3fc-b3c9c0b6a4d2",
                             "name": "API is reachable.",
                             "originalRequest": {
                                 "url": {
@@ -71,6 +71,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"<dateTime>\"\n}",
@@ -78,7 +114,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "1095ae1c-f3e7-4973-b3d1-7ab55d01ee31",
+                            "id": "f66f13c2-87c9-4266-b77c-2fb801dedd2d",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -114,6 +150,15 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -121,7 +166,95 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "9ee45e7f-a2f1-4270-98d7-6c87e86950e5",
+                            "id": "f44d72b8-c4e6-4560-8f41-bfaff1dde3e3",
+                            "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "ping"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {}
+                            },
+                            "status": "Too Many Requests",
+                            "code": 429,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "Retry-After",
+                                    "value": ""
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "4ff748c4-e716-4e3b-a03e-e011a8bcf886",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -157,6 +290,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -180,12 +349,12 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "604697c2-77ca-497f-ac0b-387078448d20",
+                            "id": "f20dcfcf-58ac-469a-94fb-f3972190cd7c",
                             "name": "List catalog products",
                             "request": {
                                 "name": "List catalog products",
                                 "description": {
-                                    "content": "Returns the products in your catalog. Supports filtering and pagination. Filters are AND-combined across fields; within a single field you may pass multiple comma-separated values (for example `country=GB,IE`).",
+                                    "content": "Returns catalog products as one row per country. Regional products share the same `productCode` across rows and differ by `countryCode` / `sku`. Filter by country/language/brand/category/tag (comma-separated for multiple) and paginate with skip/take (take max 100).",
                                     "type": "text/plain"
                                 },
                                 "url": {
@@ -284,7 +453,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "6d5f4f61-66f3-491a-9348-b9f559734323",
+                                    "id": "3b52c61a-3a03-488d-9cc5-6d65adcb241e",
                                     "name": "A paginated list of catalog products.",
                                     "originalRequest": {
                                         "url": {
@@ -394,14 +563,50 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
                                         }
                                     ],
-                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Added Value\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number>\",\n      \"denominationMaxValue\": \"<number>\",\n      \"denominationStep\": \"<number>\",\n      \"denominationDefaultValue\": \"<number>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Value Off\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}",
+                                    "body": "{\n  \"count\": \"<integer>\",\n  \"skip\": \"<integer>\",\n  \"take\": \"<integer>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"isSandboxProduct\": \"<boolean>\",\n      \"denominationType\": \"open\",\n      \"denominationMinValue\": \"<number,null>\",\n      \"denominationMaxValue\": \"<number,null>\",\n      \"denominationStep\": \"<number,null>\",\n      \"denominationDefaultValue\": \"<number,null>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Added Value\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Percentage\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"descriptionHtml\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"tncHtml\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\",\n          \"redemptionInstructionsHtml\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"descriptionHtml\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"tncHtml\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\",\n          \"redemptionInstructionsHtml\": \"<string>\"\n        }\n      ],\n      \"sku\": \"<string>\",\n      \"availableCountries\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"shortName\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"buyingPrice\": \"<number>\",\n      \"buyingCurrencyCode\": \"<string>\",\n      \"discountAmount\": \"<number>\",\n      \"discountPercentage\": \"<number>\",\n      \"currencyMismatch\": \"<boolean>\",\n      \"isSandboxProduct\": \"<boolean>\",\n      \"denominationType\": \"fixed\",\n      \"denominationMinValue\": \"<number,null>\",\n      \"denominationMaxValue\": \"<number,null>\",\n      \"denominationStep\": \"<number,null>\",\n      \"denominationDefaultValue\": \"<number,null>\",\n      \"brand\": \"<string>\",\n      \"publisher\": \"<string>\",\n      \"countryCode\": \"<string>\",\n      \"mainCategory\": \"<string>\",\n      \"subCategory\": \"<string>\",\n      \"productCategory\": \"<string>\",\n      \"productType\": \"<string>\",\n      \"platform\": \"<string>\",\n      \"redeemable\": \"<string>\",\n      \"preorder\": \"<boolean>\",\n      \"preorderCode\": \"<boolean>\",\n      \"firstSale\": \"<date>\",\n      \"playableOn\": \"<date>\",\n      \"expires\": \"<boolean>\",\n      \"expiryPolicy\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"status\": \"<string>\",\n      \"promotion\": \"<boolean>\",\n      \"promotionType\": \"Discount\",\n      \"promotionDetails\": \"<string>\",\n      \"promotionStartDate\": \"<date>\",\n      \"promotionEndDate\": \"<date>\",\n      \"serviceFee\": \"<boolean>\",\n      \"serviceFeeType\": \"Amount\",\n      \"serviceFeeValue\": \"<string>\",\n      \"type\": \"<string>\",\n      \"languages\": [\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"descriptionHtml\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"tncHtml\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\",\n          \"redemptionInstructionsHtml\": \"<string>\"\n        },\n        {\n          \"languageCode\": \"<string>\",\n          \"name\": \"<string>\",\n          \"sku\": \"<string>\",\n          \"image\": \"<uri>\",\n          \"description\": \"<string>\",\n          \"descriptionHtml\": \"<string>\",\n          \"tnc\": \"<string>\",\n          \"tncHtml\": \"<string>\",\n          \"redemptionInstructions\": \"<string>\",\n          \"redemptionInstructionsHtml\": \"<string>\"\n        }\n      ],\n      \"sku\": \"<string>\",\n      \"availableCountries\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ]\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "e68d16cb-3a96-45a9-9398-b2b71a41a328",
+                                    "id": "edebe336-c094-437b-b6ad-a2b29af5d3a7",
                                     "name": "Missing or invalid `x-api-key`.",
                                     "originalRequest": {
                                         "url": {
@@ -511,6 +716,15 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
                                         }
                                     ],
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -518,7 +732,169 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "e175adc4-9ec7-4a7d-8853-2835a3d5a661",
+                                    "id": "16776f0c-a9f3-4304-b270-ec619410c732",
+                                    "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "catalog",
+                                                "products"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by ISO country code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "country",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by language code(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "language",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by brand name(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "brand",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by category/main category. Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "category",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Filter by tag(s). Comma-separated for multiple.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "tag",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Free-text search across product name and productCode.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "search",
+                                                    "value": "<string>"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to skip (offset).",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "skip",
+                                                    "value": "0"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Number of records to return. Maximum 100.",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "take",
+                                                    "value": "20"
+                                                }
+                                            ],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Too Many Requests",
+                                    "code": 429,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "Retry-After",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "c5442304-9871-44a8-bb77-162129c7031a",
                                     "name": "Unexpected server error.",
                                     "originalRequest": {
                                         "url": {
@@ -628,6 +1004,42 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
                                         }
                                     ],
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -645,7 +1057,7 @@
                             "description": "",
                             "item": [
                                 {
-                                    "id": "a5753706-d167-4d63-8bc2-7f5f180e69f6",
+                                    "id": "7974fe79-e2e5-42ea-bc5d-009cb3e9ef6e",
                                     "name": "Get a single product",
                                     "request": {
                                         "name": "Get a single product",
@@ -662,7 +1074,17 @@
                                             "host": [
                                                 "{{baseUrl}}"
                                             ],
-                                            "query": [],
+                                            "query": [
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "Select the market row for a multi-country product (ISO country code).",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "country",
+                                                    "value": "<string>"
+                                                }
+                                            ],
                                             "variable": [
                                                 {
                                                     "type": "any",
@@ -688,7 +1110,7 @@
                                     },
                                     "response": [
                                         {
-                                            "id": "9575a875-fd45-476b-9215-8e6de7e2259a",
+                                            "id": "9220b965-6221-41c3-ae23-1b2f0c05b589",
                                             "name": "The requested product.",
                                             "originalRequest": {
                                                 "url": {
@@ -700,7 +1122,17 @@
                                                     "host": [
                                                         "{{baseUrl}}"
                                                     ],
-                                                    "query": [],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "Select the market row for a multi-country product (ISO country code).",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "country",
+                                                            "value": "<string>"
+                                                        }
+                                                    ],
                                                     "variable": []
                                                 },
                                                 "header": [
@@ -726,14 +1158,50 @@
                                                 {
                                                     "key": "Content-Type",
                                                     "value": "application/json"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-Request-Id",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Limit",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Remaining",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Reset",
+                                                    "value": ""
                                                 }
                                             ],
-                                            "body": "{\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discountAmount\": \"<number>\",\n  \"discountPercentage\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"denominationType\": \"open\",\n  \"denominationMinValue\": \"<number>\",\n  \"denominationMaxValue\": \"<number>\",\n  \"denominationStep\": \"<number>\",\n  \"denominationDefaultValue\": \"<number>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Discount\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"serviceFee\": \"<boolean>\",\n  \"serviceFeeType\": \"Percentage\",\n  \"serviceFeeValue\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\"\n    }\n  ]\n}",
+                                            "body": "{\n  \"productCode\": \"<string>\",\n  \"name\": \"<string>\",\n  \"shortName\": \"<string>\",\n  \"image\": \"<uri>\",\n  \"price\": \"<integer>\",\n  \"currencyCode\": \"<string>\",\n  \"buyingPrice\": \"<number>\",\n  \"buyingCurrencyCode\": \"<string>\",\n  \"discountAmount\": \"<number>\",\n  \"discountPercentage\": \"<number>\",\n  \"currencyMismatch\": \"<boolean>\",\n  \"isSandboxProduct\": \"<boolean>\",\n  \"denominationType\": \"fixed\",\n  \"denominationMinValue\": \"<number,null>\",\n  \"denominationMaxValue\": \"<number,null>\",\n  \"denominationStep\": \"<number,null>\",\n  \"denominationDefaultValue\": \"<number,null>\",\n  \"brand\": \"<string>\",\n  \"publisher\": \"<string>\",\n  \"countryCode\": \"<string>\",\n  \"mainCategory\": \"<string>\",\n  \"subCategory\": \"<string>\",\n  \"productCategory\": \"<string>\",\n  \"productType\": \"<string>\",\n  \"platform\": \"<string>\",\n  \"redeemable\": \"<string>\",\n  \"preorder\": \"<boolean>\",\n  \"preorderCode\": \"<boolean>\",\n  \"firstSale\": \"<date>\",\n  \"playableOn\": \"<date>\",\n  \"expires\": \"<boolean>\",\n  \"expiryPolicy\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"status\": \"<string>\",\n  \"promotion\": \"<boolean>\",\n  \"promotionType\": \"Added Value\",\n  \"promotionDetails\": \"<string>\",\n  \"promotionStartDate\": \"<date>\",\n  \"promotionEndDate\": \"<date>\",\n  \"serviceFee\": \"<boolean>\",\n  \"serviceFeeType\": \"Amount\",\n  \"serviceFeeValue\": \"<string>\",\n  \"type\": \"<string>\",\n  \"languages\": [\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"descriptionHtml\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"tncHtml\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\",\n      \"redemptionInstructionsHtml\": \"<string>\"\n    },\n    {\n      \"languageCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"image\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"descriptionHtml\": \"<string>\",\n      \"tnc\": \"<string>\",\n      \"tncHtml\": \"<string>\",\n      \"redemptionInstructions\": \"<string>\",\n      \"redemptionInstructionsHtml\": \"<string>\"\n    }\n  ],\n  \"sku\": \"<string>\",\n  \"availableCountries\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                                             "cookie": [],
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "3b7faea6-a504-48b6-b3b0-8d2bf8399fb1",
+                                            "id": "4a304717-1d76-40c4-9712-7dc9a749c7e6",
                                             "name": "Missing or invalid `x-api-key`.",
                                             "originalRequest": {
                                                 "url": {
@@ -745,7 +1213,17 @@
                                                     "host": [
                                                         "{{baseUrl}}"
                                                     ],
-                                                    "query": [],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "Select the market row for a multi-country product (ISO country code).",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "country",
+                                                            "value": "<string>"
+                                                        }
+                                                    ],
                                                     "variable": []
                                                 },
                                                 "header": [
@@ -771,6 +1249,15 @@
                                                 {
                                                     "key": "Content-Type",
                                                     "value": "application/json"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-Request-Id",
+                                                    "value": ""
                                                 }
                                             ],
                                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -778,7 +1265,7 @@
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "95403f35-f3c2-438f-8dee-d2520a18b198",
+                                            "id": "e5845c09-3418-4260-a76d-2a377bd60da7",
                                             "name": "Product not found in your active catalog.",
                                             "originalRequest": {
                                                 "url": {
@@ -790,7 +1277,17 @@
                                                     "host": [
                                                         "{{baseUrl}}"
                                                     ],
-                                                    "query": [],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "Select the market row for a multi-country product (ISO country code).",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "country",
+                                                            "value": "<string>"
+                                                        }
+                                                    ],
                                                     "variable": []
                                                 },
                                                 "header": [
@@ -816,6 +1313,42 @@
                                                 {
                                                     "key": "Content-Type",
                                                     "value": "application/json"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-Request-Id",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Limit",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Remaining",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Reset",
+                                                    "value": ""
                                                 }
                                             ],
                                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -823,7 +1356,107 @@
                                             "_postman_previewlanguage": "json"
                                         },
                                         {
-                                            "id": "ddf9475b-17a1-43dc-a757-9d5d9cafb7fa",
+                                            "id": "7eb4a093-c790-4f8c-a7ed-3511c8e99ab6",
+                                            "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                                            "originalRequest": {
+                                                "url": {
+                                                    "path": [
+                                                        "catalog",
+                                                        "products",
+                                                        ":productCode"
+                                                    ],
+                                                    "host": [
+                                                        "{{baseUrl}}"
+                                                    ],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "Select the market row for a multi-country product (ISO country code).",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "country",
+                                                            "value": "<string>"
+                                                        }
+                                                    ],
+                                                    "variable": []
+                                                },
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application/json"
+                                                    },
+                                                    {
+                                                        "description": {
+                                                            "content": "Added as a part of security scheme: apikey",
+                                                            "type": "text/plain"
+                                                        },
+                                                        "key": "x-api-key",
+                                                        "value": "<API Key>"
+                                                    }
+                                                ],
+                                                "method": "GET",
+                                                "body": {}
+                                            },
+                                            "status": "Too Many Requests",
+                                            "code": 429,
+                                            "header": [
+                                                {
+                                                    "key": "Content-Type",
+                                                    "value": "application/json"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-Request-Id",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Limit",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Remaining",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Reset",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "Retry-After",
+                                                    "value": ""
+                                                }
+                                            ],
+                                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                            "cookie": [],
+                                            "_postman_previewlanguage": "json"
+                                        },
+                                        {
+                                            "id": "6da78dd9-0f99-4b66-aa0d-694949bda15a",
                                             "name": "Unexpected server error.",
                                             "originalRequest": {
                                                 "url": {
@@ -835,7 +1468,17 @@
                                                     "host": [
                                                         "{{baseUrl}}"
                                                     ],
-                                                    "query": [],
+                                                    "query": [
+                                                        {
+                                                            "disabled": false,
+                                                            "description": {
+                                                                "content": "Select the market row for a multi-country product (ISO country code).",
+                                                                "type": "text/plain"
+                                                            },
+                                                            "key": "country",
+                                                            "value": "<string>"
+                                                        }
+                                                    ],
                                                     "variable": []
                                                 },
                                                 "header": [
@@ -861,6 +1504,42 @@
                                                 {
                                                     "key": "Content-Type",
                                                     "value": "application/json"
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-Request-Id",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Limit",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Remaining",
+                                                    "value": ""
+                                                },
+                                                {
+                                                    "disabled": false,
+                                                    "description": {
+                                                        "content": "",
+                                                        "type": "text/plain"
+                                                    },
+                                                    "key": "X-RateLimit-Reset",
+                                                    "value": ""
                                                 }
                                             ],
                                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -884,12 +1563,12 @@
             "description": "",
             "item": [
                 {
-                    "id": "d8034c47-dd02-4c83-8fd2-6db6664b831f",
+                    "id": "3ed05a52-a81a-4f80-a8d3-66a180bdd73a",
                     "name": "Place an order",
                     "request": {
                         "name": "Place an order",
                         "description": {
-                            "content": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nThe `externalOrderCode` is your idempotency key: re-posting the same code returns the existing order instead of creating a duplicate.",
+                            "content": "Creates an order asynchronously. The response returns immediately with an `orderId` and a `processing` status, plus an `estimatedReadyAt` timestamp that indicates when to start polling for codes. Larger orders receive a later `estimatedReadyAt`.\n\nSend the catalog `productCode` and the `price` you expect to pay (used to validate the order). For fixed-price products the price must match the current catalog price; for open-denomination products send the chosen amount within the allowed range.\n\nSend `country` on each line: the `countryCode` of the catalog row. It is required when the product's `availableCountries` has more than one entry.\n\n`externalOrderCode` is your idempotency key. Repeating a code you already used returns `202` with the existing order and its current status; no second order is created. If two requests with the same new code arrive at the same moment, one of them can get `409`: fetch the order with `GET /orders/{externalOrderCode}`.",
                             "type": "text/plain"
                         },
                         "url": {
@@ -915,7 +1594,7 @@
                         "method": "POST",
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productCode\": \"{{productCode}}\",\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
+                            "raw": "{\n  \"externalOrderCode\": \"{{externalOrderCode}}\",\n  \"currency\": \"{{currency}}\",\n  \"price\": {{linePrice}},\n  \"orderProducts\": [\n    {\n      \"productCode\": \"{{productCode}}\",\n      \"country\": \"{{country}}\",\n      \"price\": {{linePrice}},\n      \"quantity\": 1\n    }\n  ]\n}",
                             "options": {
                                 "raw": {
                                     "headerFamily": "json",
@@ -927,8 +1606,8 @@
                     },
                     "response": [
                         {
-                            "id": "376198b3-32e7-4a19-9e0e-0ff746205d9a",
-                            "name": "Order accepted and now processing.",
+                            "id": "12423270-4202-4fa2-b1d8-c31358f9af25",
+                            "name": "Order accepted. Also returned, with the existing order, when you repeat an `externalOrderCode`.",
                             "originalRequest": {
                                 "url": {
                                     "path": [
@@ -961,7 +1640,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -976,6 +1655,15 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
                                 },
                                 {
                                     "disabled": false,
@@ -1005,12 +1693,12 @@
                                     "value": ""
                                 }
                             ],
-                            "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"processing\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"proident19_\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                            "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"partially_completed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"wallet\": {\n    \"balances\": {\n      \"animbef\": \"<number>\",\n      \"pariaturc2c\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "180b6369-079f-44f6-a190-d6a022b93ddf",
+                            "id": "db7e51e2-c4ac-430c-b4e2-2161e0b07337",
                             "name": "Validation or order rejection. See the Errors guide for the full message catalogue.",
                             "originalRequest": {
                                 "url": {
@@ -1044,7 +1732,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1059,6 +1747,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1066,7 +1790,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ea72e316-7afb-4b90-9547-766627092d29",
+                            "id": "dafa75a0-5ef1-476b-8313-8ccac2e52f43",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -1100,7 +1824,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1115,6 +1839,15 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1122,7 +1855,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "a7e11ce8-f4a6-4a4e-a366-812668dbd2ba",
+                            "id": "6d80ab5d-2c27-4161-a696-dc331174ba28",
                             "name": "API ordering disabled for your account.",
                             "originalRequest": {
                                 "url": {
@@ -1156,7 +1889,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1171,6 +1904,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1178,7 +1947,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "61c9e3a6-86be-4cb6-8f3a-9039460919d5",
+                            "id": "93c19cab-8062-4474-a416-5235d4a89802",
                             "name": "Product not found in your active catalog.",
                             "originalRequest": {
                                 "url": {
@@ -1212,7 +1981,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1227,6 +1996,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1234,8 +2039,8 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "7789cd0f-5bc1-4931-bc0d-ab36bccfde90",
-                            "name": "An order with the same externalOrderCode already exists.",
+                            "id": "e33ccab8-d73e-4187-899c-393cfdc0cf78",
+                            "name": "Another request with the same `externalOrderCode` was being placed at the same moment. The order exists: fetch it with `GET /orders/{externalOrderCode}` instead of retrying.",
                             "originalRequest": {
                                 "url": {
                                     "path": [
@@ -1268,7 +2073,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1283,6 +2088,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1290,7 +2131,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "8d3fa6ea-5571-419b-aed2-fdcc58a6693e",
+                            "id": "5e6c16e5-0d0a-4df8-a0cb-768cc02cf516",
                             "name": "Order limit exceeded, insufficient wallet funds, or product not available for purchase.",
                             "originalRequest": {
                                 "url": {
@@ -1324,7 +2165,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1339,6 +2180,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1346,7 +2223,108 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "5acc3171-5c91-4036-9ff8-0580136ba199",
+                            "id": "eaefd416-c021-4096-9f6c-a7d09d53f463",
+                            "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "orders"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "headerFamily": "json",
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "status": "Too Many Requests",
+                            "code": 429,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "Retry-After",
+                                    "value": ""
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "0bbbaf98-0e86-439e-92e0-0d559502a0b5",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -1380,7 +2358,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1395,6 +2373,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1402,7 +2416,7 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "243e0af9-d26a-472d-8ed1-a6750210e73d",
+                            "id": "720958b1-7a02-492c-8586-398bff49a255",
                             "name": "Order could not be created or is temporarily unavailable.",
                             "originalRequest": {
                                 "url": {
@@ -1436,7 +2450,7 @@
                                 "method": "POST",
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
+                                    "raw": "{\n  \"externalOrderCode\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"orderProducts\": [\n    {\n      \"productCode\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"price\": \"<integer>\",\n      \"currency\": \"<string>\",\n      \"sku\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"price\": \"<integer>\"\n}",
                                     "options": {
                                         "raw": {
                                             "headerFamily": "json",
@@ -1451,6 +2465,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1468,7 +2518,7 @@
                     "description": "",
                     "item": [
                         {
-                            "id": "422b0df8-97eb-46da-b11b-580b106b8157",
+                            "id": "1bf3df62-93d1-48b7-97f0-01e1a8defd9a",
                             "name": "Retrieve an order",
                             "request": {
                                 "name": "Retrieve an order",
@@ -1510,7 +2560,7 @@
                             },
                             "response": [
                                 {
-                                    "id": "2328eabb-49ce-4b11-bfc5-9ed01f05ca0b",
+                                    "id": "4c3a7e15-c1d4-4810-a527-b8dc2c9ba330",
                                     "name": "The order and its current status.",
                                     "originalRequest": {
                                         "url": {
@@ -1547,14 +2597,50 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
                                         }
                                     ],
-                                    "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"failed\",\n  \"estimatedReadyAt\": \"<dateTime>\",\n  \"message\": \"<string>\",\n  \"reason\": \"<string>\",\n  \"delivered\": \"<integer>\",\n  \"total\": \"<integer>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"magna_79c\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
+                                    "body": "{\n  \"orderId\": \"<uuid>\",\n  \"externalOrderCode\": \"<string>\",\n  \"status\": \"completed\",\n  \"estimatedReadyAt\": \"<string,null-date-time>\",\n  \"message\": \"<string,null>\",\n  \"reason\": \"<string,null>\",\n  \"delivered\": \"<integer,null>\",\n  \"total\": \"<integer,null>\",\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"quantity\": \"<integer>\",\n      \"codes\": [\n        {\n          \"code\": \"<string>\"\n        },\n        {\n          \"code\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"wallet\": {\n    \"balances\": {\n      \"adipisicing7\": \"<number>\",\n      \"eiusmodd1\": \"<number>\"\n    },\n    \"lowBalance\": \"<boolean>\"\n  }\n}",
                                     "cookie": [],
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "152654e8-d58f-45d3-9609-b4882ac9efdd",
+                                    "id": "e4c49f03-f2b5-4ee8-8920-a37b4856ee8f",
                                     "name": "Missing or invalid `x-api-key`.",
                                     "originalRequest": {
                                         "url": {
@@ -1591,6 +2677,15 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
                                         }
                                     ],
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1598,7 +2693,7 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "cf71b730-80b9-4578-8097-f507a7a59366",
+                                    "id": "07ad3d91-b824-4462-835a-30004549c4f0",
                                     "name": "Order not found for the supplied reference.",
                                     "originalRequest": {
                                         "url": {
@@ -1635,6 +2730,42 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
                                         }
                                     ],
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1642,7 +2773,96 @@
                                     "_postman_previewlanguage": "json"
                                 },
                                 {
-                                    "id": "44f4a29a-3c22-42d0-82fa-317e9003329a",
+                                    "id": "aa84b446-6131-44c8-9a79-ce0cfe8fdc3b",
+                                    "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "path": [
+                                                "orders",
+                                                ":reference"
+                                            ],
+                                            "host": [
+                                                "{{baseUrl}}"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Too Many Requests",
+                                    "code": 429,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "Retry-After",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "0b8eef35-a916-49ba-9566-f5ae3c55c08c",
                                     "name": "Unexpected server error.",
                                     "originalRequest": {
                                         "url": {
@@ -1679,6 +2899,42 @@
                                         {
                                             "key": "Content-Type",
                                             "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
                                         }
                                     ],
                                     "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1751,7 +3007,7 @@
             "description": "",
             "item": [
                 {
-                    "id": "b78e67d8-880b-42e9-97dc-e2488eb36117",
+                    "id": "803e1c7e-8a2a-4701-9bb9-7ca666f51426",
                     "name": "Get wallet balances",
                     "request": {
                         "name": "Get wallet balances",
@@ -1781,7 +3037,7 @@
                     },
                     "response": [
                         {
-                            "id": "75c9cfa1-8246-4c14-b0b5-a926755fc964",
+                            "id": "7dac11c9-b957-4b98-b9d5-4a50bf12e563",
                             "name": "Current wallet snapshot.",
                             "originalRequest": {
                                 "url": {
@@ -1817,14 +3073,50 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
-                            "body": "{\n  \"balances\": {\n    \"ina\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
+                            "body": "{\n  \"balances\": {\n    \"deserunt_f4a\": \"<number>\"\n  },\n  \"lowBalance\": \"<boolean>\",\n  \"threshold\": \"<number>\"\n}",
                             "cookie": [],
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "fd7e76b2-cd51-4b7f-92c2-8c7deac2a669",
+                            "id": "391e114c-a84e-4a32-b61e-4ba046318f86",
                             "name": "Missing or invalid `x-api-key`.",
                             "originalRequest": {
                                 "url": {
@@ -1860,6 +3152,15 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1867,7 +3168,95 @@
                             "_postman_previewlanguage": "json"
                         },
                         {
-                            "id": "ebfdde48-b056-4274-a3bc-8aa4c205ec21",
+                            "id": "b876ba79-70d4-45fb-be55-b54e5719cd0c",
+                            "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                            "originalRequest": {
+                                "url": {
+                                    "path": [
+                                        "wallet"
+                                    ],
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "description": {
+                                            "content": "Added as a part of security scheme: apikey",
+                                            "type": "text/plain"
+                                        },
+                                        "key": "x-api-key",
+                                        "value": "<API Key>"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {}
+                            },
+                            "status": "Too Many Requests",
+                            "code": 429,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "Retry-After",
+                                    "value": ""
+                                }
+                            ],
+                            "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                            "cookie": [],
+                            "_postman_previewlanguage": "json"
+                        },
+                        {
+                            "id": "d9a8b3df-e240-4024-a035-0dd6c56a1de9",
                             "name": "Unexpected server error.",
                             "originalRequest": {
                                 "url": {
@@ -1903,6 +3292,42 @@
                                 {
                                     "key": "Content-Type",
                                     "value": "application/json"
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-Request-Id",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Limit",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Remaining",
+                                    "value": ""
+                                },
+                                {
+                                    "disabled": false,
+                                    "description": {
+                                        "content": "",
+                                        "type": "text/plain"
+                                    },
+                                    "key": "X-RateLimit-Reset",
+                                    "value": ""
                                 }
                             ],
                             "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
@@ -1914,6 +3339,461 @@
                     "protocolProfileBehavior": {
                         "disableBodyPruning": true
                     }
+                }
+            ]
+        },
+        {
+            "name": "sandbox",
+            "description": "",
+            "item": [
+                {
+                    "name": "scenarios",
+                    "description": "",
+                    "item": [
+                        {
+                            "id": "f105f1dc-7b96-47dd-aced-848a31fb3d55",
+                            "name": "List sandbox test products",
+                            "request": {
+                                "name": "List sandbox test products",
+                                "description": {
+                                    "content": "Sandbox only. Returns the Kalixo Test products with their expected outcome and a `sampleOrderLine` you can send to `POST /orders` as-is. The same products appear in `GET /catalog/products` with brand **Kalixo Test** and `isSandboxProduct: true`. On the production API this endpoint returns `404`.",
+                                    "type": "text/plain"
+                                },
+                                "url": {
+                                    "protocol": "https",
+                                    "path": [
+                                        "v2",
+                                        "sandbox",
+                                        "scenarios"
+                                    ],
+                                    "host": [
+                                        "sandbox",
+                                        "kalixo",
+                                        "io"
+                                    ],
+                                    "query": [],
+                                    "variable": []
+                                },
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "method": "GET",
+                                "body": {},
+                                "auth": null
+                            },
+                            "response": [
+                                {
+                                    "id": "8af587ab-9315-4ccb-bf01-74b0b26bd843",
+                                    "name": "Kalixo Test products and expected outcomes.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "protocol": "https",
+                                            "path": [
+                                                "v2",
+                                                "sandbox",
+                                                "scenarios"
+                                            ],
+                                            "host": [
+                                                "sandbox",
+                                                "kalixo",
+                                                "io"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"products\": [\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"denominationType\": \"fixed\",\n      \"isSandboxProduct\": \"<boolean>\",\n      \"expectedOutcome\": \"<string>\",\n      \"sampleOrderLine\": {\n        \"productCode\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<integer>\",\n        \"currency\": \"<string>\",\n        \"sku\": \"<string>\",\n        \"country\": \"<string>\"\n      }\n    },\n    {\n      \"productCode\": \"<string>\",\n      \"name\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"currencyCode\": \"<string>\",\n      \"denominationType\": \"open\",\n      \"isSandboxProduct\": \"<boolean>\",\n      \"expectedOutcome\": \"<string>\",\n      \"sampleOrderLine\": {\n        \"productCode\": \"<string>\",\n        \"quantity\": \"<integer>\",\n        \"price\": \"<integer>\",\n        \"currency\": \"<string>\",\n        \"sku\": \"<string>\",\n        \"country\": \"<string>\"\n      }\n    }\n  ],\n  \"note\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "eec3897f-03aa-4bfc-81c3-b4c40ab44a08",
+                                    "name": "Missing or invalid `x-api-key`.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "protocol": "https",
+                                            "path": [
+                                                "v2",
+                                                "sandbox",
+                                                "scenarios"
+                                            ],
+                                            "host": [
+                                                "sandbox",
+                                                "kalixo",
+                                                "io"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Unauthorized",
+                                    "code": 401,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "7fa324c4-2077-4417-8566-5f6c00a5170f",
+                                    "name": "Called on the production API. Sandbox helpers exist on the sandbox only.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "protocol": "https",
+                                            "path": [
+                                                "v2",
+                                                "sandbox",
+                                                "scenarios"
+                                            ],
+                                            "host": [
+                                                "sandbox",
+                                                "kalixo",
+                                                "io"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Not Found",
+                                    "code": 404,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "2ce338b1-a942-4c9e-b315-5e4cad84cf17",
+                                    "name": "Rate limit exceeded. Wait `Retry-After` seconds, then retry.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "protocol": "https",
+                                            "path": [
+                                                "v2",
+                                                "sandbox",
+                                                "scenarios"
+                                            ],
+                                            "host": [
+                                                "sandbox",
+                                                "kalixo",
+                                                "io"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Too Many Requests",
+                                    "code": 429,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "Retry-After",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                },
+                                {
+                                    "id": "30ea0c23-29be-4075-b337-5acfac8ba801",
+                                    "name": "Unexpected server error.",
+                                    "originalRequest": {
+                                        "url": {
+                                            "protocol": "https",
+                                            "path": [
+                                                "v2",
+                                                "sandbox",
+                                                "scenarios"
+                                            ],
+                                            "host": [
+                                                "sandbox",
+                                                "kalixo",
+                                                "io"
+                                            ],
+                                            "query": [],
+                                            "variable": []
+                                        },
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json"
+                                            },
+                                            {
+                                                "description": {
+                                                    "content": "Added as a part of security scheme: apikey",
+                                                    "type": "text/plain"
+                                                },
+                                                "key": "x-api-key",
+                                                "value": "<API Key>"
+                                            }
+                                        ],
+                                        "method": "GET",
+                                        "body": {}
+                                    },
+                                    "status": "Internal Server Error",
+                                    "code": 500,
+                                    "header": [
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-Request-Id",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Limit",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Remaining",
+                                            "value": ""
+                                        },
+                                        {
+                                            "disabled": false,
+                                            "description": {
+                                                "content": "",
+                                                "type": "text/plain"
+                                            },
+                                            "key": "X-RateLimit-Reset",
+                                            "value": ""
+                                        }
+                                    ],
+                                    "body": "{\n  \"statusCode\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"error\": \"<string>\"\n}",
+                                    "cookie": [],
+                                    "_postman_previewlanguage": "json"
+                                }
+                            ],
+                            "event": [],
+                            "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                            }
+                        }
+                    ]
                 }
             ]
         }
@@ -1969,12 +3849,16 @@
             "value": "GBP"
         },
         {
+            "key": "country",
+            "value": "GB"
+        },
+        {
             "key": "ordersBaseUrl",
             "value": "https://sandbox.kalixo.io/v2"
         }
     ],
     "info": {
-        "_postman_id": "5281ce31-b4a6-4241-b48a-a8417056e928",
+        "_postman_id": "c898c09c-abdc-4fc2-b54a-71de3ccbf0c9",
         "name": "Kalixo API v2",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
         "description": {

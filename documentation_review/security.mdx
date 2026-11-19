@@ -1,0 +1,44 @@
+---
+title: "Security & data handling"
+description: "PCI scope, what Kalixo protects, and what you must do."
+---
+
+Kalixo is the merchant of record and operates the payment providers, which keeps most of the payments-security burden on Kalixo's side. A few things stay your responsibility — this page lists both.
+
+## PCI DSS
+
+Card details are entered in secure fields that Kalixo.js loads from the payment provider. **Card data never touches your page or Kalixo's own servers**, which keeps your PCI scope at **SAQ A** — as long as you load Kalixo.js from `https://js.kalixo.io` and never self-host or proxy it.
+
+<Warning>
+Do not bundle, copy or self-host Kalixo.js, and never build your own card field. Either breaks SAQ A and pulls card data into your scope.
+</Warning>
+
+## Keys and secrets
+
+| Secret | Where it lives | Rules |
+| - | - | - |
+| Secret key (`kc_sk_...`) | Your server only | Never in browser or mobile code. Kalixo.js refuses it. |
+| Publishable key (`kc_pk_...`) | The browser | Works only from your registered domains (`origin_not_allowed` otherwise). |
+| `client_secret` | Passed to Kalixo.js | Never log it or send it to analytics; it is in the hosted URL fragment, which browsers never send to servers. |
+| Webhook secret (`whsec_...`) | Your server | Shown once at creation. Store securely; rotate with dual signing. |
+
+Kalixo stores only a hash of your API keys and shows each key once. Rotate a key by deploying a new one and asking Kalixo to revoke the old (effective within 30 seconds).
+
+## What you must do
+
+- **Verify webhooks** against the **raw** body, and reject deliveries whose timestamp is more than 5 minutes old. See [Webhooks](/checkout/concepts/webhooks).
+- **Confirm on your server before fulfilling.** Browser events and redirects are not proof of payment. See [Fulfilment](/checkout/guides/fulfilment).
+- **Restrict `return_url`** to your own HTTPS domains. A leaked secret key should not be able to send shoppers to a page you do not control.
+- **Harden transport:** HTTPS, HSTS with a long `max-age`, and a CSP that allows only Kalixo's domains.
+- **Show only safe error text.** The `message` on a decline is safe to display; never show raw issuer responses — they can help fraudsters.
+
+## Data handling
+
+- Kalixo encrypts customer email and name at rest. Do not store card numbers yourself — you never receive them.
+- **Dispute evidence must not contain card numbers or identity documents** (see [Disputes](/checkout/guides/disputes)).
+- Events and objects echo your `reference` and `metadata` unchanged — do not put secrets or personal data you would not want returned in webhooks into `metadata`.
+- Events are retained for 30 days (`GET /v1/events`); reports for 30 days.
+
+## Reporting a vulnerability
+
+Found a security issue? Email [integrations@kalixo.io](mailto:integrations@kalixo.io) with the details and a `request_id` where relevant. Do not include real card numbers or personal data.

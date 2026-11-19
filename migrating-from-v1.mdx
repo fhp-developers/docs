@@ -28,18 +28,19 @@ v1 remains available; migrate when you’re ready.
 
 | v1 | v2 | Notes |
 | --- | --- | --- |
-| `POST /v1/orders/place-order` (sync, returns pins) | `POST /v2/orders` (async) | Returns `orderId` + `processing`; poll for pins |
-| `GET /v1/orders/retrieve-order?id=` | `GET /v2/orders/{reference}` | By UUID `orderId` **or** `externalOrderCode`; codes only when `completed` |
-| `GET /v1/catalog/products` | `GET /v2/catalog/products` | Adds filters + `skip`/`take` (max 100) |
-| `GET /v1/catalog/product?sku=` | `GET /v2/catalog/products/{productCode}` | Fetch by catalog `productCode` |
+| `POST /v1/orders/place-order` (sync, returns pins) | `POST /v2/orders` (async) | Returns `orderId` + `processing`; poll for codes |
+| `GET /v1/orders/retrieve-order?id=` | `GET /v2/orders/{reference}` | By UUID `orderId` **or** `externalOrderCode`; codes when `completed`, delivered codes when `partially_completed` |
+| `GET /v1/catalog/products` | `GET /v2/catalog/products` | Adds filters + `skip`/`take` (max 100); one row per product and country |
+| `GET /v1/catalog/product?sku=` | `GET /v2/catalog/products/{productCode}` | Fetch by catalog `productCode`; optional `?country=` |
 | _(none)_ | `GET /v2/wallet` | New dedicated wallet endpoint |
+| _(none)_ | `GET /v2/ping` | Connectivity check |
 
 ## Behavioural differences
 
 <Warning>
   The biggest change: **ordering is asynchronous**. Code that expected pins in the
   `place-order` response must now poll `GET /v2/orders/{reference}` until `status` is
-  `completed`. See [Order lifecycle](/concepts/order-lifecycle).
+  `completed`, `partially_completed` or `failed`. See [Order lifecycle](/concepts/order-lifecycle).
 </Warning>
 
 <Note>
@@ -59,7 +60,18 @@ v1 remains available; migrate when you’re ready.
   numeric order ids are not accepted.
 </Note>
 
-## Response shape changes (v2.1)
+<Note>
+  Regional products appear once per country in the v2 catalog, with the same `productCode`.
+  Send the row's `countryCode` as `country` on each order line; it is required when the
+  product has more than one market. See [Regional products](/concepts/order-lifecycle#regional-products).
+</Note>
+
+<Note>
+  In v2, use the `X-Request-Id` header, present on every response, instead of v1's
+  correlation key. Include it when you contact support. See [Errors](/concepts/errors#request-id).
+</Note>
+
+## Response shape changes
 
 | v1 / early v2 | Current v2 |
 | --- | --- |
@@ -68,5 +80,7 @@ v1 remains available; migrate when you’re ready.
 | `PIN` / `pin: [{ pin }]` | `codes: [{ code }]` |
 | `tags` as comma-separated string | `tags` as `string[]` |
 | `rrp`, `rrpCurrency`, `state` on products | Removed - use `price` and `status` |
+| `discount` on products | `discountAmount` (minor units) and `discountPercentage` |
+| One catalog row per product | One row per product and country, with `sku`, `countryCode` and `availableCountries` |
 
 See the [Changelog](/changelog) for the full list.

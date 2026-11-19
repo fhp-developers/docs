@@ -1,0 +1,91 @@
+---
+title: "SDKs & libraries"
+description: "Official libraries, and how to call the API from any language."
+---
+
+## Official libraries
+
+| Library | Use | Install |
+| - | - | - |
+| `@kalixo/checkout-node` | Server-side: sessions, payments, captures, refunds, webhooks | `npm i @kalixo/checkout-node` |
+| `@kalixo/checkout-js` | Browser: render the checkout with Kalixo.js | `npm i @kalixo/checkout-js` (or the `js.kalixo.io` script tag) |
+
+The Node SDK signs requests, sends an `Idempotency-Key` on every `POST` and reuses it on automatic retries, and verifies webhook signatures with `constructEvent`.
+
+<Note>
+Need a server SDK for another language (Python, PHP, Java, Ruby, Go, .NET) or a mobile SDK? Tell [integrations@kalixo.io](mailto:integrations@kalixo.io) what you need. Until then, call the REST API directly — it is small and consistent.
+</Note>
+
+## Call the API from any language
+
+Every endpoint is plain REST with a bearer token, JSON bodies, amounts in minor units, and an `Idempotency-Key` on each `POST`. Here is "create a checkout session" in several languages.
+
+<CodeGroup>
+```bash cURL theme={"dark"}
+curl https://sandbox.checkout.kalixo.io/v1/checkout-sessions \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: order-1001-checkout" \
+  -H "Content-Type: application/json" \
+  -d '{ "amount": 4999, "currency": "EUR", "country": "NL", "reference": "order-1001",
+        "return_url": "https://shop.example.com/checkout/complete" }'
+```
+
+```python Python theme={"dark"}
+import os, uuid, requests
+
+resp = requests.post(
+    "https://sandbox.checkout.kalixo.io/v1/checkout-sessions",
+    headers={
+        "Authorization": f"Bearer {os.environ['KALIXO_CHECKOUT_SECRET_KEY']}",
+        "Idempotency-Key": "order-1001-checkout",
+        "Content-Type": "application/json",
+    },
+    json={"amount": 4999, "currency": "EUR", "country": "NL",
+          "reference": "order-1001",
+          "return_url": "https://shop.example.com/checkout/complete"},
+    timeout=30,
+)
+session = resp.json()
+```
+
+```php PHP theme={"dark"}
+<?php
+$ch = curl_init("https://sandbox.checkout.kalixo.io/v1/checkout-sessions");
+curl_setopt_array($ch, [
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_POST => true,
+  CURLOPT_HTTPHEADER => [
+    "Authorization: Bearer " . getenv("KALIXO_CHECKOUT_SECRET_KEY"),
+    "Idempotency-Key: order-1001-checkout",
+    "Content-Type: application/json",
+  ],
+  CURLOPT_POSTFIELDS => json_encode([
+    "amount" => 4999, "currency" => "EUR", "country" => "NL",
+    "reference" => "order-1001",
+    "return_url" => "https://shop.example.com/checkout/complete",
+  ]),
+]);
+$session = json_decode(curl_exec($ch), true);
+```
+
+```go Go theme={"dark"}
+body, _ := json.Marshal(map[string]any{
+    "amount": 4999, "currency": "EUR", "country": "NL",
+    "reference": "order-1001",
+    "return_url": "https://shop.example.com/checkout/complete",
+})
+req, _ := http.NewRequest("POST", "https://sandbox.checkout.kalixo.io/v1/checkout-sessions", bytes.NewReader(body))
+req.Header.Set("Authorization", "Bearer "+os.Getenv("KALIXO_CHECKOUT_SECRET_KEY"))
+req.Header.Set("Idempotency-Key", "order-1001-checkout")
+req.Header.Set("Content-Type", "application/json")
+resp, err := http.DefaultClient.Do(req)
+```
+</CodeGroup>
+
+When you call the API directly, you implement two things the Node SDK gives you for free: send a stable `Idempotency-Key` on every `POST` (see [Idempotency](/checkout/concepts/idempotency)), and verify the `Kalixo-Signature` on webhooks against the raw body (see [Webhooks](/checkout/concepts/webhooks)).
+
+## Spec & collection
+
+- **OpenAPI** — download the spec from the [API reference](/checkout/api-reference/introduction) to generate a client.
+- **Postman** — import the [Postman collection](/quickstart#postman-collection).
+- **`llms.txt`** — machine-readable docs at [`/llms.txt`](https://developer.kalixo.io/llms.txt) and `/llms-full.txt` for AI tools.

@@ -1,0 +1,150 @@
+---
+title: "Fulfilment"
+description: "Confirm a payment on your server before you deliver the order."
+icon: "box-open"
+---
+
+Fulfilment is the one step you must get right. Browser events and redirects tell the shopper
+what happened; they are not proof of payment. Confirm every order on your server, from
+Kalixo's records, before you deliver.
+
+<Warning>
+  Never fulfil from `payment.completed` in Kalixo.js, a `return_url` redirect, or
+  `checkout_session.status`. Anyone can open your `return_url` with a session ID. Treat a
+  webhook as a trigger to check the payment, not as the proof itself.
+</Warning>
+
+## The rule
+
+Deliver an order only when the payment you read with `GET /v1/payments/{id}` has:
+
+- `status` `captured` (or `authorized` with manual capture, if you ship before you capture),
+- `amount_captured` (or `amount_authorized`) equal to your order total, in the minor unit:
+  `4999` for EUR 49.99,
+- `currency` equal to your order currency,
+- `amount_mismatch` `false`.
+
+## The flow
+
+<Steps>
+  <Step title="Create the session on your server">
+    Set the amount, currency and your `reference`. This amount is the only amount Kalixo will
+    charge. See the [Quickstart](/checkout/quickstart).
+  </Step>
+  <Step title="Receive the webhook">
+    Listen for `payment.captured` on your [webhook endpoint](/checkout/concepts/webhooks).
+    Verify the `Kalixo-Signature` against the raw body, answer `2xx` within 10 seconds, then
+    process asynchronously.
+  </Step>
+  <Step title="Read the payment">
+    Call `GET /v1/payments/{id}` with the ID from the event and apply the rule above to
+    Kalixo's record, not to the webhook body.
+  </Step>
+  <Step title="Fulfil exactly once">
+    Key fulfilment on the payment ID or your `reference`, so a duplicate delivery or a replay
+    never delivers twice.
+  </Step>
+  <Step title="Reconcile">
+    Match captures, refunds and chargebacks to your orders with the `financial_transactions`
+    [report](/checkout/guides/reports).
+  </Step>
+</Steps>
+
+## Verify and fulfil
+
+<CodeGroup>
+```javascript Node.js
+import express from 'express';
+import { KalixoCheckout, constructEvent } from '@kalixo/checkout-node';
+
+const kalixo = new KalixoCheckout(process.env.KALIXO_CHECKOUT_SECRET_KEY);
+const app = express();
+
+app.post('/webhooks/kalixo-checkout', express.raw({ type: 'application/json' }), (req, res) => {
+  let event;
+  try {
+    event = constructEvent(req.body, req.header('Kalixo-Signature'), process.env.KALIXO_CHECKOUT_WEBHOOK_SECRET);
+  } catch {
+    return res.status(400).end();
+  }
+  res.status(200).end(); // answer first, then process
+  if (event.type === 'payment.captured') fulfil(event.data.object.id).catch(console.error);
+});
+
+async function fulfil(paymentId) {
+  // Kalixo's record, not the webhook body, decides.
+  const payment = await kalixo.payments.retrieve(paymentId);
+  const order = await db.orders.findByReference(payment.reference);
+  if (!order) return;
+  const paid =
+    payment.status === 'captured' &&
+    !payment.amount_mismatch &&
+    payment.currency === order.currency &&
+    payment.amount_captured === order.amount; // 4999 for EUR 49.99
+  if (paid) await db.orders.fulfilOnce(order.id, payment.id); // no-op if already fulfilled
+}
+```
+
+```python Python
+import json
+import os
+
+import requests
+
+API = "https://sandbox.checkout.kalixo.io"
+SECRET_KEY = os.environ["KALIXO_CHECKOUT_SECRET_KEY"]
+
+
+def handle_event(raw_body: bytes, signature_header: str) -> int:
+    # verify() is the signature check from /checkout/concepts/webhooks#verify-the-signature
+    if not verify(raw_body, signature_header, os.environ["KALIXO_CHECKOUT_WEBHOOK_SECRET"]):
+        return 400
+    event = json.loads(raw_body)
+    if event["type"] == "payment.captured":
+        queue.enqueue(fulfil, event["data"]["object"]["id"])  # answer first, then process
+    return 200
+
+
+def fulfil(payment_id: str) -> None:
+    # Kalixo's record, not the webhook body, decides.
+    payment = requests.get(
+        f"{API}/v1/payments/{payment_id}",
+        headers={"Authorization": f"Bearer {SECRET_KEY}"},
+        timeout=30,
+    ).json()
+    order = db.orders.find_by_reference(payment["reference"])
+    if not order:
+        return
+    paid = (
+        payment["status"] == "captured"
+        and payment["amount_mismatch"] is False
+        and payment["currency"] == order.currency
+        and payment["amount_captured"] == order.amount  # 4999 for EUR 49.99
+    )
+    if paid:
+        db.orders.fulfil_once(order.id, payment["id"])  # no-op if already fulfilled
+```
+</CodeGroup>
+
+## Manual capture
+
+With `capture_method: "manual"` you can ship on `payment.authorized` and capture when you
+ship. Apply the same check to `status: authorized` and `amount_authorized`. Capture promptly:
+authorisations expire after a few days, depending on the payment method. See
+[Captures, cancellations and refunds](/checkout/guides/captures-and-refunds).
+
+## Other outcomes
+
+| Event | What to do |
+| --- | --- |
+| `payment.failed` | Keep the order unpaid. The shopper can retry while the session is open |
+| `payment.amount_mismatch` | Never fulfil. Kalixo reverses the payment |
+| `checkout_session.expired`, `payment.expired` | Close the order as unpaid |
+| `refund.succeeded` | Compare `amount_refunded` with `amount_captured` to mark the order refunded or partially refunded |
+| `dispute.created` | Collect [evidence](/checkout/guides/disputes). Refunds are blocked while the dispute is open |
+
+## Missed webhooks
+
+Delivery is at least once, and Kalixo retries for about 3 days. If your endpoint was down
+longer, list events with `GET /v1/events` (kept for 30 days) or read the payment directly,
+and apply the same rule.

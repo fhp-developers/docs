@@ -1,0 +1,72 @@
+---
+title: "Security and data handling"
+description: "PCI scope, what Kalixo protects, and what you must do."
+icon: "lock"
+---
+
+Kalixo is the merchant of record and operates the payment providers, so most of the payment
+security work is on Kalixo's side. A few things stay your responsibility. This page lists
+both.
+
+## PCI DSS
+
+Card details are entered in secure fields that Kalixo.js loads from the payment provider.
+Card data never touches your page or Kalixo's servers. This keeps your PCI scope at SAQ A,
+provided you load Kalixo.js from `https://js.kalixo.io`. The hosted checkout keeps you at
+SAQ A too.
+
+<Warning>
+  Do not bundle, copy, proxy or self-host Kalixo.js, and never build your own card fields.
+  Either brings card data into your PCI scope.
+</Warning>
+
+## Keys and secrets
+
+| Secret | Where it lives | Rules |
+| --- | --- | --- |
+| Secret key (`kc_sk_...`) | Your server only | Never in browser or mobile code. Kalixo.js refuses it |
+| Publishable key (`kc_pk_...`) | The browser | Works only from your registered domains (`origin_not_allowed` otherwise) |
+| `client_secret` | Passed to Kalixo.js | Do not log it or send it to analytics. In the hosted checkout `url` it is in the fragment after `#`, which browsers never send to servers |
+| Webhook secret (`whsec_...`) | Your server | Shown once, when you create or rotate it. Rotation signs with both secrets for 24 hours |
+
+Kalixo stores only a hash of your API keys and shows each key once. To rotate a secret key,
+deploy a new one, then ask Kalixo to revoke the old one. Revocation takes effect within 30
+seconds.
+
+## What Kalixo enforces
+
+- **Amounts.** Kalixo charges only the amount of the checkout session and checks every
+  amount the provider reports. See [Amount integrity](/checkout/concepts/amount-integrity).
+- **Return domains.** A `return_url` must be on a domain registered for your account
+  (`return_url_not_allowed` otherwise), so a leaked secret key cannot send shoppers to a
+  look-alike site.
+- **Webhook targets.** Webhook endpoints must be public HTTPS URLs. Private and internal
+  addresses are refused (`url_not_public`).
+- **Card testing.** Payment attempts are limited per session, per shopper IP address and per
+  account. See [Rate limits](/checkout/concepts/rate-limits).
+- **Hosted checkout.** The page shows order details only with the client secret.
+
+## What you must do
+
+- **Verify webhooks** against the raw body, and reject a timestamp older than 5 minutes.
+  See [Webhooks](/checkout/concepts/webhooks#verify-the-signature).
+- **Confirm on your server before you fulfil.** Read the payment with
+  `GET /v1/payments/{id}`. See [Fulfilment](/checkout/guides/fulfilment).
+- **Protect your pages.** Serve your checkout and return pages over HTTPS with
+  `Strict-Transport-Security` and a Content Security Policy that allows Kalixo.js. See
+  [Kalixo.js](/checkout/guides/kalixo-js).
+- **Show shoppers only the decline `message`.** It is written to be safe to display.
+
+## Data handling
+
+- Kalixo encrypts shopper email addresses and names at rest. You never receive card numbers,
+  so never store them.
+- Never upload card numbers or identity documents as [dispute evidence](/checkout/guides/disputes).
+- Payments and events return your `reference` and `metadata` unchanged. Do not put secrets or
+  personal data in them.
+- Events are kept for 30 days (`GET /v1/events`). Report files are kept for 30 days.
+
+## Report a vulnerability
+
+Email [integrations@kalixo.io](mailto:integrations@kalixo.io) with the details and, where
+relevant, a `request_id`. Do not include real card numbers or personal data.

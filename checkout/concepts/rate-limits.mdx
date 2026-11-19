@@ -1,0 +1,53 @@
+---
+title: "Rate limits"
+description: "Request and payment attempt limits, and how to handle 429 responses."
+icon: "gauge-high"
+---
+
+Kalixo limits request bursts and payment attempts to keep the platform fast and to protect
+you from card-testing attacks. A limited request fails with `429` and `rate_limit_error`.
+
+## Limits
+
+| Limit | Applies to | Default | Error code |
+| --- | --- | --- | --- |
+| API requests | All requests made with one secret key | About 600 per minute | `rate_limited` |
+| Checkout sessions | `POST /v1/checkout-sessions` with one secret key | About 60 per minute | `rate_limited` |
+| Kalixo.js requests | Requests from one shopper IP address | About 60 checkout loads per minute | `rate_limited` |
+| Payment attempts per shopper | Attempts from one shopper IP address, on any checkout | 10 per minute | `rate_limited` |
+| Payment attempts per session | Kalixo.js and hosted checkout attempts on one checkout session | 5 attempts | `too_many_attempts` |
+| Payment attempts per account | All attempts across your account | 120 per minute | `rate_limited` |
+
+Kalixo can raise these limits for your account; ask Kalixo integrations. Kalixo also
+applies per-payment and daily amount limits, which fail with `402 amount_limit_exceeded`.
+
+```json
+{
+  "error": {
+    "type": "rate_limit_error",
+    "code": "rate_limited",
+    "decline_code": null,
+    "message": "Too many requests. Slow down and retry with backoff.",
+    "param": null,
+    "request_id": "req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e"
+  }
+}
+```
+
+## Handling `429`
+
+- Wait for the number of seconds in the `Retry-After` header, then retry. If you retry
+  again, back off exponentially with jitter.
+- Retry a `POST` with the **same** `Idempotency-Key`, so it is applied at most once. See
+  [Idempotency](/checkout/concepts/idempotency).
+- `@kalixo/checkout-node` retries `429` and `5xx` responses twice with backoff, reusing the
+  idempotency key. Set `maxRetries` to change this.
+- `too_many_attempts` does not go away with time: the session has used all its attempts.
+  Create a new checkout session for the shopper. Repeated declines on many sessions can
+  mean card testing: check the shopper before you create more sessions.
+
+## Reduce your request volume
+
+- Use [webhooks](/checkout/concepts/webhooks) instead of polling payments.
+- Page through lists with `limit=100`.
+- Cache objects you read often, such as webhook endpoints.

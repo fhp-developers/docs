@@ -29,30 +29,65 @@ See [Authentication](/authentication) for how to send your key.
 
 ## Kalixo Test products
 
-Call **`GET /v2/sandbox/scenarios`** with your sandbox API key for the current
-list of test `productCode`s, sample order lines, and expected outcomes. Each
-scenario includes a `sampleOrderLine` (with `productCode`, `quantity`, and
-`price`) that you can send to `POST /v2/orders` as-is.
+Each test product triggers one outcome, so you can exercise every branch of your
+integration:
 
-| Product | Expected outcome |
-| --- | --- |
-| Success (Fixed) | `completed` + codes |
-| Success (Open) | `completed` - send line `price` |
-| Async failure | `failed` |
-| Partial | `partially_completed` when qty ≥ 2 |
-| Slow | `processing` ~10s, then `completed` |
+| Product | Price | Expected outcome |
+| --- | --- | --- |
+| Kalixo Test - Success (Fixed) | 499 | `completed` with one `SANDBOX-…` code per unit |
+| Kalixo Test - Success (Open) | 500 to 50000, step 100 | `completed`; send the line `price` |
+| Kalixo Test - Async Failure | 499 | `failed`, no codes |
+| Kalixo Test - Partial Completion | 499 | `partially_completed` when quantity ≥ 2 (odd units succeed) |
+| Kalixo Test - Slow Processing | 499 | `processing` for about 10 seconds, then `completed` |
 
-**Mixed partial:** order the success and failure products in one request →
+Prices are in minor units (`499` is GBP 4.99). Every scenario exists in **GBP** (country
+`GB`), **USD** (`US`) and **EUR** for every euro-area country (`DE`, `FR`, `IE`, `NL` and the
+others), each with its own productCode. Each test product has a single market, so `country`
+is optional on its order lines.
+
+**Mixed partial:** order a success and a failure product in one request to get
 `partially_completed`.
 
 **Your catalog products:** any product returned by `GET /v2/catalog/products` can
 also be ordered in sandbox; codes are still test-only.
 
+### Find the test productCodes
+
+Test productCodes are specific to the sandbox. Read them from either endpoint:
+
+- `GET /v2/catalog/products?brand=Kalixo%20Test` returns them as normal catalog rows.
+- `GET /v2/sandbox/scenarios` (**Sandbox** in the [API reference](/api-reference/introduction))
+  returns each product with its expected outcome and a `sampleOrderLine` you can send to
+  `POST /v2/orders` as-is. It returns `404` on the production API.
+
+```bash
+curl "https://sandbox.kalixo.io/v2/sandbox/scenarios" \
+  -H "x-api-key: $KALIXO_SANDBOX_API_KEY"
+```
+
+```json Response (shortened, example values)
+{
+  "products": [
+    {
+      "productCode": "10999000412573",
+      "name": "Kalixo Test - Success (Fixed)",
+      "price": 499,
+      "currencyCode": "GBP",
+      "denominationType": "fixed",
+      "isSandboxProduct": true,
+      "expectedOutcome": "completed with SANDBOX-* test code(s)",
+      "sampleOrderLine": { "productCode": "10999000412573", "quantity": 1, "price": 499 }
+    }
+  ],
+  "note": "Kalixo Test products appear in GET /v2/catalog/products alongside your assigned catalog. All sandbox orders return SANDBOX-* test codes only."
+}
+```
+
 ## Wallet
 
-If wallet ordering is enabled for your account, sandbox orders **debit your test
-wallet** the same way production would. Top up your sandbox balance through your
-account manager if you need to test low-balance behaviour.
+If wallet ordering is enabled for your account, sandbox orders **debit your sandbox
+wallet** the same way production would. They never touch your production wallet. Top up
+your sandbox balance through your account manager if you need to test low-balance behaviour.
 
 ## Getting started
 
@@ -62,5 +97,5 @@ account manager if you need to test low-balance behaviour.
 4. Follow the [Quickstart](/quickstart) - place an order, poll until
    `completed`, and read the `SANDBOX-*` codes from the response.
 5. When you are ready to go live, switch to `https://api.kalixo.io/v2` and your
-   production key (`kal_live_…`). Catalog `productCode`s are identical in sandbox
-   and production, so the codes you integrated against keep working unchanged.
+   production key (`kal_live_…`). Catalog `productCode`s of your assigned products are
+   identical in sandbox and production, so the codes you integrated against keep working.

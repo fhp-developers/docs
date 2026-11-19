@@ -10,7 +10,8 @@ icon: "shield-check"
   `currency` and `line_items` until the first payment attempt; after that the API
   returns `amount_locked`. Expire the session and create a new one if the order changes.
 - **Line items must add up.** When you send `line_items`, the sum of
-  `quantity * unit_amount` must equal `amount` (`line_items_mismatch` otherwise).
+  `quantity * unit_amount` must equal `amount` (`line_items_mismatch` otherwise). See
+  [Line items](#line-items) for tax, shipping and discounts.
 - **Every provider event is checked.** If the provider ever reports a different amount,
   Kalixo sets `amount_mismatch: true`, sends `payment.amount_mismatch`, and cancels or
   refunds the payment automatically. Never fulfil a payment with `amount_mismatch: true`.
@@ -31,3 +32,59 @@ icon: "shield-check"
 | EUR, GBP, USD, SAR, AED | 49.99 | `4999` |
 | KWD, BHD, OMR, JOD | 1.500 | `1500` |
 | JPY | 1500 | `1500` |
+
+## Supported currencies
+
+Kalixo Checkout accepts these ISO 4217 currencies. Your account can be limited to some of
+them (`currency_not_enabled`); ask Kalixo integrations which ones are enabled for you.
+
+| Minor unit | Currencies |
+| --- | --- |
+| 2 decimals | AED, AUD, BRL, CAD, CHF, CZK, DKK, EGP, EUR, GBP, HKD, HUF, ILS, INR, MAD, MXN, NOK, NZD, PLN, QAR, RON, SAR, SEK, SGD, TRY, USD, ZAR |
+| 3 decimals | BHD, JOD, KWD, OMR |
+| 0 decimals | JPY |
+
+`country` is the shopper's country as an ISO 3166-1 alpha-2 code. Which payment methods
+the checkout offers depends on your account, currency and country; ask Kalixo integrations.
+
+## Line items
+
+`line_items` are optional. Kalixo stores them on the session and sends them to the payment
+provider with the payment; they never change what Kalixo charges. When you send them:
+
+- `unit_amount` is the price of **one unit, including tax**, in the minor unit.
+- `tax_amount` is the tax **included** in one unit's `unit_amount`. It is informational:
+  Kalixo does not calculate tax.
+- `tax_percentage` is in **basis points** (hundredths of a percent): 21% is `2100`, 5.5% is
+  `550`. This is different from the Distribution API, where `discountPercentage` is a plain
+  percentage (`5` is 5%).
+- The sum of `quantity * unit_amount` over all lines must equal `amount` exactly.
+
+Model shipping and discounts as lines with a `type`:
+
+| `type` | `unit_amount` | Use for |
+| --- | --- | --- |
+| `item` (default) | Zero or positive | Products |
+| `shipping` | Zero or positive | Delivery or handling fees |
+| `discount` | Zero or negative | Coupons, promotions, store credit |
+
+Example: two EUR 25.00 gift cards with 21% VAT, EUR 2.99 delivery and a EUR 5.00 coupon.
+Amounts are in minor units, so the total is 2 × 2500 + 299 − 500 = `4799` (EUR 47.99):
+
+```json
+{
+  "amount": 4799,
+  "currency": "EUR",
+  "country": "NL",
+  "reference": "order-1002",
+  "return_url": "https://shop.example.com/checkout/complete",
+  "line_items": [
+    { "name": "Gift card EUR 25", "quantity": 2, "unit_amount": 2500, "tax_amount": 434, "tax_percentage": 2100 },
+    { "name": "Delivery", "quantity": 1, "unit_amount": 299, "type": "shipping" },
+    { "name": "Spring promotion", "quantity": 1, "unit_amount": -500, "tax_amount": -87, "type": "discount" }
+  ]
+}
+```
+
+A discount line's `tax_amount` is zero or negative and never larger than its `unit_amount`
+in absolute value. A negative `unit_amount` on any other line fails with `line_items_invalid`.

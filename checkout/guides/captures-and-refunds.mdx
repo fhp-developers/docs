@@ -7,10 +7,13 @@ icon: "rotate-left"
 ## Automatic or manual capture
 
 By default, payments are captured automatically: you receive `payment.authorized`
-and then `payment.captured`.
+and then `payment.captured`, usually within seconds. "By default" means your account's
+default capture method, which is `automatic` unless Kalixo configured `manual` for your
+account. Calling capture on an automatic payment fails with `capture_not_allowed`.
 
 Set `capture_method: "manual"` on the checkout session to authorise first and capture
-later, for example when you ship.
+later, for example when you ship. See [Payment lifecycle](/checkout/concepts/payment-lifecycle#automatic-and-manual-capture)
+for the event order.
 
 ```javascript
 await kalixo.payments.capture('pay_...', { amount: 600 }); // partial capture

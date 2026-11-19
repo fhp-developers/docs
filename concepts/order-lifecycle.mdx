@@ -21,7 +21,7 @@ then poll until the codes are ready.
   See [Partial deliveries](#partial-deliveries) below.
 </ResponseField>
 <ResponseField name="failed" type="status">
-  No codes were delivered. The response includes a `reason`.
+  No codes were delivered. The response includes a `reason` (`Order could not be fulfilled`).
 </ResponseField>
 
 <Note>
@@ -57,11 +57,12 @@ Each line in `orderProducts` carries a **unit price** in minor units (validated 
 | Field | Meaning |
 | --- | --- |
 | `orderProducts[].price` | **Unit price** per line. Required for open-denomination products; for fixed products it must match the catalog price. |
+| `orderProducts[].country` | The market to fulfil: the `countryCode` of the catalog row. Required when the product's `availableCountries` has more than one entry. |
 | Top-level `price` | **Optional order total**. If you send it, it must equal `sum(unitPrice × quantity)` across all lines. If omitted, Kalixo computes the total from your lines. |
 
 ### Multi-line example
 
-Two fixed-price products totalling **15000** minor units (£100 + £50):
+Two fixed-price products totalling **15000** minor units (GBP 100.00 + GBP 50.00):
 
 ```json
 {
@@ -69,11 +70,35 @@ Two fixed-price products totalling **15000** minor units (£100 + £50):
   "currency": "GBP",
   "price": 15000,
   "orderProducts": [
-    { "productCode": "10020000213575", "price": 10000, "quantity": 1 },
-    { "productCode": "10001000000421", "price": 5000, "quantity": 1 }
+    { "productCode": "10020000213575", "country": "GB", "price": 10000, "quantity": 1 },
+    { "productCode": "10001000000421", "country": "GB", "price": 5000, "quantity": 1 }
   ]
 }
 ```
+
+## Regional products
+
+A regional product can be sold in several countries. The catalog returns one row per
+country, all with the same `productCode`, and each row lists every market in
+`availableCountries`. Tell Kalixo which market to fulfil with `country` on the order line:
+
+```json
+{
+  "externalOrderCode": "O-12346",
+  "currency": "EUR",
+  "orderProducts": [
+    { "productCode": "10001000227724", "country": "DE", "price": 5000, "quantity": 2 }
+  ]
+}
+```
+
+| You send | Result |
+| --- | --- |
+| `country` from the catalog row | The order is fulfilled for that market |
+| A market `sku` (`DE-DE-10001000227724`) and no `country` | The country prefix of the `sku` is used |
+| Neither, and the product has one market | That market is used |
+| Neither, and the product has several markets | `400`: `Product {productCode} is available in multiple countries (DE, FR, IT); pass country (or a market sku) on the line` |
+| A country outside `availableCountries` | `400`: `Product {productCode} is not available in ES (available: DE, FR, IT)` |
 
 ## Redemption codes
 
@@ -110,7 +135,7 @@ Poll `GET /orders/{reference}` until you reach a terminal status. While the orde
     Poll at or after `estimatedReadyAt`, then every minute or so. Avoid tight polling loops.
   </Card>
   <Card title="Idempotency" icon="fingerprint" href="/concepts/idempotency">
-    Re-submitting the same `externalOrderCode` returns the existing order - never a duplicate.
+    Re-submitting the same `externalOrderCode` returns `202` with the existing order - never a duplicate.
   </Card>
 </CardGroup>
 
@@ -151,36 +176,52 @@ Example - 3 of 5 codes delivered:
 
 ## Polling example
 
+The example waits until `estimatedReadyAt`, then polls once a minute. It retries rate limits,
+`5xx` responses and network errors with backoff, and gives up after a maximum wait. Other
+`4xx` responses are not retried: they need a fix on your side.
+
 ```javascript Node
+const BASE_URL = "https://api.kalixo.io/v2";
 const POLL_MS = 60_000;
+const MAX_WAIT_MS = 2 * 60 * 60_000; // stop polling after 2 hours
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function waitUntil(iso) {
-  const ms = Math.max(0, new Date(iso).getTime() - Date.now());
-  return sleep(ms);
-}
-
-async function fetchOrder(ref) {
-  const res = await fetch(`https://api.kalixo.io/v2/orders/${ref}`, {
-    headers: { "x-api-key": process.env.KALIXO_API_KEY },
-  });
-  if (res.status === 429) {
-    const retryAfter = Number(res.headers.get("Retry-After") ?? "60");
-    await sleep(retryAfter * 1000);
-    return fetchOrder(ref);
+async function fetchOrder(ref, attempt = 0) {
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}/orders/${encodeURIComponent(ref)}`, {
+      headers: { "x-api-key": process.env.KALIXO_API_KEY },
+    });
+  } catch (networkError) {
+    if (attempt >= 5) throw networkError;
+    await sleep(Math.min(2 ** attempt * 1000, 30_000));
+    return fetchOrder(ref, attempt + 1);
   }
-  if (!res.ok) throw new Error(`Order fetch failed: ${res.status}`);
+  if (res.status === 429) {
+    await sleep(Number(res.headers.get("Retry-After") ?? "60") * 1000);
+    return fetchOrder(ref, attempt);
+  }
+  if (res.status >= 500 && attempt < 5) {
+    await sleep(Math.min(2 ** attempt * 1000, 30_000));
+    return fetchOrder(ref, attempt + 1);
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(`Order fetch failed (${res.status}, request ${res.headers.get("X-Request-Id")}): ${body.message}`);
+  }
   return res.json();
 }
 
 async function waitForOrder(ref, estimatedReadyAt) {
-  if (estimatedReadyAt) await waitUntil(estimatedReadyAt);
+  const deadline = Date.now() + MAX_WAIT_MS;
+  if (estimatedReadyAt) await sleep(Math.max(0, new Date(estimatedReadyAt) - Date.now()));
   for (;;) {
     const order = await fetchOrder(ref);
-    if (order.status !== "processing") return order;
+    if (order.status !== "processing") return order; // completed, partially_completed or failed
+    if (Date.now() >= deadline) {
+      throw new Error(`Order ${ref} still processing after ${MAX_WAIT_MS / 60_000} minutes; contact support`);
+    }
     await sleep(POLL_MS);
   }
 }
@@ -189,3 +230,10 @@ async function waitForOrder(ref, estimatedReadyAt) {
 // const { orderId, estimatedReadyAt } = await placeRes.json();
 // const order = await waitForOrder(orderId, estimatedReadyAt);
 ```
+
+<Tip>
+  Choose the maximum wait from the order size: `estimatedReadyAt` is about 5 minutes after
+  placement for up to 50 codes, 30 minutes for up to 500, and 60 minutes above that. If an
+  order is still `processing` well past its estimate, contact
+  [integrations@kalixo.io](mailto:integrations@kalixo.io) with the `orderId`.
+</Tip>

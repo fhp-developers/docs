@@ -13,6 +13,12 @@ info:
     - Client endpoints are called by `Kalixo.js` with a publishable key and the
       checkout session's `client_secret`.
     - Every `POST` with a secret key requires an `Idempotency-Key` header.
+    - Every response has a `Request-Id` header. Errors repeat it in `error.request_id`;
+      include it when you contact Kalixo support.
+    - Bursts above about 50 requests per second per API key can be rejected with
+      `429 rate_limit_error`. Retry with exponential backoff.
+    - Request bodies with unknown fields are rejected (`parameter_invalid`). Responses
+      and events can gain fields at any time; ignore the ones you do not know.
   contact:
     name: Kalixo Checkout integrations
     email: integrations@kalixo.io
@@ -23,7 +29,7 @@ servers:
   - url: https://checkout.kalixo.io
     description: Live
   - url: https://sandbox.checkout.kalixo.io
-    description: Sandbox (test keys only, connected to the provider test environment)
+    description: Sandbox (test keys only, never moves money)
 security:
   - secretKey: []
 tags:
@@ -45,6 +51,8 @@ tags:
     description: Where Kalixo delivers signed events.
   - name: Reports
     description: CSV exports of transactions for reconciliation and partner invoicing.
+  - name: Test helpers
+    description: Sandbox only. Send test webhook events and simulate disputes.
   - name: Client
     description: Called by Kalixo.js and the hosted checkout. Not for partner servers.
 
@@ -64,13 +72,25 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreateCheckoutSessionRequest" }
+            examples:
+              minimal: { $ref: "#/components/examples/CreateSessionMinimal" }
+              lineItems: { $ref: "#/components/examples/CreateSessionWithLineItems" }
+              manualCapture: { $ref: "#/components/examples/CreateSessionManualCapture" }
       responses:
         "200":
           description: Checkout session created.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/CheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                session: { $ref: "#/components/examples/CheckoutSessionOpen" }
+        "400": { $ref: "#/components/responses/CreateSessionBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "402": { $ref: "#/components/responses/AmountLimitExceeded" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Checkout sessions]
       operationId: listCheckoutSessions
@@ -97,7 +117,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/CheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/checkout-sessions/{id}:
     parameters:
@@ -112,7 +135,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/CheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                session: { $ref: "#/components/examples/CheckoutSessionOpen" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     patch:
       tags: [Checkout sessions]
       operationId: updateCheckoutSession
@@ -126,13 +154,22 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/UpdateCheckoutSessionRequest" }
+            examples:
+              amount: { $ref: "#/components/examples/UpdateSessionAmount" }
       responses:
         "200":
           description: The updated checkout session.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/CheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                session: { $ref: "#/components/examples/CheckoutSessionOpen" }
+        "400": { $ref: "#/components/responses/UpdateSessionBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/UpdateSessionConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/checkout-sessions/{id}/expire:
     parameters:
@@ -141,7 +178,7 @@ paths:
       tags: [Checkout sessions]
       operationId: expireCheckoutSession
       summary: Expire a checkout session
-      description: Fails with `payment_in_progress` if an attempt is still being processed.
+      description: Fails with `payment_in_progress` if an attempt is still being processed, and with `session_not_open` if the session is already complete or expired.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
@@ -150,7 +187,14 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/CheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                expired: { $ref: "#/components/examples/CheckoutSessionExpired" }
+        "400": { $ref: "#/components/responses/PostBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ExpireSessionConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payments:
     get:
@@ -185,7 +229,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/Payment" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payments/{id}:
     parameters:
@@ -200,7 +247,14 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Payment" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                captured: { $ref: "#/components/examples/PaymentCaptured" }
+                authorized: { $ref: "#/components/examples/PaymentAuthorized" }
+                declined: { $ref: "#/components/examples/PaymentDeclined" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payments/{id}/capture:
     parameters:
@@ -210,7 +264,9 @@ paths:
       operationId: capturePayment
       summary: Capture an authorized payment
       description: |
-        Captures a payment created with `capture_method: manual`. Omit `amount`
+        Captures a payment created with `capture_method: manual`. Payments with
+        `capture_method: automatic` are captured by Kalixo and fail here with
+        `capture_not_allowed`. Omit `amount`
         to capture the full remaining authorized amount. Partial captures are
         allowed where the payment method supports them. Captures are
         asynchronous: the result arrives as `payment.captured`,
@@ -229,13 +285,23 @@ paths:
                   format: int64
                   minimum: 1
                   description: Amount to capture. Cannot exceed the capturable amount.
+            examples:
+              full: { $ref: "#/components/examples/CaptureFull" }
+              partial: { $ref: "#/components/examples/CapturePartial" }
       responses:
         "200":
           description: Capture requested.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Capture" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                pending: { $ref: "#/components/examples/CapturePending" }
+        "400": { $ref: "#/components/responses/CaptureBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/CaptureConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payments/{id}/cancel:
     parameters:
@@ -255,7 +321,14 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Cancellation" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                pending: { $ref: "#/components/examples/CancellationPending" }
+        "400": { $ref: "#/components/responses/PostBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/CancelConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/refunds:
     post:
@@ -274,13 +347,23 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreateRefundRequest" }
+            examples:
+              partial: { $ref: "#/components/examples/CreateRefundPartial" }
+              full: { $ref: "#/components/examples/CreateRefundFull" }
       responses:
         "200":
           description: Refund requested.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Refund" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                pending: { $ref: "#/components/examples/RefundPending" }
+        "400": { $ref: "#/components/responses/RefundBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/RefundConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Refunds]
       operationId: listRefunds
@@ -304,7 +387,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/Refund" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/refunds/{id}:
     parameters:
@@ -319,7 +405,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Refund" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                succeeded: { $ref: "#/components/examples/RefundSucceeded" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payment-links:
     post:
@@ -337,13 +428,21 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreatePaymentLinkRequest" }
+            examples:
+              singleUse: { $ref: "#/components/examples/CreatePaymentLink" }
       responses:
         "200":
           description: Payment link created.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/PaymentLink" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                link: { $ref: "#/components/examples/PaymentLink" }
+        "400": { $ref: "#/components/responses/PaymentLinkBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Payment links]
       operationId: listPaymentLinks
@@ -364,7 +463,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/PaymentLink" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payment-links/{id}:
     parameters:
@@ -379,7 +481,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/PaymentLink" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                link: { $ref: "#/components/examples/PaymentLink" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/payment-links/{id}/deactivate:
     parameters:
@@ -396,7 +503,14 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/PaymentLink" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                inactive: { $ref: "#/components/examples/PaymentLinkInactive" }
+        "400": { $ref: "#/components/responses/PostBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/customers:
     post:
@@ -411,13 +525,21 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreateCustomerRequest" }
+            examples:
+              customer: { $ref: "#/components/examples/CreateCustomer" }
       responses:
         "200":
           description: Customer created.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Customer" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                customer: { $ref: "#/components/examples/Customer" }
+        "400": { $ref: "#/components/responses/PostBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Customers]
       operationId: listCustomers
@@ -441,7 +563,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/Customer" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/customers/{id}:
     parameters:
@@ -456,7 +581,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Customer" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                customer: { $ref: "#/components/examples/Customer" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/customers/{id}/payment-methods:
     parameters:
@@ -478,7 +608,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/PaymentMethod" }
-        default: { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/customers/{id}/payment-methods/{payment_method_id}:
     parameters:
@@ -498,7 +631,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/PaymentMethod" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                detached: { $ref: "#/components/examples/PaymentMethodDetached" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/disputes:
     get:
@@ -524,7 +662,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/Dispute" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/disputes/{id}:
     parameters:
@@ -539,7 +680,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Dispute" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                needsResponse: { $ref: "#/components/examples/DisputeNeedsResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/disputes/{id}/evidence:
     parameters:
@@ -560,13 +706,22 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/UploadDisputeEvidenceRequest" }
+            examples:
+              proofOfDelivery: { $ref: "#/components/examples/UploadEvidence" }
       responses:
         "200":
           description: The dispute with the new evidence document.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Dispute" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                withEvidence: { $ref: "#/components/examples/DisputeWithEvidence" }
+        "400": { $ref: "#/components/responses/EvidenceBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/EvidenceConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/events:
     get:
@@ -596,7 +751,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/Event" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/events/{id}:
     parameters:
@@ -611,7 +769,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Event" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                paymentCaptured: { $ref: "#/components/examples/EventPaymentCaptured" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/webhook-endpoints:
     post:
@@ -626,13 +789,21 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreateWebhookEndpointRequest" }
+            examples:
+              paymentEvents: { $ref: "#/components/examples/CreateWebhookEndpoint" }
       responses:
         "200":
           description: Webhook endpoint created.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                created: { $ref: "#/components/examples/WebhookEndpointCreated" }
+        "400": { $ref: "#/components/responses/WebhookEndpointBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Webhook endpoints]
       operationId: listWebhookEndpoints
@@ -650,7 +821,9 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/webhook-endpoints/{id}:
     parameters:
@@ -665,7 +838,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                endpoint: { $ref: "#/components/examples/WebhookEndpoint" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     patch:
       tags: [Webhook endpoints]
       operationId: updateWebhookEndpoint
@@ -675,13 +853,21 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/UpdateWebhookEndpointRequest" }
+            examples:
+              disable: { $ref: "#/components/examples/UpdateWebhookEndpoint" }
       responses:
         "200":
           description: The updated webhook endpoint.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                endpoint: { $ref: "#/components/examples/WebhookEndpoint" }
+        "400": { $ref: "#/components/responses/WebhookEndpointBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     delete:
       tags: [Webhook endpoints]
       operationId: deleteWebhookEndpoint
@@ -692,7 +878,10 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/webhook-endpoints/{id}/rotate-secret:
     parameters:
@@ -712,7 +901,14 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WebhookEndpoint" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                rotated: { $ref: "#/components/examples/WebhookEndpointCreated" }
+        "400": { $ref: "#/components/responses/PostBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/reports:
     post:
@@ -730,13 +926,21 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/CreateReportRequest" }
+            examples:
+              financialTransactions: { $ref: "#/components/examples/CreateReport" }
       responses:
         "200":
           description: Report export started.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ReportExport" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                pending: { $ref: "#/components/examples/ReportPending" }
+        "400": { $ref: "#/components/responses/ReportBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
     get:
       tags: [Reports]
       operationId: listReports
@@ -757,7 +961,10 @@ paths:
                       data:
                         type: array
                         items: { $ref: "#/components/schemas/ReportExport" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/reports/{id}:
     parameters:
@@ -772,7 +979,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ReportExport" }
-        default: { $ref: "#/components/responses/Error" }
+              examples:
+                ready: { $ref: "#/components/examples/ReportReady" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/reports/{id}/download:
     parameters:
@@ -787,7 +999,11 @@ paths:
           content:
             text/csv:
               schema: { type: string }
-        default: { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ReportNotReady" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
   /v1/client/checkout-sessions/{id}:
     parameters:
@@ -810,7 +1026,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ClientCheckoutSession" }
-        default: { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/ClientUnauthorized" }
+        "403": { $ref: "#/components/responses/ClientForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
+        "503": { $ref: "#/components/responses/RouteUnavailable" }
 
   /v1/client/checkout-sessions/{id}/attempts:
     parameters:
@@ -834,7 +1055,15 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ClientAttemptResult" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/ClientUnauthorized" }
+        "402": { $ref: "#/components/responses/AmountLimitExceeded" }
+        "403": { $ref: "#/components/responses/ClientForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/ClientConflict" }
+        "429": { $ref: "#/components/responses/ClientTooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
+        "503": { $ref: "#/components/responses/RouteUnavailable" }
 
   /v1/client/attempts/{id}/details:
     parameters:
@@ -865,7 +1094,169 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ClientAttemptResult" }
-        default: { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/ClientUnauthorized" }
+        "403": { $ref: "#/components/responses/ClientForbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /v1/test-helpers/webhook-endpoints/{id}/send-event:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Test helpers]
+      operationId: sendTestWebhookEvent
+      summary: Send a test event to a webhook endpoint
+      description: |
+        Sandbox only. Signs a sample event of `type` with the endpoint's secret
+        and sends it to the endpoint once, synchronously. The response tells you
+        whether your endpoint answered with a `2xx`.
+
+        Test events are not stored in `GET /v1/events`, are not retried and go
+        only to this endpoint, even if it does not subscribe to `type` or is
+        disabled. Their objects do not exist: `reference` is `kalixo_test_event`
+        and `metadata.kalixo_test_event` is `"true"` where the object has them.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  allOf:
+                    - $ref: "#/components/schemas/EventType"
+                  default: payment.captured
+            examples:
+              paymentCaptured: { $ref: "#/components/examples/SendTestEvent" }
+      responses:
+        "200":
+          description: The delivery result.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookTestDelivery" }
+              examples:
+                delivered: { $ref: "#/components/examples/TestDelivery" }
+        "400": { $ref: "#/components/responses/TestHelperBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/IdempotencyConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /v1/test-helpers/payments/{id}/dispute:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Test helpers]
+      operationId: simulateDispute
+      summary: Simulate a dispute on a sandbox payment
+      description: |
+        Sandbox only. Moves a dispute on a captured payment to `stage`, the way a
+        real chargeback does. The dispute and its events (`dispute.created`,
+        `dispute.funds_withdrawn`, `dispute.won`, `dispute.lost`) follow
+        asynchronously, usually within seconds.
+
+        | `stage` | Dispute status | Events |
+        | --- | --- | --- |
+        | `opened` | `needs_response` | `dispute.created` |
+        | `funds_withdrawn` | `funds_withdrawn` | `dispute.funds_withdrawn` |
+        | `won` | `won` | `dispute.won` |
+        | `lost` | `lost` | `dispute.lost` |
+
+        Later stages apply to the payment's open dispute, or open a new one.
+        Works for payments made with the sandbox test cards only.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stage:
+                  type: string
+                  enum: [opened, funds_withdrawn, won, lost]
+                  default: opened
+            examples:
+              opened: { $ref: "#/components/examples/SimulateDisputeOpened" }
+              lost: { $ref: "#/components/examples/SimulateDisputeLost" }
+      responses:
+        "200":
+          description: The simulation was queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DisputeSimulation" }
+              examples:
+                queued: { $ref: "#/components/examples/DisputeSimulation" }
+        "400": { $ref: "#/components/responses/TestHelperBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/DisputeSimulationConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /v1/test-helpers/checkout-sessions/{id}/simulate:
+    parameters:
+      - $ref: "#/components/parameters/PathId"
+    post:
+      tags: [Test helpers]
+      operationId: simulateCheckoutSession
+      summary: Simulate a payment on a sandbox checkout session
+      description: |
+        Sandbox only. Pays an open checkout session without a shopper, so you can test your
+        order flow and webhook handling end to end without a browser or 3D Secure.
+
+        The payment goes through Kalixo's sandbox test processor, never a real payment provider.
+        Everything after that is the normal flow: `payment.authorized`, then `payment.captured`
+        once the capture is confirmed (or `payment.failed`), and `checkout_session.completed`.
+        You can refund the payment and simulate a dispute on it with
+        `POST /v1/test-helpers/payments/{id}/dispute`.
+
+        | `outcome` | Result |
+        | --- | --- |
+        | `succeeded` | Authorised and, with automatic capture, captured |
+        | `declined` | Declined; the session stays open, so you can simulate again |
+        | `insufficient_funds` | Declined with `decline_code: insufficient_funds` |
+        | `processing` | Pending; the outcome arrives by webhook |
+        | `amount_mismatch` | Reported with a different amount; Kalixo reverses it and sends `payment.amount_mismatch` |
+
+        Use a session the shopper has not paid on yet: a session with an attempt at a payment
+        provider returns `session_has_attempts`.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outcome:
+                  type: string
+                  enum: [succeeded, declined, insufficient_funds, processing, amount_mismatch]
+                  default: succeeded
+            examples:
+              succeeded: { $ref: "#/components/examples/SimulateSessionSucceeded" }
+              declined: { $ref: "#/components/examples/SimulateSessionDeclined" }
+      responses:
+        "200":
+          description: The simulated attempt and its immediate result. Webhooks follow.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSessionSimulation" }
+              examples:
+                succeeded: { $ref: "#/components/examples/CheckoutSessionSimulation" }
+        "400": { $ref: "#/components/responses/TestHelperBadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/SessionSimulationConflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ServerError" }
 
 webhooks:
   event:
@@ -887,12 +1278,20 @@ webhooks:
         - name: Kalixo-Event-Id
           in: header
           required: true
+          description: Same as the event `id`. Deduplicate on it.
           schema: { type: string }
+        - name: Kalixo-Event-Type
+          in: header
+          required: true
+          description: Same as the event `type`.
+          schema: { $ref: "#/components/schemas/EventType" }
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: "#/components/schemas/Event" }
+            examples:
+              paymentCaptured: { $ref: "#/components/examples/EventPaymentCaptured" }
       responses:
         "200":
           description: Accepted.
@@ -913,7 +1312,10 @@ components:
       name: Idempotency-Key
       in: header
       required: true
-      description: Unique key per logical request, reused on retries. 1 to 255 characters.
+      description: |
+        Unique key per logical request, reused on retries. 1 to 255 characters, kept for
+        24 hours. A retry with the same key and body returns the stored response with the
+        header `Idempotent-Replayed: true`.
       schema: { type: string, minLength: 1, maxLength: 255 }
     ClientSecret:
       name: Kalixo-Client-Secret
@@ -936,12 +1338,869 @@ components:
       description: Cursor from a previous page's `next_cursor`.
       schema: { type: string }
 
+  headers:
+    RequestId:
+      description: Unique ID of the request. Send it to Kalixo support. Matches `error.request_id`.
+      schema: { type: string, examples: [req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e] }
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema: { type: integer, minimum: 1, examples: [12] }
+
   responses:
-    Error:
-      description: Error.
+    BadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            parameter_invalid: { $ref: "#/components/examples/ErrParameterInvalid" }
+    PostBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+            parameter_invalid: { $ref: "#/components/examples/ErrParameterInvalid" }
+    CreateSessionBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            line_items_mismatch: { $ref: "#/components/examples/ErrLineItemsMismatch" }
+            line_items_invalid: { $ref: "#/components/examples/ErrLineItemsInvalid" }
+            amount_invalid: { $ref: "#/components/examples/ErrAmountInvalid" }
+            currency_not_enabled: { $ref: "#/components/examples/ErrCurrencyNotEnabled" }
+            country_invalid: { $ref: "#/components/examples/ErrCountryInvalid" }
+            url_invalid: { $ref: "#/components/examples/ErrUrlInvalid" }
+            return_url_not_allowed: { $ref: "#/components/examples/ErrReturnUrlNotAllowed" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+            parameter_invalid: { $ref: "#/components/examples/ErrParameterInvalid" }
+    UpdateSessionBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            line_items_mismatch: { $ref: "#/components/examples/ErrLineItemsMismatch" }
+            amount_invalid: { $ref: "#/components/examples/ErrAmountInvalid" }
+    CaptureBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            amount_too_large: { $ref: "#/components/examples/ErrCaptureAmountTooLarge" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+    RefundBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            amount_too_large: { $ref: "#/components/examples/ErrRefundAmountTooLarge" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+    PaymentLinkBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            expires_at_invalid: { $ref: "#/components/examples/ErrExpiresAtInvalid" }
+            country_invalid: { $ref: "#/components/examples/ErrCountryInvalid" }
+            return_url_not_allowed: { $ref: "#/components/examples/ErrReturnUrlNotAllowed" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+    EvidenceBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            file_too_large: { $ref: "#/components/examples/ErrFileTooLarge" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+    WebhookEndpointBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            url_invalid: { $ref: "#/components/examples/ErrWebhookUrlInvalid" }
+            url_not_public: { $ref: "#/components/examples/ErrWebhookUrlNotPublic" }
+            limit_reached: { $ref: "#/components/examples/ErrLimitReached" }
+            unknown_event_type: { $ref: "#/components/examples/ErrUnknownEventType" }
+    ReportBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            period_too_long: { $ref: "#/components/examples/ErrPeriodTooLong" }
+            idempotency_key_missing: { $ref: "#/components/examples/ErrIdempotencyKeyMissing" }
+    TestHelperBadRequest:
+      description: Invalid request (`invalid_request_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            test_mode_only: { $ref: "#/components/examples/ErrTestModeOnly" }
+            test_helper_unavailable: { $ref: "#/components/examples/ErrTestHelperUnavailable" }
+            parameter_invalid: { $ref: "#/components/examples/ErrParameterInvalid" }
+    Unauthorized:
+      description: Missing, invalid or wrong-mode API key (`authentication_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            api_key_missing: { $ref: "#/components/examples/ErrApiKeyMissing" }
+            api_key_invalid: { $ref: "#/components/examples/ErrApiKeyInvalid" }
+            api_key_mode_mismatch: { $ref: "#/components/examples/ErrApiKeyModeMismatch" }
+            secret_key_required: { $ref: "#/components/examples/ErrSecretKeyRequired" }
+    ClientUnauthorized:
+      description: Missing or wrong publishable key (`authentication_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            publishable_key_required: { $ref: "#/components/examples/ErrPublishableKeyRequired" }
+            api_key_invalid: { $ref: "#/components/examples/ErrApiKeyInvalid" }
+    AmountLimitExceeded:
+      description: The amount exceeds a limit on your account (`payment_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            amount_limit_exceeded: { $ref: "#/components/examples/ErrAmountLimitExceeded" }
+    ClientForbidden:
+      description: Not allowed (`permission_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            origin_not_allowed: { $ref: "#/components/examples/ErrOriginNotAllowed" }
+    NotFound:
+      description: The object does not exist for your account (`not_found_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            resource_missing: { $ref: "#/components/examples/ErrResourceMissing" }
+    IdempotencyConflict:
+      description: Idempotency key conflict (`idempotency_error`).
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+            idempotency_request_in_progress: { $ref: "#/components/examples/ErrIdempotencyInProgress" }
+    UpdateSessionConflict:
+      description: The session cannot change in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            amount_locked: { $ref: "#/components/examples/ErrAmountLocked" }
+            session_not_open: { $ref: "#/components/examples/ErrSessionNotOpen" }
+    ExpireSessionConflict:
+      description: The session cannot be expired now, or is no longer open.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            payment_in_progress: { $ref: "#/components/examples/ErrPaymentInProgress" }
+            session_not_open: { $ref: "#/components/examples/ErrSessionNotOpen" }
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+    CaptureConflict:
+      description: The payment cannot be captured in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            capture_not_allowed: { $ref: "#/components/examples/ErrCaptureNotAllowed" }
+            payment_not_capturable: { $ref: "#/components/examples/ErrPaymentNotCapturable" }
+            payment_amount_mismatch: { $ref: "#/components/examples/ErrPaymentAmountMismatch" }
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+    CancelConflict:
+      description: The payment cannot be canceled in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            payment_not_cancelable: { $ref: "#/components/examples/ErrPaymentNotCancelable" }
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+    RefundConflict:
+      description: The payment cannot be refunded in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            payment_disputed: { $ref: "#/components/examples/ErrPaymentDisputed" }
+            payment_not_refundable: { $ref: "#/components/examples/ErrPaymentNotRefundable" }
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+    EvidenceConflict:
+      description: The dispute no longer accepts evidence.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            dispute_not_open: { $ref: "#/components/examples/ErrDisputeNotOpen" }
+            idempotency_key_reused: { $ref: "#/components/examples/ErrIdempotencyKeyReused" }
+    ReportNotReady:
+      description: The report is not ready yet.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            report_not_ready: { $ref: "#/components/examples/ErrReportNotReady" }
+    ClientConflict:
+      description: The checkout session no longer accepts payments.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            session_not_open: { $ref: "#/components/examples/ErrSessionNotOpen" }
+            session_expired: { $ref: "#/components/examples/ErrSessionExpired" }
+            payment_in_progress: { $ref: "#/components/examples/ErrPaymentInProgressClient" }
+    DisputeSimulationConflict:
+      description: The payment cannot be disputed in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            payment_not_disputable: { $ref: "#/components/examples/ErrPaymentNotDisputable" }
+            dispute_already_open: { $ref: "#/components/examples/ErrDisputeAlreadyOpen" }
+    SessionSimulationConflict:
+      description: The checkout session cannot be simulated in its current state.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            session_not_open: { $ref: "#/components/examples/ErrSessionNotOpen" }
+            session_expired: { $ref: "#/components/examples/ErrSessionExpired" }
+            session_has_attempts: { $ref: "#/components/examples/ErrSessionHasAttempts" }
+            payment_in_progress: { $ref: "#/components/examples/ErrPaymentInProgressClient" }
+    TooManyRequests:
+      description: Too many requests (`rate_limit_error`). Wait for `Retry-After` seconds, then retry with exponential backoff.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            rate_limited: { $ref: "#/components/examples/ErrRateLimited" }
+    ClientTooManyRequests:
+      description: Too many payment attempts (`rate_limit_error`). `too_many_attempts` is final for the session; after `rate_limited`, wait for `Retry-After` seconds.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            too_many_attempts: { $ref: "#/components/examples/ErrTooManyAttempts" }
+            rate_limited: { $ref: "#/components/examples/ErrAttemptsRateLimited" }
+    ServerError:
+      description: Kalixo-side error (`api_error`). Retry with the same `Idempotency-Key`.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            internal_error: { $ref: "#/components/examples/ErrInternal" }
+    RouteUnavailable:
+      description: Kalixo cannot process this payment right now (`api_error`). Retry later.
+      headers:
+        Request-Id: { $ref: "#/components/headers/RequestId" }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+          examples:
+            payment_route_unavailable: { $ref: "#/components/examples/ErrRouteUnavailable" }
+
+  examples:
+    # Requests
+    CreateSessionMinimal:
+      summary: EUR 49.99, automatic capture
+      description: Amounts are integers in the minor unit. `4999` is EUR 49.99.
+      value:
+        amount: 4999
+        currency: EUR
+        country: NL
+        reference: order-1001
+        return_url: https://shop.example.com/checkout/complete
+        metadata: { cartId: abc }
+    CreateSessionWithLineItems:
+      summary: Line items with tax, shipping and a discount (EUR 47.99)
+      description: |
+        `unit_amount` includes tax. The lines add up to `amount`:
+        2 x 2500 + 299 - 500 = 4799 (EUR 47.99).
+      value:
+        amount: 4799
+        currency: EUR
+        country: NL
+        reference: order-1002
+        return_url: https://shop.example.com/checkout/complete
+        line_items:
+          - { name: Gift card EUR 25, quantity: 2, unit_amount: 2500, tax_amount: 434, tax_percentage: 2100, sku: GC-EUR-25 }
+          - { name: Delivery, quantity: 1, unit_amount: 299, type: shipping }
+          - { name: Spring promotion, quantity: 1, unit_amount: -500, tax_amount: -87, type: discount }
+    CreateSessionManualCapture:
+      summary: GBP 25.00, manual capture for a stored card
+      value:
+        amount: 2500
+        currency: GBP
+        country: GB
+        reference: order-2002
+        return_url: https://shop.example.com/checkout/complete
+        capture_method: manual
+        customer: cus_01M75NC2D7E1F4G7H1J4K8M2NP
+        store_payment_method: true
+        expires_in: 1800
+    UpdateSessionAmount:
+      summary: Change the amount before the shopper pays (EUR 54.99)
+      value:
+        amount: 5499
+        metadata: { cartId: abc, coupon: none }
+    CaptureFull:
+      summary: Capture the remaining authorised amount
+      value: {}
+    CapturePartial:
+      summary: Capture EUR 6.00 of the authorisation
+      value: { amount: 600 }
+    CreateRefundPartial:
+      summary: Refund EUR 3.00
+      value: { payment: pay_01M75N56PRT5WA5G2JF25B20RJ, amount: 300, reason: requested_by_customer, metadata: { ticket: SUP-8812 } }
+    CreateRefundFull:
+      summary: Refund the rest of the captured amount
+      value: { payment: pay_01M75N56PRT5WA5G2JF25B20RJ }
+    CreatePaymentLink:
+      summary: Single-use link for EUR 15.00
+      value: { amount: 1500, currency: EUR, country: NL, reference: invoice-77, expires_at: "2026-11-30T23:59:59Z" }
+    CreateCustomer:
+      summary: Customer for one-click checkout
+      value: { reference: user-42, email: shopper@example.com, name: Sam Shopper }
+    UploadEvidence:
+      summary: Proof of delivery (PDF)
+      value:
+        document_type: proof_of_delivery
+        file_name: delivery-order-1001.pdf
+        content_type: application/pdf
+        content_base64: JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFI+PgpzdHJlYW0K
+        description: Code delivered to the shopper account on 12 October
+    CreateWebhookEndpoint:
+      summary: Endpoint for payment and refund events
+      value: { url: https://shop.example.com/webhooks/kalixo-checkout, description: Production order service, enabled_events: [payment.captured, payment.failed, payment.amount_mismatch, refund.succeeded, refund.failed] }
+    UpdateWebhookEndpoint:
+      summary: Disable an endpoint
+      value: { status: disabled }
+    CreateReport:
+      summary: October financial transactions
+      value: { type: financial_transactions, period_start: "2026-10-01T00:00:00Z", period_end: "2026-11-01T00:00:00Z" }
+    SendTestEvent:
+      summary: Send a sample payment.captured event
+      value: { type: payment.captured }
+    SimulateDisputeOpened:
+      summary: Open a dispute
+      value: { stage: opened }
+    SimulateDisputeLost:
+      summary: Lose the open dispute
+      value: { stage: lost }
+
+    # Objects
+    CheckoutSessionOpen:
+      summary: Open session (EUR 49.99)
+      value:
+        id: cs_01M75N56PR5PD2YXWBDEYS6GY0
+        object: checkout_session
+        status: open
+        payment: pay_01M75N56PRT5WA5G2JF25B20RJ
+        amount: 4999
+        currency: EUR
+        country: NL
+        reference: order-1001
+        description: null
+        capture_method: automatic
+        customer: null
+        customer_email: null
+        line_items: []
+        store_payment_method: false
+        locale: en-GB
+        return_url: https://shop.example.com/checkout/complete
+        url: "https://checkout.kalixo.io/c/cs_01M75N56PR5PD2YXWBDEYS6GY0#cs_01M75N56PR5PD2YXWBDEYS6GY0_secret_Qm9yZ2VzX3NlY3JldF9leGFtcGxl"
+        client_secret: cs_01M75N56PR5PD2YXWBDEYS6GY0_secret_Qm9yZ2VzX3NlY3JldF9leGFtcGxl
+        amount_locked: false
+        payment_link: null
+        metadata: { cartId: abc }
+        version: 1
+        expires_at: "2026-10-13T17:20:00.000Z"
+        created_at: "2026-10-13T16:20:00.000Z"
+        livemode: false
+    CheckoutSessionExpired:
+      summary: Expired session
+      value:
+        id: cs_01M75N56PR5PD2YXWBDEYS6GY0
+        object: checkout_session
+        status: expired
+        payment: pay_01M75N56PRT5WA5G2JF25B20RJ
+        amount: 4999
+        currency: EUR
+        country: NL
+        reference: order-1001
+        description: null
+        capture_method: automatic
+        customer: null
+        customer_email: null
+        line_items: []
+        store_payment_method: false
+        locale: en-GB
+        return_url: https://shop.example.com/checkout/complete
+        url: "https://checkout.kalixo.io/c/cs_01M75N56PR5PD2YXWBDEYS6GY0#cs_01M75N56PR5PD2YXWBDEYS6GY0_secret_Qm9yZ2VzX3NlY3JldF9leGFtcGxl"
+        client_secret: cs_01M75N56PR5PD2YXWBDEYS6GY0_secret_Qm9yZ2VzX3NlY3JldF9leGFtcGxl
+        amount_locked: false
+        payment_link: null
+        metadata: { cartId: abc }
+        version: 2
+        expires_at: "2026-10-13T17:20:00.000Z"
+        created_at: "2026-10-13T16:20:00.000Z"
+        livemode: false
+    PaymentCaptured:
+      summary: Captured (automatic capture, EUR 49.99)
+      value:
+        id: pay_01M75N56PRT5WA5G2JF25B20RJ
+        object: payment
+        status: captured
+        amount: 4999
+        currency: EUR
+        amount_authorized: 4999
+        amount_captured: 4999
+        amount_refunded: 0
+        amount_disputed: 0
+        amount_capturable: 0
+        amount_mismatch: false
+        capture_method: automatic
+        checkout_session: cs_01M75N56PR5PD2YXWBDEYS6GY0
+        customer: null
+        reference: order-1001
+        description: null
+        payment_method: { type: card, brand: visa, last4: "1111", exp_month: 3, exp_year: 2030, stored_payment_method: null }
+        last_payment_error: null
+        metadata: { cartId: abc }
+        version: 4
+        authorized_at: "2026-10-13T16:21:04.000Z"
+        captured_at: "2026-10-13T16:21:06.000Z"
+        canceled_at: null
+        created_at: "2026-10-13T16:20:00.000Z"
+        updated_at: "2026-10-13T16:21:06.000Z"
+        livemode: false
+    PaymentAuthorized:
+      summary: Authorised, waiting for a manual capture (GBP 25.00)
+      value:
+        id: pay_01M75N56PRT5WA5G2JF25B20RJ
+        object: payment
+        status: authorized
+        amount: 2500
+        currency: GBP
+        amount_authorized: 2500
+        amount_captured: 0
+        amount_refunded: 0
+        amount_disputed: 0
+        amount_capturable: 2500
+        amount_mismatch: false
+        capture_method: manual
+        checkout_session: cs_01M75N56PR5PD2YXWBDEYS6GY0
+        customer: cus_01M75NC2D7E1F4G7H1J4K8M2NP
+        reference: order-2002
+        description: null
+        payment_method: { type: card, brand: visa, last4: "1111", exp_month: 3, exp_year: 2030, stored_payment_method: pm_01M75NC3E8F2G5H8J2K5M9N3PQ }
+        last_payment_error: null
+        metadata: {}
+        version: 3
+        authorized_at: "2026-10-13T16:21:04.000Z"
+        captured_at: null
+        canceled_at: null
+        created_at: "2026-10-13T16:20:00.000Z"
+        updated_at: "2026-10-13T16:21:04.000Z"
+        livemode: false
+    PaymentDeclined:
+      summary: Last attempt declined; the shopper can retry
+      value:
+        id: pay_01M75N56PRT5WA5G2JF25B20RJ
+        object: payment
+        status: requires_payment_method
+        amount: 4999
+        currency: EUR
+        amount_authorized: 0
+        amount_captured: 0
+        amount_refunded: 0
+        amount_disputed: 0
+        amount_capturable: 0
+        amount_mismatch: false
+        capture_method: automatic
+        checkout_session: cs_01M75N56PR5PD2YXWBDEYS6GY0
+        customer: null
+        reference: order-1001
+        description: null
+        payment_method: null
+        last_payment_error: { code: payment_declined, decline_code: insufficient_funds, message: The card has insufficient funds. }
+        metadata: { cartId: abc }
+        version: 2
+        authorized_at: null
+        captured_at: null
+        canceled_at: null
+        created_at: "2026-10-13T16:20:00.000Z"
+        updated_at: "2026-10-13T16:21:04.000Z"
+        livemode: false
+    CapturePending:
+      summary: Capture of EUR 6.00 requested
+      value: { id: cap_01M75N8E3W7RYQ4M5N2V8K1D6B, object: capture, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, amount: 600, currency: EUR, status: pending, failure_reason: null, created_at: "2026-10-14T09:00:00.000Z", updated_at: "2026-10-14T09:00:00.000Z" }
+    CancellationPending:
+      summary: Cancellation requested
+      value: { id: cnl_01M75N8F4X8SZR5N6P3W9M2E7C, object: cancellation, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, status: pending, failure_reason: null, created_at: "2026-10-14T09:00:00.000Z" }
+    RefundPending:
+      summary: Refund of EUR 3.00 requested
+      value: { id: re_01M75N9Q2V8KX3D7TB4ZJ6HC1A, object: refund, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, amount: 300, currency: EUR, status: pending, reason: requested_by_customer, failure_reason: null, metadata: { ticket: SUP-8812 }, created_at: "2026-10-15T10:00:00.000Z", updated_at: "2026-10-15T10:00:00.000Z" }
+    RefundSucceeded:
+      summary: Refund succeeded
+      value: { id: re_01M75N9Q2V8KX3D7TB4ZJ6HC1A, object: refund, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, amount: 300, currency: EUR, status: succeeded, reason: requested_by_customer, failure_reason: null, metadata: { ticket: SUP-8812 }, created_at: "2026-10-15T10:00:00.000Z", updated_at: "2026-10-15T10:00:03.000Z" }
+    PaymentLink:
+      summary: Active single-use link (EUR 15.00)
+      value: { id: plink_01M75NB1C6D9E2F5G8H1J4K7MN, object: payment_link, url: "https://checkout.kalixo.io/l/Hk3s9QfL2mXp", status: active, amount: 1500, currency: EUR, country: NL, reference: invoice-77, description: null, reusable: false, capture_method: automatic, return_url: null, expires_at: "2026-11-30T23:59:59.000Z", payments_count: 0, metadata: {}, created_at: "2026-10-13T16:20:00.000Z" }
+    PaymentLinkInactive:
+      summary: Deactivated link
+      value: { id: plink_01M75NB1C6D9E2F5G8H1J4K7MN, object: payment_link, url: "https://checkout.kalixo.io/l/Hk3s9QfL2mXp", status: inactive, amount: 1500, currency: EUR, country: NL, reference: invoice-77, description: null, reusable: false, capture_method: automatic, return_url: null, expires_at: "2026-11-30T23:59:59.000Z", payments_count: 0, metadata: {}, created_at: "2026-10-13T16:20:00.000Z" }
+    Customer:
+      summary: Customer
+      value: { id: cus_01M75NC2D7E1F4G7H1J4K8M2NP, object: customer, reference: user-42, email: shopper@example.com, name: Sam Shopper, metadata: {}, created_at: "2026-10-13T16:20:00.000Z" }
+    PaymentMethodDetached:
+      summary: Detached card
+      value: { id: pm_01M75NC3E8F2G5H8J2K5M9N3PQ, object: payment_method, customer: cus_01M75NC2D7E1F4G7H1J4K8M2NP, type: card, card: { brand: visa, last4: "1111", exp_month: 3, exp_year: 2030 }, status: detached, available: false, created_at: "2026-10-13T16:21:04.000Z" }
+    DisputeNeedsResponse:
+      summary: Dispute waiting for evidence (EUR 49.99)
+      value: { id: dp_01M75ND4F9G3H6J9K3M6N1P4QR, object: dispute, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, status: needs_response, amount: 4999, currency: EUR, reason_code: "10.4", reason: Fraudulent transaction, evidence_due_by: "2026-11-04T00:00:00.000Z", evidence: [], version: 1, created_at: "2026-10-21T08:00:00.000Z", updated_at: "2026-10-21T08:00:00.000Z" }
+    DisputeWithEvidence:
+      summary: Dispute with uploaded evidence
+      value: { id: dp_01M75ND4F9G3H6J9K3M6N1P4QR, object: dispute, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, status: needs_response, amount: 4999, currency: EUR, reason_code: "10.4", reason: Fraudulent transaction, evidence_due_by: "2026-11-04T00:00:00.000Z", evidence: [{ id: dpe_01M75NDA2B3C4D5E6F7G8H9J1K, document_type: proof_of_delivery, file_name: delivery-order-1001.pdf, created_at: "2026-10-22T10:00:00.000Z" }], version: 1, created_at: "2026-10-21T08:00:00.000Z", updated_at: "2026-10-21T08:00:00.000Z" }
+    EventPaymentCaptured:
+      summary: payment.captured
+      value:
+        id: evt_01M75N56PRH407DCRY2E5BYY3Y
+        type: payment.captured
+        api_version: "2026-10-01"
+        created_at: "2026-10-13T16:21:06.000Z"
+        livemode: false
+        partner_id: ptn_01M75N0J8SFRJV6H2JGMCJR6Q2
+        data:
+          object:
+            id: pay_01M75N56PRT5WA5G2JF25B20RJ
+            object: payment
+            status: captured
+            amount: 4999
+            currency: EUR
+            amount_authorized: 4999
+            amount_captured: 4999
+            amount_refunded: 0
+            amount_disputed: 0
+            amount_capturable: 0
+            amount_mismatch: false
+            capture_method: automatic
+            checkout_session: cs_01M75N56PR5PD2YXWBDEYS6GY0
+            customer: null
+            reference: order-1001
+            description: null
+            payment_method: { type: card, brand: visa, last4: "1111", exp_month: 3, exp_year: 2030, stored_payment_method: null }
+            last_payment_error: null
+            metadata: { cartId: abc }
+            version: 4
+            authorized_at: "2026-10-13T16:21:04.000Z"
+            captured_at: "2026-10-13T16:21:06.000Z"
+            canceled_at: null
+            created_at: "2026-10-13T16:20:00.000Z"
+            updated_at: "2026-10-13T16:21:06.000Z"
+            livemode: false
+    WebhookEndpointCreated:
+      summary: Endpoint with its signing secret (shown once)
+      value: { id: we_01M75NE5G1H4J7K1M4N7P2Q5RS, object: webhook_endpoint, url: https://shop.example.com/webhooks/kalixo-checkout, description: Production order service, enabled_events: [payment.captured, payment.failed, payment.amount_mismatch, refund.succeeded, refund.failed], status: enabled, secret: whsec_Zm9yX2V4YW1wbGVfb25seV9ub3RfYV9yZWFsX3NlY3JldA, created_at: "2026-10-13T16:20:00.000Z" }
+    WebhookEndpoint:
+      summary: Endpoint
+      value: { id: we_01M75NE5G1H4J7K1M4N7P2Q5RS, object: webhook_endpoint, url: https://shop.example.com/webhooks/kalixo-checkout, description: Production order service, enabled_events: [payment.captured, payment.failed, payment.amount_mismatch, refund.succeeded, refund.failed], status: enabled, created_at: "2026-10-13T16:20:00.000Z" }
+    ReportPending:
+      summary: Export started
+      value: { id: rex_01M75NF6H2J5K8M2N5P8Q3R6ST, object: report_export, type: financial_transactions, period_start: "2026-10-01T00:00:00.000Z", period_end: "2026-11-01T00:00:00.000Z", status: pending, row_count: null, failure_reason: null, created_at: "2026-11-01T06:00:00.000Z", completed_at: null }
+    ReportReady:
+      summary: Export ready to download
+      value: { id: rex_01M75NF6H2J5K8M2N5P8Q3R6ST, object: report_export, type: financial_transactions, period_start: "2026-10-01T00:00:00.000Z", period_end: "2026-11-01T00:00:00.000Z", status: ready, row_count: 1284, failure_reason: null, created_at: "2026-11-01T06:00:00.000Z", completed_at: "2026-11-01T06:00:04.000Z" }
+    TestDelivery:
+      summary: Delivered to your endpoint
+      value:
+        object: webhook_test_delivery
+        webhook_endpoint: we_01M75NE5G1H4J7K1M4N7P2Q5RS
+        delivered: true
+        status_code: 200
+        error: null
+        duration_ms: 182
+        event:
+          id: evt_01M75NG7J3K6M9N3P6Q9R4S7TV
+          type: payment.captured
+          api_version: "2026-10-01"
+          created_at: "2026-10-13T16:21:06.000Z"
+          livemode: false
+          partner_id: ptn_01M75N0J8SFRJV6H2JGMCJR6Q2
+          data:
+            object:
+              id: pay_01M75NG8K4M7N1P4Q7R1S5T8VW
+              object: payment
+              status: captured
+              amount: 4999
+              currency: EUR
+              amount_authorized: 4999
+              amount_captured: 4999
+              amount_refunded: 0
+              amount_disputed: 0
+              amount_capturable: 0
+              amount_mismatch: false
+              capture_method: automatic
+              checkout_session: cs_01M75NG9M5N8P2Q5R8S2T6V9WX
+              customer: null
+              reference: kalixo_test_event
+              description: Kalixo test event
+              payment_method: { type: card, brand: visa, last4: "1111", exp_month: 3, exp_year: 2030, stored_payment_method: null }
+              last_payment_error: null
+              metadata: { kalixo_test_event: "true" }
+              version: 3
+              authorized_at: "2026-10-13T16:21:06.000Z"
+              captured_at: "2026-10-13T16:21:06.000Z"
+              canceled_at: null
+              created_at: "2026-10-13T16:21:06.000Z"
+              updated_at: "2026-10-13T16:21:06.000Z"
+              livemode: false
+    DisputeSimulation:
+      summary: Dispute notification queued
+      value: { object: dispute_simulation, payment: pay_01M75N56PRT5WA5G2JF25B20RJ, dispute: null, stage: opened, status: pending }
+    SimulateSessionSucceeded:
+      summary: A successful payment
+      value: { outcome: succeeded }
+    SimulateSessionDeclined:
+      summary: A declined payment
+      value: { outcome: declined }
+    CheckoutSessionSimulation:
+      summary: Authorised; payment.captured follows by webhook
+      value:
+        object: checkout_session_simulation
+        checkout_session: cs_01M75N56PRT5WA5G2JF25B20RK
+        payment: pay_01M75N56PRT5WA5G2JF25B20RJ
+        outcome: succeeded
+        attempt: { id: att_01M75N56PRT5WA5G2JF25B20RM, status: authorized, error: null }
+
+    # Errors
+    ErrParameterInvalid:
+      summary: parameter_invalid
+      value: { error: { type: invalid_request_error, code: parameter_invalid, decline_code: null, message: amount must be an integer number, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrIdempotencyKeyMissing:
+      summary: idempotency_key_missing
+      value: { error: { type: invalid_request_error, code: idempotency_key_missing, decline_code: null, message: Provide an Idempotency-Key header (1 to 255 characters) on every POST, param: Idempotency-Key, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrLineItemsMismatch:
+      summary: line_items_mismatch
+      value: { error: { type: invalid_request_error, code: line_items_mismatch, decline_code: null, message: Line items add up to 4500 but amount is 4999, param: line_items, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrLineItemsInvalid:
+      summary: line_items_invalid
+      value: { error: { type: invalid_request_error, code: line_items_invalid, decline_code: null, message: Only discount line items can have a negative unit_amount, param: "line_items[1].unit_amount", request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrAmountInvalid:
+      summary: amount_invalid
+      value: { error: { type: invalid_request_error, code: amount_invalid, decline_code: null, message: Amount must be a positive integer in the currency minor unit, param: amount, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrCurrencyNotEnabled:
+      summary: currency_not_enabled
+      value: { error: { type: invalid_request_error, code: currency_not_enabled, decline_code: null, message: Currency SAR is not enabled for your account, param: currency, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrUrlInvalid:
+      summary: url_invalid
+      value: { error: { type: invalid_request_error, code: url_invalid, decline_code: null, message: "'return_url' must use https", param: return_url, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrCountryInvalid:
+      summary: country_invalid
+      value: { error: { type: invalid_request_error, code: country_invalid, decline_code: null, message: Country must be an ISO 3166-1 alpha-2 code in uppercase, param: country, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrReturnUrlNotAllowed:
+      summary: return_url_not_allowed
+      value: { error: { type: invalid_request_error, code: return_url_not_allowed, decline_code: null, message: The return_url domain https://shop.example.net is not registered for your account. Ask Kalixo to add it., param: return_url, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrWebhookUrlInvalid:
+      summary: url_invalid
+      value: { error: { type: invalid_request_error, code: url_invalid, decline_code: null, message: "'url' must use https", param: url, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrWebhookUrlNotPublic:
+      summary: url_not_public
+      value: { error: { type: invalid_request_error, code: url_not_public, decline_code: null, message: "'url' must be a public https URL: 10.0.0.5 resolves to a private address", param: url, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrCaptureAmountTooLarge:
+      summary: amount_too_large
+      value: { error: { type: invalid_request_error, code: amount_too_large, decline_code: null, message: Capture amount 6000 exceeds the capturable amount 4999, param: amount, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrRefundAmountTooLarge:
+      summary: amount_too_large
+      value: { error: { type: invalid_request_error, code: amount_too_large, decline_code: null, message: Refund amount 6000 exceeds the refundable amount 4999, param: amount, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrExpiresAtInvalid:
+      summary: expires_at_invalid
+      value: { error: { type: invalid_request_error, code: expires_at_invalid, decline_code: null, message: expires_at must be in the future and at most 90 days away, param: expires_at, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrFileTooLarge:
+      summary: file_too_large
+      value: { error: { type: invalid_request_error, code: file_too_large, decline_code: null, message: File exceeds 2 MB for application/pdf, param: content_base64, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrLimitReached:
+      summary: limit_reached
+      value: { error: { type: invalid_request_error, code: limit_reached, decline_code: null, message: At most 16 webhook endpoints, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrUnknownEventType:
+      summary: parameter_invalid (unknown event type)
+      value: { error: { type: invalid_request_error, code: parameter_invalid, decline_code: null, message: "Unknown event type 'order.completed'", param: enabled_events, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPeriodTooLong:
+      summary: period_too_long
+      value: { error: { type: invalid_request_error, code: period_too_long, decline_code: null, message: A report covers at most 92 days, param: period_end, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrTestModeOnly:
+      summary: test_mode_only
+      value: { error: { type: invalid_request_error, code: test_mode_only, decline_code: null, message: Test helpers are available in the sandbox only, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrTestHelperUnavailable:
+      summary: test_helper_unavailable
+      value: { error: { type: invalid_request_error, code: test_helper_unavailable, decline_code: null, message: Dispute simulation works only for payments made with the sandbox test cards, param: id, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrApiKeyMissing:
+      summary: api_key_missing
+      value: { error: { type: authentication_error, code: api_key_missing, decline_code: null, message: Provide your API key in the Authorization header as a Bearer token, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrApiKeyInvalid:
+      summary: api_key_invalid
+      value: { error: { type: authentication_error, code: api_key_invalid, decline_code: null, message: Invalid API key, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrApiKeyModeMismatch:
+      summary: api_key_mode_mismatch
+      value: { error: { type: authentication_error, code: api_key_mode_mismatch, decline_code: null, message: This environment only accepts test keys, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrSecretKeyRequired:
+      summary: secret_key_required
+      value: { error: { type: authentication_error, code: secret_key_required, decline_code: null, message: This endpoint requires a secret key, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPublishableKeyRequired:
+      summary: publishable_key_required
+      value: { error: { type: authentication_error, code: publishable_key_required, decline_code: null, message: Provide your publishable key, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrAmountLimitExceeded:
+      summary: amount_limit_exceeded
+      value: { error: { type: payment_error, code: amount_limit_exceeded, decline_code: null, message: Amount exceeds your limit of 100000 EUR per payment, param: amount, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrOriginNotAllowed:
+      summary: origin_not_allowed
+      value: { error: { type: permission_error, code: origin_not_allowed, decline_code: null, message: This origin is not registered for your account, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrResourceMissing:
+      summary: resource_missing
+      value: { error: { type: not_found_error, code: resource_missing, decline_code: null, message: "No such payment: 'pay_01M75N56PRT5WA5G2JF25B20RJ'", param: id, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrIdempotencyKeyReused:
+      summary: idempotency_key_reused
+      value: { error: { type: idempotency_error, code: idempotency_key_reused, decline_code: null, message: This Idempotency-Key was already used with a different request, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrIdempotencyInProgress:
+      summary: idempotency_request_in_progress
+      value: { error: { type: idempotency_error, code: idempotency_request_in_progress, decline_code: null, message: A request with this Idempotency-Key is still in progress, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrAmountLocked:
+      summary: amount_locked
+      value: { error: { type: invalid_request_error, code: amount_locked, decline_code: null, message: The amount cannot change after the shopper started paying. Expire this session and create a new one., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrSessionNotOpen:
+      summary: session_not_open
+      value: { error: { type: invalid_request_error, code: session_not_open, decline_code: null, message: This checkout session is complete, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrSessionExpired:
+      summary: session_expired
+      value: { error: { type: invalid_request_error, code: session_expired, decline_code: null, message: This checkout session has expired, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrSessionHasAttempts:
+      summary: session_has_attempts
+      value: { error: { type: invalid_request_error, code: session_has_attempts, decline_code: null, message: This session already has a payment attempt with the payment provider. Simulate on a new session., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentInProgress:
+      summary: payment_in_progress
+      value: { error: { type: invalid_request_error, code: payment_in_progress, decline_code: null, message: A payment attempt is still being processed for this session, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentInProgressClient:
+      summary: payment_in_progress
+      value: { error: { type: invalid_request_error, code: payment_in_progress, decline_code: null, message: This payment is already being processed, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrCaptureNotAllowed:
+      summary: capture_not_allowed
+      value: { error: { type: invalid_request_error, code: capture_not_allowed, decline_code: null, message: Payments with capture_method automatic are captured by the provider, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentNotCapturable:
+      summary: payment_not_capturable
+      value: { error: { type: invalid_request_error, code: payment_not_capturable, decline_code: null, message: A canceled payment cannot be captured, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentAmountMismatch:
+      summary: payment_amount_mismatch
+      value: { error: { type: invalid_request_error, code: payment_amount_mismatch, decline_code: null, message: This payment has an amount mismatch and is being reversed, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentNotCancelable:
+      summary: payment_not_cancelable
+      value: { error: { type: invalid_request_error, code: payment_not_cancelable, decline_code: null, message: A captured payment cannot be canceled. Refund captured payments instead., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentDisputed:
+      summary: payment_disputed
+      value: { error: { type: invalid_request_error, code: payment_disputed, decline_code: null, message: Disputed payments cannot be refunded; the dispute decides the outcome, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentNotRefundable:
+      summary: payment_not_refundable
+      value: { error: { type: invalid_request_error, code: payment_not_refundable, decline_code: null, message: This payment has no refundable amount, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrDisputeNotOpen:
+      summary: dispute_not_open
+      value: { error: { type: invalid_request_error, code: dispute_not_open, decline_code: null, message: Evidence cannot be added to a won dispute, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrReportNotReady:
+      summary: report_not_ready
+      value: { error: { type: invalid_request_error, code: report_not_ready, decline_code: null, message: This report is pending, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrPaymentNotDisputable:
+      summary: payment_not_disputable
+      value: { error: { type: invalid_request_error, code: payment_not_disputable, decline_code: null, message: Only captured payments can be disputed, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrDisputeAlreadyOpen:
+      summary: dispute_already_open
+      value: { error: { type: invalid_request_error, code: dispute_already_open, decline_code: null, message: "Payment pay_01M75N56PRT5WA5G2JF25B20RJ already has an open dispute (dp_01M75ND4F9G3H6J9K3M6N1P4QR)", param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrRateLimited:
+      summary: rate_limited
+      value: { error: { type: rate_limit_error, code: rate_limited, decline_code: null, message: Too many requests. Slow down and retry with backoff., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrTooManyAttempts:
+      summary: too_many_attempts
+      value: { error: { type: rate_limit_error, code: too_many_attempts, decline_code: null, message: Too many payment attempts for this checkout, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrAttemptsRateLimited:
+      summary: rate_limited
+      value: { error: { type: rate_limit_error, code: rate_limited, decline_code: null, message: Too many payment attempts. Try again in a minute., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrInternal:
+      summary: internal_error
+      value: { error: { type: api_error, code: internal_error, decline_code: null, message: An internal error occurred. Retry with the same Idempotency-Key., param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+    ErrRouteUnavailable:
+      summary: payment_route_unavailable
+      value: { error: { type: api_error, code: payment_route_unavailable, decline_code: null, message: No payment route is configured for this payment, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
 
   schemas:
     Amount:
@@ -967,17 +2226,48 @@ components:
     CaptureMethod:
       type: string
       enum: [automatic, manual]
+      description: |
+        `automatic` captures the payment as soon as the payment provider confirms the
+        authorisation: you receive `payment.authorized`, then `payment.captured`.
+        `manual` stops at `authorized` until you call `POST /v1/payments/{id}/capture`.
+        When you omit it, Kalixo uses your account's default, which is `automatic`
+        unless Kalixo configured `manual` for your account.
     LineItem:
       type: object
+      description: |
+        Optional itemisation, stored on the session and sent to the payment provider with
+        the payment. The sum of `quantity * unit_amount` over all lines must equal the session
+        `amount` exactly (`line_items_mismatch` otherwise).
       required: [name, quantity, unit_amount]
       properties:
+        type:
+          type: string
+          enum: [item, shipping, discount]
+          default: item
+          description: "`discount` lines reduce the total and are the only lines with a negative `unit_amount`."
         name: { type: string, maxLength: 200 }
         quantity: { type: integer, minimum: 1 }
-        unit_amount: { $ref: "#/components/schemas/Amount" }
-        tax_amount: { $ref: "#/components/schemas/Amount" }
+        unit_amount:
+          type: integer
+          format: int64
+          description: |
+            Price of one unit in the minor unit, **including tax**. Zero or positive for
+            `item` and `shipping`, zero or negative for `discount`.
+          examples: [2500, -500]
+        tax_amount:
+          type: integer
+          format: int64
+          description: |
+            Tax included in one unit's `unit_amount`, in the minor unit. Has the same sign
+            as `unit_amount` and is never larger than it in absolute value. Informational:
+            Kalixo does not calculate tax.
+          examples: [434]
         tax_percentage:
           type: integer
-          description: Tax percentage in basis points (21% = 2100).
+          minimum: 0
+          maximum: 10000
+          description: Tax rate in basis points (hundredths of a percent). 21% is `2100`, 5.5% is `550`.
+          examples: [2100]
         sku: { type: string, maxLength: 100 }
         product_url: { type: string, format: uri }
         image_url: { type: string, format: uri }
@@ -1017,12 +2307,16 @@ components:
         locale: { type: string, examples: [en-GB] }
         return_url: { type: string, format: uri }
         url:
-          type: string
+          type: [string, "null"]
           format: uri
-          description: Hosted checkout URL. Contains the client secret in the URL fragment.
-        client_secret: { type: string, description: Pass to Kalixo.js. Do not log or store it in analytics. }
+          description: Hosted checkout URL. Contains the client secret in the URL fragment. `null` in list responses and events.
+        client_secret: { type: string, description: Pass to Kalixo.js. Do not log or store it in analytics. Omitted in list responses and events. }
         amount_locked: { type: boolean, description: True once the first payment attempt has started. }
         payment_link: { type: [string, "null"] }
+        version:
+          type: integer
+          minimum: 1
+          description: Increases with every change. Ignore a `checkout_session.*` event whose session has a lower `version` than the one you stored.
         expires_at: { type: string, format: date-time }
         created_at: { type: string, format: date-time }
         livemode: { type: boolean }
@@ -1038,7 +2332,10 @@ components:
         currency: { $ref: "#/components/schemas/Currency" }
         country: { $ref: "#/components/schemas/Country" }
         reference: { type: string, minLength: 1, maxLength: 80 }
-        return_url: { type: string, format: uri, description: "HTTPS URL. The shopper returns here with `?session_id=cs_...`." }
+        return_url:
+          type: string
+          format: uri
+          description: "HTTPS URL on a domain registered for your account (`return_url_not_allowed` otherwise). The shopper returns here with `?session_id=cs_...`."
         description: { type: string, maxLength: 500 }
         capture_method: { $ref: "#/components/schemas/CaptureMethod" }
         customer: { type: string, description: "Existing customer ID. Required to store payment methods." }
@@ -1046,6 +2343,7 @@ components:
         line_items:
           type: array
           maxItems: 100
+          description: Optional. When present, the lines must add up to `amount` exactly.
           items: { $ref: "#/components/schemas/LineItem" }
         store_payment_method:
           type: boolean
@@ -1107,7 +2405,11 @@ components:
         customer: { type: [string, "null"] }
         reference: { type: string }
         description: { type: [string, "null"] }
-        payment_method: { $ref: "#/components/schemas/PaymentMethodDetails" }
+        payment_method:
+          description: How the shopper paid. `null` until an attempt is authorised.
+          oneOf:
+            - $ref: "#/components/schemas/PaymentMethodDetails"
+            - type: "null"
         last_payment_error:
           oneOf:
             - $ref: "#/components/schemas/PaymentError"
@@ -1200,8 +2502,8 @@ components:
         description: { type: string, maxLength: 500 }
         reusable: { type: boolean, default: false }
         capture_method: { $ref: "#/components/schemas/CaptureMethod" }
-        return_url: { type: string, format: uri }
-        expires_at: { type: string, format: date-time, description: At most 90 days in the future. }
+        return_url: { type: string, format: uri, description: "HTTPS URL on a domain registered for your account. Without it, the shopper sees a Kalixo confirmation page." }
+        expires_at: { type: string, format: date-time, description: At most 90 days in the future. Defaults to 7 days after creation. }
         locale: { type: string }
         metadata: { $ref: "#/components/schemas/Metadata" }
 
@@ -1270,6 +2572,7 @@ components:
               document_type: { type: string }
               file_name: { type: string }
               created_at: { type: string, format: date-time }
+        version: { type: integer, description: Increases with every change. }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     UploadDisputeEvidenceRequest:
@@ -1349,14 +2652,14 @@ components:
           type: array
           items: { type: string }
           description: Event types, or `["*"]` for all.
-        status: { type: string, enum: [enabled, disabled] }
+        status: { type: string, enum: [enabled, disabled, deleted], description: "`deleted` only in the response to `DELETE`." }
         secret: { type: string, description: Only returned on create and rotate. Starts with `whsec_`. }
         created_at: { type: string, format: date-time }
     CreateWebhookEndpointRequest:
       type: object
       required: [url]
       properties:
-        url: { type: string, format: uri, description: Must be HTTPS in live mode. }
+        url: { type: string, format: uri, description: "A public HTTPS URL, in the sandbox too. Private and local addresses are refused; use a tunnel to test locally. At most 16 endpoints per account." }
         description: { type: string, maxLength: 200 }
         enabled_events:
           type: array
@@ -1393,6 +2696,46 @@ components:
         type: { type: string, enum: [financial_transactions, payments, refunds, disputes] }
         period_start: { type: string, format: date-time }
         period_end: { type: string, format: date-time, description: Exclusive. At most 92 days after `period_start`. }
+
+    WebhookTestDelivery:
+      type: object
+      required: [object, webhook_endpoint, event, delivered, status_code, error, duration_ms]
+      properties:
+        object: { type: string, const: webhook_test_delivery }
+        webhook_endpoint: { type: string, examples: [we_01JABCDEF] }
+        event: { $ref: "#/components/schemas/Event" }
+        delivered: { type: boolean, description: True if your endpoint answered with a `2xx`. }
+        status_code: { type: [integer, "null"], description: HTTP status your endpoint returned. `null` if it could not be reached. }
+        error: { type: [string, "null"], description: "Why the delivery failed, for example `HTTP 500` or a timeout." }
+        duration_ms: { type: integer }
+    DisputeSimulation:
+      type: object
+      required: [object, payment, dispute, stage, status]
+      properties:
+        object: { type: string, const: dispute_simulation }
+        payment: { type: string }
+        dispute: { type: [string, "null"], description: The open dispute the stage applies to. `null` when a new dispute will be opened. }
+        stage: { type: string, enum: [opened, funds_withdrawn, won, lost] }
+        status: { type: string, const: pending, description: The dispute changes asynchronously; watch for `dispute.*` events. }
+    CheckoutSessionSimulation:
+      type: object
+      required: [object, checkout_session, payment, outcome, attempt]
+      properties:
+        object: { type: string, const: checkout_session_simulation }
+        checkout_session: { type: string }
+        payment: { type: string }
+        outcome: { type: string, enum: [succeeded, declined, insufficient_funds, processing, amount_mismatch] }
+        attempt:
+          type: object
+          required: [id, status, error]
+          description: The simulated attempt's immediate result. The payment's final state arrives by webhook.
+          properties:
+            id: { type: string }
+            status: { type: string, enum: [authorized, processing, requires_action, refused, error] }
+            error:
+              oneOf:
+                - $ref: "#/components/schemas/PaymentError"
+                - type: "null"
 
     ClientCheckoutSession:
       type: object
@@ -1459,8 +2802,8 @@ components:
             type:
               type: string
               enum: [invalid_request_error, authentication_error, permission_error, not_found_error, idempotency_error, payment_error, rate_limit_error, api_error]
-            code: { type: string, examples: [amount_locked] }
-            decline_code: { type: [string, "null"] }
-            message: { type: string }
-            param: { type: [string, "null"] }
-            request_id: { type: string }
+            code: { type: string, examples: [amount_locked], description: "Stable machine-readable code. Branch on `code`, not on `message`." }
+            decline_code: { type: [string, "null"], description: Set on declined payments only. }
+            message: { type: string, description: Human-readable explanation. Can change; do not parse it. }
+            param: { type: [string, "null"], description: "The request field or header that caused the error, when there is one." }
+            request_id: { type: string, description: Same as the `Request-Id` response header. Include it when you contact support. }

@@ -25,10 +25,23 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
   refers to a product, it uses the **`productCode` you sent** in the request.
 </ResponseField>
 
+## Request ID
+
+Every response, including errors, carries an `X-Request-Id` header. Log it with the error
+and include it when you contact [integrations@kalixo.io](mailto:integrations@kalixo.io):
+it lets Kalixo find the exact request.
+
+```text
+X-Request-Id: 3f2c1b9e-8d7a-4c6b-9e5f-1a2b3c4d5e6f
+```
+
+To correlate with your own logs, send your own `X-Request-Id` (8 to 64 letters, digits,
+`-` or `_`). Kalixo uses it and echoes it back; otherwise Kalixo generates one.
+
 <Note>
   Placeholders below use `{productCode}`, `{reference}`, `{min}`, `{max}`, `{expected}`,
-  `{productCurrency}`, `{requested}`, and `{seconds}` for values that depend on your request.
-  All other text is returned **exactly** as shown.
+  `{productCurrency}`, `{requested}`, `{country}`, `{countries}`, `{reason}` and `{seconds}`
+  for values that depend on your request. All other text is returned **exactly** as shown.
 </Note>
 
 ## Status codes
@@ -39,7 +52,7 @@ The API uses conventional HTTP status codes and returns a consistent JSON error 
 | `401` | `Unauthorized` | Missing or invalid `x-api-key` |
 | `403` | `Forbidden` | API ordering disabled for your account |
 | `404` | `Not Found` | Unknown catalog product or order |
-| `409` | `Conflict` | Duplicate `externalOrderCode` |
+| `409` | `Conflict` | Two requests with the same new `externalOrderCode` arrived at the same moment |
 | `422` | `Unprocessable Entity` | Account order limit exceeded, insufficient wallet funds, or product not available for purchase |
 | `429` | `Too Many Requests` | [Rate limit](/concepts/rate-limits) exceeded |
 | `502` | `Bad Gateway` | Order could not be created or is temporarily unavailable |
@@ -64,7 +77,8 @@ The `Retry-After` response header matches `{seconds}`. See [Rate limits](/concep
 
 ## Catalog (`404`)
 
-Returned by `GET /catalog/products/{productCode}` when the productCode is not in your active catalog.
+Returned by `GET /catalog/products/{productCode}`, and by `POST /orders` for an order line,
+when the productCode is not in your active catalog or cannot be ordered.
 
 | Message |
 | --- |
@@ -78,8 +92,11 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
 | --- |
 | `orderProducts must not be empty` |
 | `Each line requires a productCode and a quantity of at least 1` |
+| `Product {productCode} is available in multiple countries ({countries}); pass country (or a market sku) on the line` |
+| `Product {productCode} is not available in {country} (available: {countries})` |
 | `Product {productCode} is priced in {productCurrency}, not {requested}` |
 | `Product {productCode} is open-denomination and requires a price` |
+| `Price for product {productCode} must be a positive whole number in minor units` |
 | `Price for product {productCode} is below the minimum allowed ({min})` |
 | `Price for product {productCode} exceeds the maximum allowed ({max})` |
 | `Product {productCode} price mismatch: expected {expected}` |
@@ -87,6 +104,8 @@ Returned by `POST /orders` when the request body fails checks **before** the ord
 
 <Info>
   Prices in mismatch and denomination messages are in **minor units** (same as the catalog), e.g. `10000` = 100.00.
+  `{countries}` is the product's `availableCountries`, comma-separated. Send one of them as
+  `country` on the line; see [Regional products](/concepts/order-lifecycle#regional-products).
 </Info>
 
 ## Orders - rejected at placement (`400`)
@@ -99,6 +118,7 @@ Returned by `POST /orders` when the order cannot be accepted after validation.
 | Product inactive | `Product {productCode} is not currently available.` |
 | Wrong order currency | `Product {productCode} cannot be ordered in the requested currency.` |
 | Open denomination, price missing | `Product {productCode} is open-denomination and requires a price.` |
+| Open denomination, price not allowed (step, whole units, or range) | `Product {productCode} has an invalid price: {reason}.` |
 | Order data invalid | `The order could not be validated. Check product codes, prices, and currency.` |
 | Order already placed | `This order has already been placed.` |
 | Other rejection | `The order could not be placed. Check your request and try again.` |
@@ -115,6 +135,11 @@ Returned by `POST /orders` when the order cannot be accepted after validation.
 | `API ordering is disabled for your account. Contact support for assistance.` |
 
 ## Orders - conflict (`409`)
+
+Returned when another request with the same new `externalOrderCode` was being placed at the
+same moment. The order exists: fetch it with `GET /orders/{externalOrderCode}`. A repeat of a
+code that was already placed returns `202` with the existing order instead; see
+[Idempotency](/concepts/idempotency).
 
 | Message |
 | --- |
@@ -160,14 +185,16 @@ The `error` field is omitted on some `500` responses.
 ## Handling errors in your integration
 
 <Steps>
-  <Step title="Log statusCode and message">
-    Persist both fields for support and retries. Treat `message` as human-readable text.
+  <Step title="Log statusCode, message and X-Request-Id">
+    Persist all three for support and retries. Treat `message` as human-readable text.
   </Step>
   <Step title="Map by productCode">
     When `message` starts with `Product {productCode}`, attach the error to that line in your cart or order payload.
   </Step>
   <Step title="Retry only when appropriate">
-    Retry `502` and `429` with backoff. Do not retry `400`, `403`, `404`, `409`, or `422` without fixing the request.
+    Retry `429` after `Retry-After`, and `500` and `502` with backoff. Retrying `POST /orders` with the
+    same `externalOrderCode` never creates a second order. On `409`, fetch the order instead of
+    retrying. Do not retry `400`, `403`, `404`, or `422` without fixing the request.
   </Step>
   <Step title="Refresh catalog on configuration errors">
     If you see “not available for ordering with the supplied country or currency”, re-fetch the product from

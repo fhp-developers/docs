@@ -1,0 +1,64 @@
+---
+title: "Testing webhooks"
+description: "Receive, verify and replay events while you build."
+---
+
+Webhooks are the backbone of fulfilment, so test them end to end in the sandbox before you go live.
+
+## 1. Expose a local endpoint
+
+Kalixo needs a public HTTPS URL. While developing, put a tunnel in front of your local server:
+
+```bash theme={"dark"}
+# example with a tunnelling tool
+ngrok http 3000
+# -> https://<id>.ngrok.app  ->  http://localhost:3000
+```
+
+Register that URL as a sandbox webhook endpoint and store the returned `secret`:
+
+```bash theme={"dark"}
+curl https://sandbox.checkout.kalixo.io/v1/webhook-endpoints \
+  -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+  -H "Idempotency-Key: dev-endpoint-1" \
+  -H "Content-Type: application/json" \
+  -d '{ "url": "https://<id>.ngrok.app/webhooks/kalixo-checkout", "enabled_events": ["*"] }'
+```
+
+## 2. Trigger real events
+
+Make a sandbox payment and watch the events arrive:
+
+- Pay with `4111 1111 1111 1111` for a straight-through `payment.authorized` → `payment.captured`.
+- Use the **pending** card `4000 0000 0000 0077` to get the outcome **by webhook only** — the best test that your fulfilment does not depend on the browser.
+- Use the **amount-mismatch** card `4000 0000 0000 0101` to confirm you never fulfil when `amount_mismatch` is `true`.
+
+See [Testing](/checkout/concepts/testing) for the full list.
+
+## 3. Verify the signature
+
+Check that your handler accepts a good signature and rejects a bad one. Verify against the **raw** body — parsing and re-serialising JSON changes the bytes and breaks the signature. Reject when no `v1` matches or the timestamp is more than 5 minutes old. Code samples are in [Webhooks](/checkout/concepts/webhooks).
+
+Things worth asserting in a test:
+
+| Case | Expect |
+| - | - |
+| Unsigned / wrong signature | `400`, not processed |
+| Timestamp older than 5 minutes | `400` (replay protection) |
+| Same event delivered twice (same `id`) | Processed once |
+| Lower `version` than you stored | Ignored |
+| Two `v1` signatures (rotation) | Accepted if one matches |
+
+## 4. Inspect and replay
+
+- Every event is in `GET /v1/events` for 30 days — list or retrieve to compare against what your endpoint received.
+- Failed deliveries retry with exponential backoff for about 3 days. To test recovery, stop your endpoint, make a payment, then bring it back and confirm the retry (or reconcile from `GET /v1/events`).
+- Deduplicate on the event `id` so a retry or a manual replay never fulfils twice.
+
+<Note>
+Answer `2xx` within 10 seconds and process asynchronously. If your handler does slow work before responding, Kalixo treats the delivery as failed and retries it.
+</Note>
+
+## 5. Rotate the secret
+
+Call `POST /v1/webhook-endpoints/{id}/rotate-secret`. For 24 hours Kalixo signs each delivery with both the old and new secret (two `v1` values), so deploy the new secret and confirm your verifier accepts either during the overlap.

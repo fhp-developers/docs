@@ -1,0 +1,72 @@
+---
+title: "Rate limits"
+description: "Request limits, the headers that report them, and how to back off."
+---
+
+Kalixo limits request rates to keep the API stable and to stop abuse such as card testing. When you exceed a limit the API returns `429` with `type: "rate_limit_error"`; retry after the delay the response gives you.
+
+{/* TODO (Kalixo team): confirm the final published limits before this page ships. The numbers below are placeholders that match the intended design. */}
+
+## What counts
+
+Limits apply per API key and per client IP. The browser-facing client endpoints (`/v1/client/...`, used by Kalixo.js) are limited more tightly than the server API, because they are the surface bots use to test stolen cards.
+
+| Surface | Scope | Example limit |
+| - | - | - |
+| Server API (`/v1/...` with a secret key) | per key | 100 requests / second (burst), confirm final |
+| `POST /v1/checkout-sessions` | per key | confirm final |
+| Client endpoints (`/v1/client/...`) | per IP + per session | low; payment attempts are capped per session, confirm final |
+
+<Note>
+Payment-attempt limits on the client endpoints are deliberately strict: after a few failed attempts a session is locked. This is expected and protects you from fraud; it is not an outage.
+</Note>
+
+## The 429 response
+
+```json theme={"dark"}
+{
+  "error": {
+    "type": "rate_limit_error",
+    "code": "rate_limit_exceeded",
+    "message": "Too many requests. Retry after the time in the Retry-After header.",
+    "request_id": "req_6f1c..."
+  }
+}
+```
+
+Every response carries rate-limit headers, so you can slow down before you are limited:
+
+| Header | Meaning |
+| - | - |
+| `Retry-After` | Seconds to wait before retrying (sent on `429`). |
+| `X-RateLimit-Limit` | Requests allowed in the current window. |
+| `X-RateLimit-Remaining` | Requests left in the current window. |
+| `X-RateLimit-Reset` | Unix time when the window resets. |
+
+## Handling limits
+
+- **Honour `Retry-After`.** Wait at least that long, then retry.
+- **Back off exponentially** with jitter on repeated `429`s, rather than retrying in a tight loop.
+- **Reuse the `Idempotency-Key`** on a retried `POST` so a retry can never create a second object. See [Idempotency](/checkout/concepts/idempotency).
+- **Don't parallelise beyond need.** Batch and queue background work (reports, list scans) instead of bursting.
+
+```javascript Node.js theme={"dark"}
+async function withBackoff(fn, tries = 5) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err.status !== 429 || i === tries - 1) throw err;
+      const wait = Number(err.headers?.['retry-after']) * 1000
+        || Math.min(2 ** i * 200 + Math.random() * 200, 10000);
+      await new Promise(r => setTimeout(r, wait));
+    }
+  }
+}
+```
+
+## Designing around limits
+
+- Fulfil from webhooks and `GET /v1/payments/{id}`, not by polling list endpoints.
+- Page through lists with `starting_after` and a sensible `limit` (max 100) rather than scanning repeatedly.
+- If you expect sustained high volume, tell [integrations@kalixo.io](mailto:integrations@kalixo.io) so your limits can be reviewed.

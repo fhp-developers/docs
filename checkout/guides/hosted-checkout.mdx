@@ -21,10 +21,13 @@ res.redirect(303, session.url);
 - The URL contains the session's client secret after `#`. Browsers never send that part
   to servers. Treat the URL as private to the shopper.
 - After the payment, the shopper returns to your `return_url` with `?session_id=cs_...`.
-  Confirm the outcome on your server.
-- If the payment is declined, the shopper can retry on the hosted page until the session expires.
+  Confirm the outcome on your server. The `return_url` must be on a domain registered for
+  your account; ask Kalixo to add your domains.
+- If the payment is declined, the shopper can retry on the hosted page until the session
+  expires, up to the [attempt limit](/checkout/concepts/rate-limits) of the session.
 - The page shows your account name, the amount and Kalixo's terms, because Kalixo is the
-  merchant of record.
+  merchant of record. It shows them only with the client secret from the full `url`: the
+  bare `/c/cs_...` address shows no order details.
 
 ## When to choose the hosted checkout
 

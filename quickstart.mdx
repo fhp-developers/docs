@@ -1,17 +1,11 @@
 ---
 title: "Quickstart"
-description: "From zero to your first delivered order in four steps."
+description: "From zero to your first delivered order in five steps."
 icon: "bolt"
 ---
 
 This guide walks you through authenticating, finding a product, placing an order, and
-retrieving your codes.
-
-<Info>
-  **Pre-release:** Base URLs in this guide are placeholders during the pre-release period.
-  Your account manager will confirm the final endpoints when your keys are issued. Start in
-  [Sandbox](/concepts/sandbox) with a `kal_test_…` key.
-</Info>
+retrieving your codes. Start in the [sandbox](/concepts/sandbox) with a `kal_test_…` key.
 
 <Steps>
   <Step title="Get your API key">
@@ -33,7 +27,7 @@ retrieving your codes.
     Once your key is issued and your IP is whitelisted, confirm the API is reachable:
 
     ```bash cURL
-    curl -X GET "https://api.kalixo.io/v2/ping" \
+    curl -X GET "https://sandbox.kalixo.io/v2/ping" \
       -H "x-api-key: $KALIXO_API_KEY"
     ```
 
@@ -41,52 +35,64 @@ retrieving your codes.
   </Step>
 
   <Step title="Find a product in your catalog">
-    List your catalog and pick a `productCode` - a stable 14-digit catalog identifier that
-    is identical in sandbox and production. Each product also has per-locale `sku` values.
+    List your catalog and pick a row. Each row is one product in one country (market):
+
+    - `productCode`: a stable 14-digit catalog identifier, identical in sandbox and production.
+    - `countryCode`: the market of this row. You send it as `country` when you order.
+    - `availableCountries`: every market the product can be ordered for. A regional product
+      appears once per country, with the same `productCode`.
+
     Filter by country, brand, category, and more.
 
     <CodeGroup>
 
     ```bash cURL
-    curl -X GET "https://api.kalixo.io/v2/catalog/products?country=GB&take=5" \
+    curl -X GET "https://sandbox.kalixo.io/v2/catalog/products?country=GB&take=5" \
       -H "x-api-key: $KALIXO_API_KEY"
     ```
 
     ```javascript Node
     const res = await fetch(
-      "https://api.kalixo.io/v2/catalog/products?country=GB&take=5",
+      "https://sandbox.kalixo.io/v2/catalog/products?country=GB&take=5",
       { headers: { "x-api-key": process.env.KALIXO_API_KEY } }
     );
     const { products } = await res.json();
-    console.log(products[0]);
+    const { productCode, countryCode, price, currencyCode } = products[0];
     ```
 
     ```python Python
     import os, requests
 
     res = requests.get(
-        "https://api.kalixo.io/v2/catalog/products",
+        "https://sandbox.kalixo.io/v2/catalog/products",
         params={"country": "GB", "take": 5},
         headers={"x-api-key": os.environ["KALIXO_API_KEY"]},
     )
-    print(res.json()["products"][0])
+    product = res.json()["products"][0]
     ```
 
     </CodeGroup>
   </Step>
 
   <Step title="Place an order">
-    Send each line's **unit** `price`, `quantity`, and `productCode`, plus a unique
-    `externalOrderCode`. The optional top-level `price` is the **order total** - if you send
-    it, it must equal the sum of `(line price × quantity)`.
+    For each line, send the `productCode`, the row's `countryCode` as `country`, the **unit**
+    `price` and the `quantity`. Add a unique `externalOrderCode` for the order. Prices are in
+    minor units: `10000` is GBP 100.00.
 
-    The order is accepted immediately with `processing`, `estimatedReadyAt`, and a `wallet`
-    snapshot.
+    - `country` is required when the product's `availableCountries` has more than one entry.
+      Sending it on every line is always safe.
+    - The optional top-level `price` is the **order total**. If you send it, it must equal the
+      sum of `(line price × quantity)`.
+    - `externalOrderCode` is your idempotency key: a retry with the same code returns the
+      existing order instead of creating a second one. See [Idempotency](/concepts/idempotency).
+
+    The order is accepted immediately (`202`) with `processing`, `estimatedReadyAt`, and a
+    `wallet` snapshot.
 
     <CodeGroup>
 
     ```bash cURL
-    curl -X POST "https://api.kalixo.io/v2/orders" \
+    curl -X POST "https://sandbox.kalixo.io/v2/orders" \
       -H "x-api-key: $KALIXO_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{
@@ -94,28 +100,26 @@ retrieving your codes.
         "currency": "GBP",
         "price": 10000,
         "orderProducts": [
-          { "productCode": "10020000213575", "price": 10000, "quantity": 1 }
+          { "productCode": "10020000213575", "country": "GB", "price": 10000, "quantity": 1 }
         ]
       }'
     ```
 
-    ```bash cURL - two lines (total 15000)
-    curl -X POST "https://api.kalixo.io/v2/orders" \
+    ```bash cURL - regional product (EUR 100.00)
+    curl -X POST "https://sandbox.kalixo.io/v2/orders" \
       -H "x-api-key: $KALIXO_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{
-        "externalOrderCode": "O-67890",
-        "currency": "GBP",
-        "price": 15000,
+        "externalOrderCode": "O-12346",
+        "currency": "EUR",
         "orderProducts": [
-          { "productCode": "10020000213575", "price": 10000, "quantity": 1 },
-          { "productCode": "10001000000421", "price": 5000, "quantity": 1 }
+          { "productCode": "10001000227724", "country": "DE", "price": 5000, "quantity": 2 }
         ]
       }'
     ```
 
     ```javascript Node
-    const res = await fetch("https://api.kalixo.io/v2/orders", {
+    const res = await fetch("https://sandbox.kalixo.io/v2/orders", {
       method: "POST",
       headers: {
         "x-api-key": process.env.KALIXO_API_KEY,
@@ -123,17 +127,16 @@ retrieving your codes.
       },
       body: JSON.stringify({
         externalOrderCode: "O-12345",
-        currency: "GBP",
-        price: 10000,
-        orderProducts: [{ productCode: "10020000213575", price: 10000, quantity: 1 }],
+        currency: currencyCode,
+        orderProducts: [{ productCode, country: countryCode, price, quantity: 1 }],
       }),
     });
-    console.log(await res.json());
+    console.log(res.status, await res.json()); // 202
     ```
 
     </CodeGroup>
 
-    ```json Response
+    ```json Response (202)
     {
       "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
       "externalOrderCode": "O-12345",
@@ -142,21 +145,28 @@ retrieving your codes.
       "wallet": { "balances": { "GBP": 196.01 }, "lowBalance": false }
     }
     ```
+
+    <Warning>
+      Leaving out `country` for a product with several markets fails with `400`:
+      `Product 10001000227724 is available in multiple countries (DE, FR, IT); pass country (or a market sku) on the line`.
+    </Warning>
   </Step>
 
-  <Step title="Poll until completed">
-    After `estimatedReadyAt`, fetch the order. Codes are returned once the status is `completed`.
+  <Step title="Poll until a terminal status">
+    After `estimatedReadyAt`, fetch the order by `orderId` or `externalOrderCode`. Codes are
+    returned when the status is `completed` (every unit) or `partially_completed` (the
+    delivered units).
 
     ```bash cURL
-    curl -X GET "https://api.kalixo.io/v2/orders/O-12345" \
+    curl -X GET "https://sandbox.kalixo.io/v2/orders/O-12345" \
       -H "x-api-key: $KALIXO_API_KEY"
     ```
 
     ```json Response (completed)
     {
       "orderId": "b9f6f9a2-4d0a-4f5c-9a1e-7c2d8f3b6e10",
-      "status": "completed",
       "externalOrderCode": "O-12345",
+      "status": "completed",
       "products": [
         {
           "productCode": "10020000213575",
@@ -170,12 +180,17 @@ retrieving your codes.
     ```
 
     <Tip>
-      While the order is still working you'll get `{"status": "processing", "message": "Order is still processing"}`.
-      Wait until `estimatedReadyAt` before polling - see the [polling example](/concepts/order-lifecycle#polling-example).
-      Or use the [Node reference client](/examples/kalixo-node).
+      While the order is still working you get `"status": "processing"` and
+      `"message": "Order is still processing"`. Wait until `estimatedReadyAt` before polling.
+      See the [polling example](/concepts/order-lifecycle#polling-example), what to do with a
+      [partial delivery](/concepts/order-lifecycle#partial-deliveries), or use the
+      [Node reference client](/examples/kalixo-node).
     </Tip>
   </Step>
 </Steps>
+
+When you go live, switch the base URL to `https://api.kalixo.io/v2` and use your
+`kal_live_…` key. productCodes are the same in both environments.
 
 ## Next steps
 
@@ -186,8 +201,8 @@ retrieving your codes.
   <Card title="Filtering" icon="filter" href="/concepts/filtering">
     Narrow your catalog by country, language, brand, category, and tag.
   </Card>
-  <Card title="Node client" icon="code" href="/examples/kalixo-node">
-    Reference SDK with `estimatedReadyAt`-aware polling.
+  <Card title="Sell with Checkout" icon="credit-card" href="/checkout/guides/checkout-and-distribution">
+    Take the shopper's payment with Kalixo Checkout, then deliver codes with this API.
   </Card>
 </CardGroup>
 

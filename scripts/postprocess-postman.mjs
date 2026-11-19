@@ -36,6 +36,7 @@ collection.variable = [
   { key: "externalOrderCode", value: "O-12345" },
   { key: "linePrice", value: "10000" },
   { key: "currency", value: "GBP" },
+  { key: "country", value: "GB" },
 ];
 
 const placeOrderBody = `{
@@ -45,6 +46,7 @@ const placeOrderBody = `{
   "orderProducts": [
     {
       "productCode": "{{productCode}}",
+      "country": "{{country}}",
       "price": {{linePrice}},
       "quantity": 1
     }

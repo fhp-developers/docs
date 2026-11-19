@@ -1,0 +1,46 @@
+---
+title: "3D Secure & SCA"
+description: "How strong customer authentication is applied, handled and tested."
+---
+
+Many card payments need the shopper to confirm their identity with their bank (3D Secure, required by Strong Customer Authentication in Europe). Kalixo applies 3DS when the issuer or regulation requires it and runs the challenge inside its secure fields, so you do not integrate 3DS yourself.
+
+## How it works
+
+- When a payment needs authentication, the payment status becomes `requires_action` and Kalixo.js shows the challenge (a passcode, a banking-app approval, or a biometric step). The hosted checkout does the same on Kalixo's page.
+- After the shopper completes it, the status moves to `processing` and then `authorized` (or `requires_payment_method` if it failed and they can retry).
+- 3DS is handled per attempt. A declined or abandoned challenge leaves the session open so the shopper can try again.
+
+<Note>
+Kalixo, as merchant of record, requests the right exemptions where they apply (for example low-value or low-risk) so shoppers are not challenged unnecessarily. You do not request exemptions yourself.
+</Note>
+
+## What you need to do
+
+Nothing 3DS-specific in your code. Just handle the normal states:
+
+- In Kalixo.js, listen for `payment.processing` (the outcome is still pending) and `payment.failed` (`message` is safe to show). Do not fulfil from these — confirm on your server. See [Fulfilment](/checkout/guides/fulfilment).
+- For redirect methods the shopper may leave and return to your `return_url`; read the payment on your server to show the result.
+
+<Warning>
+A completed challenge is not a captured payment. Authentication only unlocks the authorisation. Fulfil only after `payment.captured` (or `payment.authorized` for manual capture) with `amount_mismatch: false`.
+</Warning>
+
+## Decline codes
+
+A payment that fails authentication reports a `decline_code` on `payment.last_payment_error` and in `payment.failed`:
+
+- `authentication_failed` — the shopper failed the challenge.
+- `authentication_required` — the issuer requires 3DS and it was not completed.
+
+Show the error `message` to the shopper and let them retry on the same session. See [Errors](/checkout/concepts/errors).
+
+## Testing
+
+Use the 3D Secure test cards in [Testing](/checkout/concepts/testing); the sandbox shows a test challenge dialog where you choose to approve or fail. Test both a passed and a failed challenge, and confirm your fulfilment only happens after `payment.captured`.
+
+| Test | Expect |
+| - | - |
+| Approve the challenge | `authorized` then `captured`; order fulfilled once |
+| Fail the challenge | `payment.failed` (`authentication_failed`); session stays open; not fulfilled |
+| Abandon the challenge | Session stays open; not fulfilled |

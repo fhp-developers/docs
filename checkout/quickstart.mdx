@@ -42,6 +42,9 @@ icon: "rocket"
     // Send session.id and session.client_secret to your checkout page.
     ```
     </CodeGroup>
+
+    Payments are captured automatically unless Kalixo set your account to manual capture.
+    See [Captures](/checkout/guides/captures-and-refunds).
   </Step>
   <Step title="Show the checkout">
     ```html
@@ -56,9 +59,108 @@ icon: "rocket"
 
     Pay with the test card `4111 1111 1111 1111`. See [Testing](/checkout/concepts/testing) for cards that decline.
   </Step>
-  <Step title="Receive the webhook">
-    Register a webhook endpoint, verify the `Kalixo-Signature` header and fulfil the order on
-    `payment.captured`. See [Webhooks](/checkout/concepts/webhooks).
+  <Step title="Register a webhook endpoint">
+    Kalixo delivers events to a public HTTPS URL. While you develop, expose your local server
+    with a tunnel (for example `ngrok http 3000`) and register that URL:
+
+    <CodeGroup>
+    ```bash cURL
+    curl https://sandbox.checkout.kalixo.io/v1/webhook-endpoints \
+      -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+      -H "Idempotency-Key: webhook-endpoint-dev" \
+      -H "Content-Type: application/json" \
+      -d '{ "url": "https://<your-tunnel>.ngrok.app/webhooks/kalixo-checkout" }'
+    ```
+
+    ```javascript Node.js
+    const endpoint = await kalixo.webhookEndpoints.create({
+      url: 'https://<your-tunnel>.ngrok.app/webhooks/kalixo-checkout',
+    });
+    console.log(endpoint.id, endpoint.secret); // we_..., whsec_...
+    ```
+    </CodeGroup>
+
+    Store `secret` (`whsec_...`) as `KALIXO_CHECKOUT_WEBHOOK_SECRET`. Kalixo shows it only once.
+  </Step>
+  <Step title="Verify the webhook and fulfil the order">
+    Verify the `Kalixo-Signature` header against the raw body and answer `200` straight away.
+    On `payment.captured`, read the payment from Kalixo and check it against your own order
+    before you fulfil. See [Fulfilment](/checkout/guides/fulfilment).
+
+    ```javascript server.js
+    import express from 'express';
+    import { KalixoCheckout, constructEvent } from '@kalixo/checkout-node';
+
+    const kalixo = new KalixoCheckout(process.env.KALIXO_CHECKOUT_SECRET_KEY);
+    const app = express();
+
+    // Your order store. Amounts are integers in the minor unit: 4999 is EUR 49.99.
+    const orders = new Map([['order-1001', { amount: 4999, currency: 'EUR', paid: false }]]);
+    const seenEvents = new Set(); // use your database in production
+
+    // Raw body: the signature covers the exact bytes Kalixo sent.
+    app.post('/webhooks/kalixo-checkout', express.raw({ type: 'application/json' }), (req, res) => {
+      let event;
+      try {
+        event = constructEvent(req.body, req.header('Kalixo-Signature'), process.env.KALIXO_CHECKOUT_WEBHOOK_SECRET);
+      } catch {
+        return res.status(400).end();
+      }
+      res.status(200).end(); // answer within 10 seconds, then process
+      if (seenEvents.has(event.id)) return; // deliveries are at least once
+      seenEvents.add(event.id);
+      handle(event).catch(console.error);
+    });
+
+    async function handle(event) {
+      if (event.type === 'payment.amount_mismatch') {
+        console.warn('Do not fulfil', event.data.object.reference); // Kalixo reverses the payment
+        return;
+      }
+      if (event.type !== 'payment.captured') return;
+
+      // The webhook is the trigger; Kalixo's record decides.
+      const payment = await kalixo.payments.retrieve(event.data.object.id);
+      const order = orders.get(payment.reference);
+      if (!order || order.paid) return;
+      const matches =
+        payment.status === 'captured' &&
+        !payment.amount_mismatch &&
+        payment.currency === order.currency &&
+        payment.amount_captured === order.amount;
+      if (!matches) return;
+
+      order.paid = true;
+      console.log(`Fulfil ${payment.reference}: ${payment.amount_captured} ${payment.currency} captured`);
+    }
+
+    // The shopper lands here after paying. Show a status; never fulfil from this page.
+    app.get('/checkout/complete', async (req, res) => {
+      const session = await kalixo.checkoutSessions.retrieve(String(req.query.session_id));
+      const payment = await kalixo.payments.retrieve(session.payment);
+      res.send(payment.status === 'captured' ? 'Thanks, your order is confirmed.' : 'We are confirming your payment.');
+    });
+
+    app.listen(3000, () => console.log('Listening on http://localhost:3000'));
+    ```
+
+    Run it with `node server.js`, pay the session from step 3, and watch the log print
+    `Fulfil order-1001: 4999 EUR captured`.
+  </Step>
+  <Step title="Test without paying">
+    Send a signed sample event to your endpoint at any time. The response shows what your
+    endpoint answered:
+
+    ```bash cURL
+    curl https://sandbox.checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
+      -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
+      -H "Idempotency-Key: $(uuidgen)" \
+      -H "Content-Type: application/json" \
+      -d '{ "type": "payment.captured" }'
+    ```
+
+    Test events use `reference: "kalixo_test_event"`, so the handler above ignores them as an
+    unknown order. See [Webhooks](/checkout/concepts/webhooks#test-your-endpoint) for more.
   </Step>
 </Steps>
 
@@ -66,3 +168,7 @@ icon: "rocket"
   Prefer not to build a checkout page? Redirect the shopper to `session.url`, the
   [hosted checkout](/checkout/guides/hosted-checkout).
 </Note>
+
+<Card title="Selling Kalixo gift cards?" icon="gift" href="/checkout/guides/checkout-and-distribution" horizontal>
+  Take the payment with Checkout, then deliver the codes with the Distribution API.
+</Card>

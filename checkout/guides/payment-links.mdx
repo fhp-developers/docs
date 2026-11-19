@@ -16,7 +16,10 @@ The response has a `url` such as `https://checkout.kalixo.io/l/Hk3s9...`. Share 
 
 - **Single-use links** (default) close after one successful payment (`status: completed`).
 - **Reusable links** (`reusable: true`) accept many payments, for example a donation or a fixed-price product.
-- Links expire at `expires_at` (at most 90 days) or when you call `POST /v1/payment-links/{id}/deactivate`.
+- Links expire at `expires_at`: 7 days after creation unless you set it, at most 90 days.
+- `POST /v1/payment-links/{id}/deactivate` closes the link at once. A checkout a shopper
+  already opened from the link expires too (`checkout_session.expired`), so nobody can pay it.
 - Each payment through a link is a normal checkout session and payment. Use webhooks
   and `reference` to match them to your invoice; the session's metadata contains `payment_link`.
-- Without a `return_url`, the shopper sees a Kalixo confirmation page after paying.
+- Without a `return_url`, the shopper sees a Kalixo confirmation page after paying. A
+  `return_url` must be on a domain registered for your account.

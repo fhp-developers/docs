@@ -1,0 +1,53 @@
+---
+title: "Payment methods"
+description: "How Kalixo chooses payment methods and how each kind of method behaves."
+icon: "wallet"
+---
+
+You integrate once, with [Kalixo.js](/checkout/guides/kalixo-js) or the
+[hosted checkout](/checkout/guides/hosted-checkout), and Kalixo shows the shopper the
+payment methods that fit the checkout session. You never add a method-specific SDK, and new
+methods need no change on your side.
+
+Kalixo chooses the methods from the session's `country` and `currency` and from what is
+enabled for your account. A method that does not fit the session is not shown.
+
+<Note>
+  Kalixo configures which payment methods your account offers. Ask
+  [integrations@kalixo.io](mailto:integrations@kalixo.io) which methods are available for your
+  markets, or to enable one.
+</Note>
+
+## How methods behave
+
+| Kind | What the shopper does | When you know the outcome |
+| --- | --- | --- |
+| Cards and wallets | Pays in the secure fields or the wallet sheet, with a [3D Secure](/checkout/concepts/3d-secure) step when the issuer requires it | Usually within seconds |
+| Redirect methods | Leaves for their bank or wallet, approves, and comes back to your `return_url` with `?session_id=cs_...` | Usually when they return, sometimes later by webhook |
+| Asynchronous methods, such as bank debits | Confirms the payment; the money arrives later | Minutes to days later, by webhook only |
+
+For every kind, wait for `payment.captured` and read the payment on your server before you
+deliver. The shopper may close the tab before returning from a redirect. See
+[Fulfilment](/checkout/guides/fulfilment).
+
+## Create sessions that fit
+
+- Set `country` to the shopper's country and `currency` to the currency you sell in. Local
+  methods appear only for their home market and currency.
+- The shopper always pays the session `amount`. If a provider reports a different amount,
+  Kalixo sets `amount_mismatch: true` and reverses the payment. See
+  [Amount integrity](/checkout/concepts/amount-integrity).
+- The payment's `payment_method.type` tells you which method the shopper used.
+
+## Capture and refunds
+
+Many redirect and bank methods capture at authorisation: they do not support manual or
+partial capture. Use `capture_method: "manual"` only when the methods on your account
+support it, typically cards. See
+[Captures, cancellations and refunds](/checkout/guides/captures-and-refunds).
+
+## Testing
+
+The sandbox test cards are on the [Testing](/checkout/concepts/testing) page. If Kalixo
+routes your sandbox account to a payment provider's test environment, the checkout shows that
+provider's test form, and Kalixo integrations sends you the test data for each method.

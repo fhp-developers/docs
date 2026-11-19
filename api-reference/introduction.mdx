@@ -9,7 +9,8 @@ send real requests straight from the docs.
 
 <Note>
   Set the `x-api-key` field in the playground’s **Authorization** section. Use your
-  **sandbox** key while testing - sandbox never charges your wallet.
+  **sandbox** key while testing - sandbox orders return test codes and never touch your
+  production wallet.
 </Note>
 
 ## Conventions
@@ -22,10 +23,11 @@ send real requests straight from the docs.
     `x-api-key` header on every request.
   </Card>
   <Card title="Money" icon="coins">
-    Prices and balances are in **minor units** (e.g. pennies/cents) unless stated otherwise.
+    Prices are in **minor units** (`10000` is GBP 100.00). Wallet balances are decimal
+    amounts in major units (`196.01` is GBP 196.01).
   </Card>
   <Card title="Errors" icon="triangle-exclamation" href="/concepts/errors">
-    Structured `{ statusCode, error, message }` body - full message catalogue in the guide.
+    Structured `{ statusCode, error, message }` body and an `X-Request-Id` header - full message catalogue in the guide.
   </Card>
 </CardGroup>
 
@@ -46,6 +48,12 @@ send real requests straight from the docs.
   </Card>
   <Card title="Wallet" icon="wallet">
     `GET /wallet`
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Sandbox" icon="flask" href="/concepts/sandbox">
+    `GET /sandbox/scenarios` (sandbox only)
   </Card>
 </CardGroup>
 

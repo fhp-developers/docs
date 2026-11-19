@@ -10,9 +10,11 @@ your project or adapt it. It is not published to npm.
 ## Features
 
 - `KalixoClient.sandbox()` / `.production()` factory helpers
-- `placeOrder()` with your `externalOrderCode` idempotency key
-- `waitForOrder()` - waits until `estimatedReadyAt`, then polls every 60s
-- Automatic `429` backoff using `Retry-After`
+- `placeOrder()` with your `externalOrderCode` idempotency key and per-line `country`
+- `waitForOrder()` - waits until `estimatedReadyAt`, polls every 60s, and gives up after a
+  maximum wait (2 hours by default)
+- Retries `429` (using `Retry-After`), `5xx` and network errors with backoff
+- `KalixoError` with `statusCode` and the `X-Request-Id` to quote to support
 - `newExternalOrderCode()` helper for stable idempotency keys
 
 ## Usage
@@ -25,30 +27,36 @@ const kalixo = KalixoClient.sandbox(process.env.KALIXO_API_KEY);
 const { products } = await kalixo.listProducts({ country: 'GB', take: 5 });
 const product = products[0];
 
-const externalOrderCode = newExternalOrderCode();
+const externalOrderCode = newExternalOrderCode(); // store it before you send the order
 
 const accepted = await kalixo.placeOrder({
   externalOrderCode,
-  currency: 'GBP',
-  price: product.price,
+  currency: product.currencyCode,
   orderProducts: [
-    { productCode: product.productCode, price: product.price, quantity: 1 },
+    {
+      productCode: product.productCode,
+      country: product.countryCode, // required for products with several availableCountries
+      price: product.price,
+      quantity: 1,
+    },
   ],
 });
 
 console.log('Processing until', accepted.estimatedReadyAt);
 
-const completed = await kalixo.waitForOrder(
-  accepted.orderId,
-  accepted.estimatedReadyAt,
-);
+const order = await kalixo.waitForOrder(accepted.orderId, accepted.estimatedReadyAt);
 
-console.log(completed.products[0].codes);
+if (order.status === 'failed') {
+  console.error(order.reason);
+} else {
+  // completed: every code; partially_completed: the delivered codes only
+  console.log(order.products.flatMap((line) => line.codes));
+}
 ```
 
 <Note>
-  Requires Node 18+ (`fetch` built in). For older Node versions, pass a `fetch` polyfill or
-  swap `fetch` for your HTTP library.
+  Requires Node 18+ (`fetch` built in) and ES modules (`"type": "module"` or a `.mjs` file).
+  For older Node versions, swap `fetch` for your HTTP library.
 </Note>
 
 See also the [polling example](/concepts/order-lifecycle#polling-example) for a minimal

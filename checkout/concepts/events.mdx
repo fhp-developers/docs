@@ -62,6 +62,11 @@ the payment of a refund event.
 
 ## Fulfilment rule of thumb
 
-Fulfil on `payment.captured` when `amount_captured` equals your order total, `currency`
-matches and `amount_mismatch` is `false`. With manual capture, ship on
-`payment.authorized` and capture when you ship.
+Fulfil on `payment.captured` when the payment you read with `GET /v1/payments/{id}` has
+`amount_captured` equal to your order total, the same `currency` and `amount_mismatch`
+`false`. With manual capture, ship on `payment.authorized` and capture when you ship. See
+[Fulfilment](/checkout/guides/fulfilment), and
+[Payment lifecycle](/checkout/concepts/payment-lifecycle#event-timing) for when each event fires.
+
+To try your handler without a payment, send a sample of any event type to your endpoint with
+[`send-event`](/checkout/concepts/webhooks#test-your-endpoint).

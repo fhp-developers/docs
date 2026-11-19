@@ -112,7 +112,9 @@
                   "checkout/index",
                   "checkout/quickstart",
                   "checkout/authentication",
+                  "checkout/sdks",
                   "checkout/concepts/testing",
+                  "checkout/go-live",
                   "checkout/changelog"
                 ]
               },
@@ -122,13 +124,16 @@
                   "checkout/guides/kalixo-js",
                   "checkout/guides/hosted-checkout",
                   "checkout/guides/payment-links",
+                  "checkout/guides/payment-methods",
                   "checkout/guides/captures-and-refunds",
-                  "checkout/guides/stored-payment-methods"
+                  "checkout/guides/stored-payment-methods",
+                  "checkout/guides/checkout-and-distribution"
                 ]
               },
               {
                 "group": "After the payment",
                 "pages": [
+                  "checkout/guides/fulfilment",
                   "checkout/concepts/webhooks",
                   "checkout/concepts/events",
                   "checkout/guides/disputes",
@@ -139,9 +144,12 @@
                 "group": "Core concepts",
                 "pages": [
                   "checkout/concepts/payment-lifecycle",
+                  "checkout/concepts/3d-secure",
                   "checkout/concepts/amount-integrity",
                   "checkout/concepts/idempotency",
                   "checkout/concepts/errors",
+                  "checkout/concepts/rate-limits",
+                  "checkout/concepts/security",
                   "checkout/concepts/versioning"
                 ]
               }

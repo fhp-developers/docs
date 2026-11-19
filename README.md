@@ -107,6 +107,3 @@ Distribution API page.
 Connect this repo to Mintlify (recommended) for hosting on the Kalixo docs domain, or
 self-host the built output. The “Download API spec” menu option lets integrators import the
 spec into Postman/Insomnia, or use the bundled Postman collection (see above).
-
-> Base URLs in `openapi.json` (`api.kalixo.io`, `sandbox.kalixo.io`) are pre-release
-> placeholders - update them once the final domains are confirmed.

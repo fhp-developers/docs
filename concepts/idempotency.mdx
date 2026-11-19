@@ -11,13 +11,37 @@ Network calls fail, time out, and get retried. To make ordering safe, Kalixo use
 
 - `externalOrderCode` must be **unique per order** within your account.
 - If you `POST /orders` again with an `externalOrderCode` that already exists, Kalixo does
-  **not** create a second order - it returns the **existing** order instead.
+  **not** create a second order. It returns `202 Accepted` with the **existing** order:
+  the same `orderId`, its **current** `status` and a fresh `wallet` snapshot.
 - This means you can safely retry a request whose response you never received.
+
+| You send | Kalixo returns |
+| --- | --- |
+| A new `externalOrderCode` | `202` with a new order in `processing` |
+| A code you already used | `202` with the existing order. `status` can already be `completed`, `partially_completed` or `failed` |
+| The same new code twice **at the same moment** (for example a retry fired before the first request finished) | `202` for one request and `409 Conflict` for the other |
+
+The replay response never contains codes. Fetch them with
+`GET /orders/{externalOrderCode}`, as for any order.
 
 <Note>
   Generate a stable `externalOrderCode` **before** you send the request (for example, your
   own order reference), so a retry uses the exact same code.
 </Note>
+
+## Handling `409 Conflict`
+
+A `409` means another request with the same `externalOrderCode` was being placed at that
+moment. The order exists. Do not place it again with a new code: fetch it with
+`GET /orders/{externalOrderCode}` and continue polling.
+
+```json
+{
+  "statusCode": 409,
+  "error": "Conflict",
+  "message": "An order with this external order code already exists."
+}
+```
 
 ## Example
 
@@ -31,11 +55,12 @@ curl -X POST "https://api.kalixo.io/v2/orders" \
     "externalOrderCode": "O-12345",
     "currency": "GBP",
     "price": 10000,
-    "orderProducts": [{ "productCode": "10020000213575", "price": 10000, "quantity": 1 }]
+    "orderProducts": [{ "productCode": "10020000213575", "country": "GB", "price": 10000, "quantity": 1 }]
   }'
 ```
 
 <Warning>
-  Reusing an `externalOrderCode` with a **different** payload does not modify the original
-  order. Always use a new code for a genuinely new order.
+  Kalixo matches on `externalOrderCode` only. Reusing a code with a **different** payload
+  returns the original order unchanged, without an error. Always use a new code for a
+  genuinely new order.
 </Warning>

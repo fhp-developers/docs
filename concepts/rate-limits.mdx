@@ -4,17 +4,19 @@ description: "Stay within request limits and handle 429 responses gracefully."
 icon: "gauge-high"
 ---
 
-Requests are rate limited per API key to keep the platform fast and fair.
+Requests are rate limited per partner account to keep the platform fast and fair. All
+endpoints count towards the same limit.
 
 <Note>
-  The default limit is **60 requests per minute per API key**. When you exceed it, responses
+  The default limit is **60 requests per minute per account**. When you exceed it, responses
   include a `Retry-After` header (in seconds). Higher limits can be arranged with your account
   manager - always design your integration to respect `429` responses.
 </Note>
 
 ## Response headers
 
-Every v2 response includes rate-limit headers:
+Every authenticated v2 response includes rate-limit headers, errors included. Only `401`
+responses, which are rejected before the limit is counted, omit them:
 
 | Header | Meaning |
 | --- | --- |
