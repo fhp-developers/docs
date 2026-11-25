@@ -28,7 +28,7 @@ info:
 servers:
   - url: https://checkout.kalixo.io
     description: Live
-  - url: https://sandbox.checkout.kalixo.io
+  - url: https://test-checkout.kalixo.io
     description: Sandbox (test keys only, never moves money)
 security:
   - secretKey: []
@@ -919,6 +919,14 @@ paths:
         Starts an asynchronous CSV export of financial transactions, payments,
         refunds or disputes for a period. Partners use the `financial_transactions`
         report as the basis for invoicing their share to Kalixo.
+
+        Poll `GET /v1/reports/{id}` until `status` is `ready`, then download it. A `failed`
+        report stays failed: create a new one. Reports are deleted 30 days after creation.
+
+        The file is UTF-8 CSV with a header row and RFC 4180 quoting. A text cell that starts
+        with `=`, `+`, `-`, `@`, a tab or a carriage return is prefixed with a single quote
+        (`'`), so spreadsheet software never runs it as a formula. Numbers, including negative
+        amounts, are not prefixed.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -1226,7 +1234,8 @@ paths:
         | `amount_mismatch` | Reported with a different amount; Kalixo reverses it and sends `payment.amount_mismatch` |
 
         Use a session the shopper has not paid on yet: a session with an attempt at a payment
-        provider returns `session_has_attempts`.
+        provider returns `session_has_attempts`. `test_helper_unavailable` means the sandbox
+        test processor is not set up in this environment: ask Kalixo integrations.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -2107,7 +2116,7 @@ components:
       value: { error: { type: invalid_request_error, code: test_mode_only, decline_code: null, message: Test helpers are available in the sandbox only, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
     ErrTestHelperUnavailable:
       summary: test_helper_unavailable
-      value: { error: { type: invalid_request_error, code: test_helper_unavailable, decline_code: null, message: Dispute simulation works only for payments made with the sandbox test cards, param: id, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
+      value: { error: { type: invalid_request_error, code: test_helper_unavailable, decline_code: null, message: "Dispute simulation works only for sandbox test card payments. Use a payment from POST /v1/test-helpers/checkout-sessions/{id}/simulate.", param: id, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }
     ErrApiKeyMissing:
       summary: api_key_missing
       value: { error: { type: authentication_error, code: api_key_missing, decline_code: null, message: Provide your API key in the Authorization header as a Bearer token, param: null, request_id: req_6f1c2a9e0b7d4c3f8a1e5d2b9c0f4a7e } }

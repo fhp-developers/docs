@@ -134,7 +134,7 @@ See [Idempotency](/checkout/concepts/idempotency).
 | Code | HTTP | When |
 | --- | --- | --- |
 | `test_mode_only` | 400 | You called a test helper on the live API |
-| `test_helper_unavailable` | 400 | You simulated a dispute on a payment that did not use a sandbox test card |
+| `test_helper_unavailable` | 400 | You simulated a dispute on a payment that did not use a sandbox test card or [simulation](/checkout/concepts/testing#simulate-a-payment), or simulation is not set up in this environment (ask Kalixo integrations) |
 
 ## Payment errors
 

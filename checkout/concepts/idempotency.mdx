@@ -7,7 +7,7 @@ icon: "repeat"
 Every `POST` with a secret key requires an `Idempotency-Key` header (1 to 255 characters).
 
 ```bash
-curl https://sandbox.checkout.kalixo.io/v1/refunds \
+curl https://test-checkout.kalixo.io/v1/refunds \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: refund-request-8812" \
   -H "Content-Type: application/json" \

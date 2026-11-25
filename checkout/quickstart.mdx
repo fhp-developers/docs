@@ -15,7 +15,7 @@ icon: "rocket"
 
     <CodeGroup>
     ```bash cURL
-    curl https://sandbox.checkout.kalixo.io/v1/checkout-sessions \
+    curl https://test-checkout.kalixo.io/v1/checkout-sessions \
       -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
       -H "Idempotency-Key: order-1001-checkout" \
       -H "Content-Type: application/json" \
@@ -65,7 +65,7 @@ icon: "rocket"
 
     <CodeGroup>
     ```bash cURL
-    curl https://sandbox.checkout.kalixo.io/v1/webhook-endpoints \
+    curl https://test-checkout.kalixo.io/v1/webhook-endpoints \
       -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
       -H "Idempotency-Key: webhook-endpoint-dev" \
       -H "Content-Type: application/json" \
@@ -152,7 +152,7 @@ icon: "rocket"
     endpoint answered:
 
     ```bash cURL
-    curl https://sandbox.checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
+    curl https://test-checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
       -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
       -H "Idempotency-Key: $(uuidgen)" \
       -H "Content-Type: application/json" \

@@ -13,7 +13,7 @@ The URL must be public and use HTTPS, in the sandbox too. You can register up to
 
 <CodeGroup>
 ```bash cURL
-curl https://sandbox.checkout.kalixo.io/v1/webhook-endpoints \
+curl https://test-checkout.kalixo.io/v1/webhook-endpoints \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: webhook-endpoint-orders" \
   -H "Content-Type: application/json" \
@@ -231,7 +231,7 @@ frameworks that parse JSON automatically, read the raw body for this route (for 
 
     <CodeGroup>
     ```bash cURL
-    curl https://sandbox.checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
+    curl https://test-checkout.kalixo.io/v1/test-helpers/webhook-endpoints/we_.../send-event \
       -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
       -H "Idempotency-Key: $(uuidgen)" \
       -H "Content-Type: application/json" \

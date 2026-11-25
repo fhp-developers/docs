@@ -5,7 +5,7 @@ icon: "link"
 ---
 
 ```bash
-curl https://sandbox.checkout.kalixo.io/v1/payment-links \
+curl https://test-checkout.kalixo.io/v1/payment-links \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: invoice-77-link" \
   -H "Content-Type: application/json" \
@@ -13,6 +13,9 @@ curl https://sandbox.checkout.kalixo.io/v1/payment-links \
 ```
 
 The response has a `url` such as `https://checkout.kalixo.io/l/Hk3s9...`. Share it with the shopper.
+The link opens the hosted checkout with the checkout session's `client_secret` in the URL
+fragment, so the shopper needs nothing else. Share the link `url` itself: a checkout page
+address without the `client_secret` shows no order details.
 
 - **Single-use links** (default) close after one successful payment (`status: completed`).
 - **Reusable links** (`reusable: true`) accept many payments, for example a donation or a fixed-price product.

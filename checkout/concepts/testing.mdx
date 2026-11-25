@@ -4,7 +4,7 @@ description: "Sandbox environment, test cards, captures, disputes and test webho
 icon: "flask"
 ---
 
-The sandbox (`https://sandbox.checkout.kalixo.io`) behaves like live but never moves
+The sandbox (`https://test-checkout.kalixo.io`) behaves like live but never moves
 money. Use your `kc_sk_test_` and `kc_pk_test_` keys.
 
 ## Test cards
@@ -21,7 +21,8 @@ Enter any future expiry date and any CVC.
 | `4000 0000 0000 0119` | Processing error |
 | `4000 0000 0000 0101` | The provider reports a different amount: triggers `payment.amount_mismatch` and an automatic reversal |
 
-Refunds of exactly `666` minor units (for example EUR 6.66) fail (`refund.failed`).
+A refund of exactly `666` in the minor unit (EUR 6.66) fails with `refund.failed`. This works
+on payments made with these cards and on [simulated payments](#simulate-a-payment).
 
 <Note>
   These cards and the `666` refund work when your sandbox account uses Kalixo's sandbox test
@@ -29,7 +30,8 @@ Refunds of exactly `666` minor units (for example EUR 6.66) fail (`refund.failed
   environment, to test more payment methods. The checkout then shows that provider's test
   form, and these cards are declined: Kalixo integrations sends you the provider's test cards
   instead. Your integration does not change. Ask Kalixo integrations which setup your account
-  has. [Simulated payments](#simulate-a-payment) and dispute simulation work with either setup.
+  has. With either setup, [simulate a payment](#simulate-a-payment) to get each outcome in the
+  table below, then refund it or simulate a dispute on it.
 </Note>
 
 ## Simulate a payment
@@ -42,7 +44,7 @@ on it.
 
 <CodeGroup>
 ```bash cURL
-curl https://sandbox.checkout.kalixo.io/v1/test-helpers/checkout-sessions/cs_.../simulate \
+curl https://test-checkout.kalixo.io/v1/test-helpers/checkout-sessions/cs_.../simulate \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: $(uuidgen)" \
   -H "Content-Type: application/json" \
@@ -87,7 +89,7 @@ matching events follow within seconds:
 
 <CodeGroup>
 ```bash cURL
-curl https://sandbox.checkout.kalixo.io/v1/test-helpers/payments/pay_.../dispute \
+curl https://test-checkout.kalixo.io/v1/test-helpers/payments/pay_.../dispute \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: $(uuidgen)" \
   -H "Content-Type: application/json" \

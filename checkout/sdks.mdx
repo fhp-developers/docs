@@ -29,7 +29,7 @@ unit, and every `POST` needs an `Idempotency-Key`. This creates a checkout sessi
 
 <CodeGroup>
 ```bash cURL
-curl https://sandbox.checkout.kalixo.io/v1/checkout-sessions \
+curl https://test-checkout.kalixo.io/v1/checkout-sessions \
   -H "Authorization: Bearer $KALIXO_CHECKOUT_SECRET_KEY" \
   -H "Idempotency-Key: order-1001-checkout" \
   -H "Content-Type: application/json" \
@@ -43,7 +43,7 @@ import os
 import requests
 
 response = requests.post(
-    "https://sandbox.checkout.kalixo.io/v1/checkout-sessions",
+    "https://test-checkout.kalixo.io/v1/checkout-sessions",
     headers={
         "Authorization": f"Bearer {os.environ['KALIXO_CHECKOUT_SECRET_KEY']}",
         "Idempotency-Key": "order-1001-checkout",
@@ -62,7 +62,7 @@ session = response.json()
 
 ```php PHP
 <?php
-$ch = curl_init('https://sandbox.checkout.kalixo.io/v1/checkout-sessions');
+$ch = curl_init('https://test-checkout.kalixo.io/v1/checkout-sessions');
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST => true,
@@ -90,7 +90,7 @@ body, _ := json.Marshal(map[string]any{
 	"reference":  "order-1001",
 	"return_url": "https://shop.example.com/checkout/complete",
 })
-req, _ := http.NewRequest("POST", "https://sandbox.checkout.kalixo.io/v1/checkout-sessions", bytes.NewReader(body))
+req, _ := http.NewRequest("POST", "https://test-checkout.kalixo.io/v1/checkout-sessions", bytes.NewReader(body))
 req.Header.Set("Authorization", "Bearer "+os.Getenv("KALIXO_CHECKOUT_SECRET_KEY"))
 req.Header.Set("Idempotency-Key", "order-1001-checkout")
 req.Header.Set("Content-Type", "application/json")

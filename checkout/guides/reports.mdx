@@ -16,13 +16,34 @@ if (ready.status === 'ready') {
 }
 ```
 
-| Type | Rows |
-| --- | --- |
-| `financial_transactions` | Every capture, refund, chargeback and chargeback reversal in the period |
-| `payments` | Payments created in the period with their amounts and status |
-| `refunds` | Refunds created in the period |
-| `disputes` | Disputes opened in the period |
-
 - `period_end` is exclusive; a report covers at most 92 days.
-- Amounts appear twice: `amount_minor` (integer) and `amount` (decimal string).
-- Reports are kept for 30 days.
+- Reports are deleted 30 days after you create them. Download and store the files you need.
+
+## Report types
+
+| Type | Rows | Columns |
+| --- | --- | --- |
+| `financial_transactions` | Every capture, refund, chargeback and chargeback reversal in the period | `id`, `occurred_at`, `type`, `amount_minor`, `amount`, `currency`, `payment`, `reference`, `related_object` |
+| `payments` | Payments created in the period with their amounts and status | `id`, `created_at`, `status`, `reference`, `currency`, `amount`, `amount_authorized`, `amount_captured`, `amount_refunded`, `amount_disputed`, `payment_method`, `brand`, `amount_mismatch` |
+| `refunds` | Refunds created in the period | `id`, `created_at`, `payment`, `status`, `reason`, `currency`, `amount` |
+| `disputes` | Disputes opened in the period | `id`, `created_at`, `payment`, `status`, `reason_code`, `currency`, `amount`, `evidence_due_by` |
+
+Amounts are integers in the minor unit: EUR 49.99 is `4999`. The `financial_transactions`
+report also has a decimal string: `amount_minor` is `4999` and `amount` is `49.99`.
+
+## Report status
+
+| `status` | Meaning |
+| --- | --- |
+| `pending` | Kalixo is building the file. A download returns `409 report_not_ready` |
+| `ready` | Download the file. `row_count` has the number of rows |
+| `failed` | The file could not be built. Create a new report. If it fails again, send the report `id` to Kalixo integrations |
+
+## File format
+
+- UTF-8 CSV with a header row. Values with commas, quotes or line breaks are in double quotes.
+- Dates are ISO 8601 in UTC, for example `2026-10-14T09:30:00.000Z`.
+- A text value that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading
+  single quote (`'`), so spreadsheet software never runs it as a formula. Numbers, including
+  negative amounts, never get one. If you parse the file in code, `'=SUM(A1)` stands for
+  `=SUM(A1)`.
